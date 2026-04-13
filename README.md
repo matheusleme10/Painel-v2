@@ -63,9 +63,6 @@ vercel deploy --prod
 
 O `vercel.json` já configura o rewrite de SPA para que o refresh de página funcione.
 
-## Senha Admin
-`ITAL123` (hash SHA-256 verificado no browser, sem backend)
-
 ## Formato do Arquivo de Dados
 
 CSV ou XLSX com as colunas:
