@@ -26,15 +26,28 @@ export function Header({ tab, onTabChange, all, lastDate }) {
           gap: 10,
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 9, flexShrink: 0 }}>
-          <img
-            src={LOGO}
-            alt="Ital In House"
-            style={{ height: 30, objectFit: 'contain' }}
-            onError={(e) => {
-              e.target.style.display = 'none';
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+          {/* Fundo vermelho para contraste com o logo branco */}
+          <div
+            style={{
+              background: C.red,
+              borderRadius: 10,
+              padding: '5px 8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
             }}
-          />
+          >
+            <img
+              src={LOGO}
+              alt="Ital In House"
+              style={{ height: 26, objectFit: 'contain', display: 'block' }}
+              onError={(e) => {
+                e.target.parentElement.style.display = 'none';
+              }}
+            />
+          </div>
           <div style={{ lineHeight: 1.2 }}>
             <div style={{ fontSize: 13, fontWeight: 900, color: C.red }}>
               Ital In House
