@@ -2,7 +2,7 @@ import { C, LOGO, TABS } from '../../constants.js';
 import { Ic } from '../ui/Icon.jsx';
 import { getLastDate } from '../../utils/date.js';
 
-export function Header({ tab, onTabChange, all, lastDate }) {
+export function Header({ tab, onTabChange, all, lastDate, syncing }) {
   return (
     <header
       style={{
@@ -88,8 +88,8 @@ export function Header({ tab, onTabChange, all, lastDate }) {
               boxShadow: all.length ? `0 0 0 3px ${C.greenL}` : 'none',
             }}
           />
-          <span style={{ fontSize: 11, color: C.muted, fontWeight: 500 }}>
-            {all.length ? `${lastDate} · ${all.length} reg.` : 'Sem dados'}
+          <span style={{ fontSize: 11, color: syncing ? C.blue : C.muted, fontWeight: 500 }}>
+            {syncing ? '↻ Sincronizando…' : all.length ? `${lastDate} · ${all.length} reg.` : 'Sem dados'}
           </span>
         </div>
       </div>
