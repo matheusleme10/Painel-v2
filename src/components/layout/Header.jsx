@@ -26,17 +26,16 @@ export function Header({ tab, onTabChange, all, lastDate }) {
           gap: 10,
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
-          {/* Fundo vermelho para contraste com o logo branco */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
           <div
             style={{
               background: C.red,
               borderRadius: 10,
-              padding: '5px 8px',
+              padding: '5px 10px',
               display: 'flex',
+              flexDirection: 'column',
               alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
+              gap: 2,
             }}
           >
             <img
@@ -47,12 +46,7 @@ export function Header({ tab, onTabChange, all, lastDate }) {
                 e.target.parentElement.style.display = 'none';
               }}
             />
-          </div>
-          <div style={{ lineHeight: 1.2 }}>
-            <div style={{ fontSize: 13, fontWeight: 900, color: C.red }}>
-              Ital In House
-            </div>
-            <div style={{ fontSize: 9, color: C.muted, letterSpacing: 0.4 }}>
+            <div style={{ fontSize: 7, color: 'rgba(255,255,255,0.75)', letterSpacing: 0.6, fontWeight: 600, whiteSpace: 'nowrap' }}>
               GESTÃO DE CARDÁPIO
             </div>
           </div>
