@@ -1,0 +1,33 @@
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+export default defineConfig({
+  plugins: [react()],
+  base: './',
+  server: {
+    host: '127.0.0.1',
+    port: 5173,
+    strictPort: true,
+    proxy: {
+      '/api': {
+        target: 'http://127.0.0.1:8080',
+        changeOrigin: false,
+      },
+    },
+  },
+  build: {
+    chunkSizeWarningLimit: 600,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // React core — loaded first, cached aggressively
+          'vendor-react': ['react', 'react-dom'],
+          // Heavy file-processing libs — loaded lazily when user opens Admin
+          'vendor-files': ['papaparse', 'xlsx'],
+          // Screenshot lib
+          'vendor-canvas': ['html2canvas'],
+        },
+      },
+    },
+  },
+})
