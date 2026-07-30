@@ -553,8 +553,14 @@ async def clear_saved_data(request: Request) -> dict:
 
 
 @app.get("/api/health")
-async def health() -> dict[str, str]:
-    return {"status": "ok", "runtime": "python"}
+async def health() -> dict:
+    return {
+        "status": "ok",
+        "runtime": "python",
+        # DIAGNOSTICO TEMPORARIO: confirma se a funcao enxerga o token do Blob
+        # (nao revela o valor, so True/False). Remover depois de resolver.
+        "blobConfigured": bool(os.getenv("BLOB_READ_WRITE_TOKEN", "").strip()),
+    }
 
 
 @app.get("/api/notifications/status")
