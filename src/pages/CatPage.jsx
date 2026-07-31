@@ -71,14 +71,6 @@ export function CatPage({ today, showFinancials = false }) {
           sub={`${cats[0]?.p || 0} itens pausados`}
           small
         />
-        {showFinancials && <Kpi
-          label="Receita em Risco"
-          value={brl(cats.reduce((s, c) => s + c.risco, 0))}
-          icon="money"
-          accent={C.orange}
-          accentBg={C.orangeL}
-          small
-        />}
         <Kpi
           label="Cats > 50% pausado"
           value={cats.filter((c) => pct(c.p, c.t) > 50).length}

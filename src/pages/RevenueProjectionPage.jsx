@@ -6,18 +6,29 @@ import { HBar } from '../components/ui/charts/HBar.jsx';
 import { brl } from '../utils/format.js';
 import { rowsByStatus } from '../utils/analytics.js';
 
-export function RevenueProjectionPage({ rows, summaryRows = [] }) {
+export function RevenueProjectionPage({ rows, summaryRows = [], isAdmin = false }) {
   const [ordersPerDay, setOrdersPerDay] = useState(30);
   const [days, setDays] = useState(30);
-  const active = useMemo(() => rowsByStatus(rows, 'Ativo'), [rows]);
+  const [query, setQuery] = useState('');
+  const term = query.trim().toLocaleLowerCase('pt-BR');
+  const filteredRows = useMemo(() => (
+    term ? rows.filter((row) => (row.loja || '').toLocaleLowerCase('pt-BR').includes(term)) : rows
+  ), [rows, term]);
+  const filteredSummaryRows = useMemo(() => (
+    term ? summaryRows.filter((row) => (row.loja || '').toLocaleLowerCase('pt-BR').includes(term)) : summaryRows
+  ), [summaryRows, term]);
+  const stores = useMemo(() => (
+    [...new Set(filteredRows.map((row) => row.loja).filter(Boolean))]
+  ), [filteredRows]);
+  const active = useMemo(() => rowsByStatus(filteredRows, 'Ativo'), [filteredRows]);
   const priced = active.filter((row) => row.precoNum > 0);
   const averageTicket = priced.length
     ? priced.reduce((sum, row) => sum + row.precoNum, 0) / priced.length
     : 0;
   const dailyPotential = averageTicket * ordersPerDay;
   const monthlyPotential = dailyPotential * days;
-  const pausedOccurrences = summaryRows.reduce((sum, row) => sum + (Number(row.unitPaused) || 0), 0);
-  const totalOccurrences = summaryRows.reduce((sum, row) => sum + (Number(row.unitTotal) || 0), 0);
+  const pausedOccurrences = filteredSummaryRows.reduce((sum, row) => sum + (Number(row.unitPaused) || 0), 0);
+  const totalOccurrences = filteredSummaryRows.reduce((sum, row) => sum + (Number(row.unitTotal) || 0), 0);
   const potentialAtRisk = averageTicket * pausedOccurrences;
   const top = [...priced].sort((a, b) => b.precoNum - a.precoNum).slice(0, 8)
     .map((row) => ({ n: row.item, v: row.precoNum }));
@@ -31,6 +42,13 @@ export function RevenueProjectionPage({ rows, summaryRows = [] }) {
           <p>Estimativa baseada somente no preço médio dos itens ativos e no volume informado por você.</p>
         </div>
       </div>
+      {isAdmin && (
+        <div className="network-store-search">
+          <input type="search" value={query} placeholder="Pesquisar uma unidade..."
+            onChange={(event) => setQuery(event.target.value)} />
+          {term && <span>{stores.length} unidade(s) encontrada(s)</span>}
+        </div>
+      )}
       <div className="network-kpis">
         <Kpi label="Itens ativos identificados" value={active.length} icon="check" accent={C.green} accentBg={C.greenL} />
         <Kpi label="Ativos com preço" value={priced.length} icon="money" accent={C.blue} accentBg={C.blueL} sub={`${active.length ? Math.round(priced.length / active.length * 100) : 0}% de cobertura`} />
