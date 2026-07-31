@@ -262,7 +262,7 @@ export function App() {
         {tab === 'forneria' && <ForneriaPage rows={exactSnapshotDates.length ? detailRows : productRows}
           summaryRows={!metadata.catalogCube?.records?.length && effectiveShift === 'Almoço' ? forneriaSummaries : []}
           showFinancials={isAdmin} />}
-        {tab === 'revenue' && <RevenueProjectionPage rows={isAdmin && productRows.length ? productRows : detailRows} summaryRows={networkRows} />}
+        {tab === 'revenue' && <RevenueProjectionPage rows={isAdmin && productRows.length ? productRows : detailRows} summaryRows={networkRows} isAdmin={isAdmin} />}
         {tab === 'notify' && isAdmin && <AutomatedNotificationPage />}
         {tab === 'update' && isAdmin && (
           <AdminPage all={all} initialAuth
