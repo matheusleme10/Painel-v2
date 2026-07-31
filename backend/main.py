@@ -38,6 +38,22 @@ BLOB_PATH = "ital-dashboard/current.json.gz"
 NOTIFICATION_SETTINGS_PATH = DATA_DIR / "notification-settings.json"
 NOTIFICATION_SETTINGS_BLOB_PATH = "ital-dashboard/notification-settings.json"
 load_dotenv(ROOT / ".env")
+
+
+def _resolve_blob_token() -> str:
+    """Retorna o token do Vercel Blob, mesmo que a integracao tenha criado a
+    variavel com um prefixo customizado (ex: BLOB_READ_WRITE_TOKEN_READ_WRITE_TOKEN
+    em vez do nome padrao BLOB_READ_WRITE_TOKEN)."""
+    direct = os.getenv("BLOB_READ_WRITE_TOKEN", "").strip()
+    if direct:
+        return direct
+    for key, value in os.environ.items():
+        if key.endswith("_READ_WRITE_TOKEN") and value.strip():
+            return value.strip()
+    return ""
+
+
+BLOB_TOKEN = _resolve_blob_token()
 load_dotenv(ROOT / ".env.local", override=True)
 
 
@@ -213,10 +229,10 @@ def redact_paused_revenue(payload: dict) -> dict:
 
 
 async def read_current_payload() -> dict | None:
-    if os.getenv("BLOB_READ_WRITE_TOKEN", "").strip():
+    if BLOB_TOKEN:
         from vercel.blob import AsyncBlobClient
 
-        async with AsyncBlobClient() as blob_client:
+        async with AsyncBlobClient(token=BLOB_TOKEN) as blob_client:
             result = await blob_client.get(BLOB_PATH, access="private")
             if result is None or result.status_code != 200 or result.stream is None:
                 return None
@@ -234,10 +250,10 @@ async def write_current_payload(payload: dict) -> None:
         json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8"),
         compresslevel=9,
     )
-    if os.getenv("BLOB_READ_WRITE_TOKEN", "").strip():
+    if BLOB_TOKEN:
         from vercel.blob import AsyncBlobClient
 
-        async with AsyncBlobClient() as blob_client:
+        async with AsyncBlobClient(token=BLOB_TOKEN) as blob_client:
             await blob_client.put(
                 BLOB_PATH,
                 compressed,
@@ -270,10 +286,10 @@ def _default_notification_settings() -> dict:
 
 async def read_notification_settings() -> dict:
     defaults = _default_notification_settings()
-    if os.getenv("BLOB_READ_WRITE_TOKEN", "").strip():
+    if BLOB_TOKEN:
         from vercel.blob import AsyncBlobClient
 
-        async with AsyncBlobClient() as blob_client:
+        async with AsyncBlobClient(token=BLOB_TOKEN) as blob_client:
             result = await blob_client.get(NOTIFICATION_SETTINGS_BLOB_PATH, access="private")
             if result is None or result.status_code != 200 or result.stream is None:
                 return defaults
@@ -288,10 +304,10 @@ async def read_notification_settings() -> dict:
 
 async def write_notification_settings(settings: dict) -> None:
     serialized = json.dumps(settings, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
-    if os.getenv("BLOB_READ_WRITE_TOKEN", "").strip():
+    if BLOB_TOKEN:
         from vercel.blob import AsyncBlobClient
 
-        async with AsyncBlobClient() as blob_client:
+        async with AsyncBlobClient(token=BLOB_TOKEN) as blob_client:
             await blob_client.put(
                 NOTIFICATION_SETTINGS_BLOB_PATH,
                 serialized,
@@ -542,10 +558,10 @@ async def save_data(action: DataAction, request: Request) -> dict:
 async def clear_saved_data(request: Request) -> dict:
     if require_session(request) != "admin":
         raise HTTPException(status_code=403, detail="Apenas administradores podem limpar a base.")
-    if os.getenv("BLOB_READ_WRITE_TOKEN", "").strip():
+    if BLOB_TOKEN:
         from vercel.blob import AsyncBlobClient
 
-        async with AsyncBlobClient() as blob_client:
+        async with AsyncBlobClient(token=BLOB_TOKEN) as blob_client:
             await blob_client.delete(BLOB_PATH)
     if CURRENT_DATA.exists():
         CURRENT_DATA.unlink()
@@ -559,7 +575,7 @@ async def health() -> dict:
         "runtime": "python",
         # DIAGNOSTICO TEMPORARIO: confirma se a funcao enxerga o token do Blob
         # (nao revela o valor, so True/False). Remover depois de resolver.
-        "blobConfigured": bool(os.getenv("BLOB_READ_WRITE_TOKEN", "").strip()),
+        "blobConfigured": bool(BLOB_TOKEN),
     }
 
 
