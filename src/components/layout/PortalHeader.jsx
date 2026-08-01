@@ -1,4 +1,4 @@
-import { ADMIN_TABS, C, FRANCHISE_TABS } from '../../constants.js';
+import { ADMIN_TABS, C, FRANCHISE_TABS, LOGO } from '../../constants.js';
 import { Ic } from '../ui/Icon.jsx';
 import { formatDateBR } from '../../utils/format.js';
 
@@ -8,7 +8,7 @@ export function PortalHeader({ tab, onTabChange, all, lastDate, shift, syncing, 
     <header className="portal-header">
       <div className="portal-header-inner">
         <button className="brand-lockup" onClick={() => onTabChange(role === 'admin' ? 'network' : 'dash')} aria-label="Ir ao dashboard">
-          <span className="brand-mark">IH</span>
+          <span className="brand-mark"><img src={LOGO} alt="" /></span>
           <span><strong>Ital in House</strong><small>{role === 'admin' ? 'Control Center' : 'Portal do Franqueado'}</small></span>
         </button>
         <nav className="portal-nav" aria-label="Navegação principal">
