@@ -231,3 +231,23 @@
 .login-footer{position:absolute;right:28px;bottom:22px;color:rgba(255,255,255,.52);font-size:8px;font-weight:850;letter-spacing:.18em}
 @media(max-width:900px){.login-shell{display:grid;padding:24px}.login-panel{min-height:auto;grid-template-columns:1fr}.login-intro{min-height:330px;padding:36px 38px}.login-main-logo{width:170px}.login-intro-content{margin:45px 0 22px}.login-intro h1{font-size:46px}.login-brand-list{margin-top:12px}.login-access{padding:42px 38px}.login-footer{display:none}}
 @media(max-width:560px){.login-shell{padding:14px}.login-panel{border-radius:24px}.login-intro{min-height:300px;padding:28px 24px}.login-main-logo{width:145px}.login-intro-content{margin:38px 0 16px}.login-intro h1{margin:15px 0 12px;font-size:38px}.login-intro p{font-size:12px}.login-brand-list span{padding:6px 8px;font-size:8px}.login-access{padding:34px 24px}.login-access-heading h2{font-size:32px}}
+
+/* Proporções desktop amplas e cores oficiais das marcas. */
+@media(min-width:1101px){
+  .login-shell{padding:44px 56px}
+  .login-panel{width:min(1480px,calc(100vw - 112px));min-height:560px;max-height:720px;grid-template-columns:minmax(0,1.18fr) minmax(420px,.82fr)}
+  .login-intro{padding:42px 52px 38px}
+  .login-main-logo{width:148px}
+  .login-intro-content{margin:34px 0 auto}
+  .login-intro h1{max-width:650px;margin:15px 0 14px;font-size:clamp(42px,3.5vw,57px);line-height:1}
+  .login-intro p{max-width:520px;font-size:13px}
+  .login-brand-list{margin-top:24px}
+  .login-access{padding:48px clamp(48px,4.5vw,78px)}
+  .login-access-heading h2{font-size:40px}
+}
+.login-brand-list span{border-color:rgba(255,255,255,.9);background:rgba(255,255,255,.96);box-shadow:0 8px 18px rgba(74,1,17,.12)}
+.login-brand-list span:nth-child(1){color:#c8102e}
+.login-brand-list span:nth-child(2){color:#ea580c}
+.login-brand-list span:nth-child(3){color:#1769e0}
+.login-brand-list span:nth-child(4){color:#059669}
+@media(min-width:1500px){.login-panel{grid-template-columns:minmax(0,1.25fr) minmax(460px,.75fr)}.login-intro{padding-left:64px}.login-access{padding-left:72px;padding-right:72px}}
