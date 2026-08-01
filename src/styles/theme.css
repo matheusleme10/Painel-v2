@@ -251,3 +251,7 @@
 .login-brand-list span:nth-child(3){color:#1769e0}
 .login-brand-list span:nth-child(4){color:#059669}
 @media(min-width:1500px){.login-panel{grid-template-columns:minmax(0,1.25fr) minmax(460px,.75fr)}.login-intro{padding-left:64px}.login-access{padding-left:72px;padding-right:72px}}
+
+/* Impede que o login desktop herde a antiga grade externa de duas colunas. */
+.login-shell{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr)}
+.login-panel{grid-column:1;grid-row:1;align-self:center;justify-self:center}
