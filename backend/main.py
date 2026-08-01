@@ -38,23 +38,39 @@ BLOB_PATH = "ital-dashboard/current.json.gz"
 NOTIFICATION_SETTINGS_PATH = DATA_DIR / "notification-settings.json"
 NOTIFICATION_SETTINGS_BLOB_PATH = "ital-dashboard/notification-settings.json"
 load_dotenv(ROOT / ".env")
+load_dotenv(ROOT / ".env.local", override=True)
 
 
-def _resolve_blob_token() -> str:
+def _resolve_blob_token() -> tuple[str, str]:
     """Retorna o token do Vercel Blob, mesmo que a integracao tenha criado a
     variavel com um prefixo customizado (ex: BLOB_READ_WRITE_TOKEN_READ_WRITE_TOKEN
     em vez do nome padrao BLOB_READ_WRITE_TOKEN)."""
     direct = os.getenv("BLOB_READ_WRITE_TOKEN", "").strip()
     if direct:
-        return direct
+        return direct, "BLOB_READ_WRITE_TOKEN"
     for key, value in os.environ.items():
         if key.endswith("_READ_WRITE_TOKEN") and value.strip():
-            return value.strip()
-    return ""
+            return value.strip(), "integration-prefixed"
+    return "", "missing"
 
 
-BLOB_TOKEN = _resolve_blob_token()
-load_dotenv(ROOT / ".env.local", override=True)
+BLOB_TOKEN, BLOB_TOKEN_SOURCE = _resolve_blob_token()
+
+
+class CloudStorageError(RuntimeError):
+    pass
+
+
+def _is_vercel_runtime() -> bool:
+    return bool(os.getenv("VERCEL", "").strip())
+
+
+def _report_blob_error(operation: str, error: Exception) -> None:
+    print(json.dumps({
+        "event": "vercel_blob_error",
+        "operation": operation,
+        "errorType": type(error).__name__,
+    }))
 
 
 @asynccontextmanager
@@ -232,12 +248,21 @@ async def read_current_payload() -> dict | None:
     if BLOB_TOKEN:
         from vercel.blob import AsyncBlobClient
 
-        async with AsyncBlobClient(token=BLOB_TOKEN) as blob_client:
-            result = await blob_client.get(BLOB_PATH, access="private")
-            if result is None or result.status_code != 200 or result.stream is None:
-                return None
-            compressed = b"".join([chunk async for chunk in result.stream])
+        try:
+            async with AsyncBlobClient(token=BLOB_TOKEN) as blob_client:
+                result = await blob_client.get(BLOB_PATH, access="private")
+                if result is None or result.status_code != 200 or result.stream is None:
+                    return None
+                compressed = b"".join([chunk async for chunk in result.stream])
+        except Exception as error:
+            _report_blob_error("read", error)
+            raise CloudStorageError(
+                "Não foi possível ler a base no Vercel Blob. Confira se o Blob está conectado ao projeto e faça um redeploy."
+            ) from error
         return json.loads(gzip.decompress(compressed).decode("utf-8"))
+
+    if _is_vercel_runtime():
+        return None
 
     if not CURRENT_DATA.is_file():
         return None
@@ -253,16 +278,27 @@ async def write_current_payload(payload: dict) -> None:
     if BLOB_TOKEN:
         from vercel.blob import AsyncBlobClient
 
-        async with AsyncBlobClient(token=BLOB_TOKEN) as blob_client:
-            await blob_client.put(
-                BLOB_PATH,
-                compressed,
-                access="private",
-                content_type="application/gzip",
-                overwrite=True,
-                cache_control_max_age=60,
-            )
+        try:
+            async with AsyncBlobClient(token=BLOB_TOKEN) as blob_client:
+                await blob_client.put(
+                    BLOB_PATH,
+                    compressed,
+                    access="private",
+                    content_type="application/gzip",
+                    overwrite=True,
+                    cache_control_max_age=60,
+                )
+        except Exception as error:
+            _report_blob_error("write", error)
+            raise CloudStorageError(
+                "O Vercel Blob recusou a gravação. Reconecte o Blob ao projeto e faça um redeploy sem cache."
+            ) from error
         return
+
+    if _is_vercel_runtime():
+        raise CloudStorageError(
+            "Vercel Blob não configurado neste deployment. Conecte o Blob ao projeto e faça um redeploy sem cache."
+        )
 
     DATA_DIR.mkdir(exist_ok=True)
     temporary = DATA_DIR / "current.next.json.gz"
@@ -507,7 +543,10 @@ async def upload_compressed_data(request: Request) -> dict:
     rows = payload.get("rows")
     if not isinstance(rows, list) or len(rows) != payload.get("totalRows"):
         raise HTTPException(status_code=400, detail="Quantidade de registros inconsistente.")
-    await write_current_payload(payload)
+    try:
+        await write_current_payload(payload)
+    except CloudStorageError as error:
+        raise HTTPException(status_code=503, detail=str(error)) from error
     notification = await maybe_send_notifications(payload)
     return {"success": True, "totalRows": len(rows), "notification": notification}
 
@@ -546,7 +585,10 @@ async def save_data(action: DataAction, request: Request) -> dict:
         if action.totalRows is not None and len(rows) != action.totalRows:
             raise HTTPException(status_code=400, detail="Quantidade de registros inconsistente.")
         payload = {"rows": rows, "totalRows": len(rows), "uploadedAt": action.uploadedAt}
-        await write_current_payload(payload)
+        try:
+            await write_current_payload(payload)
+        except CloudStorageError as error:
+            raise HTTPException(status_code=503, detail=str(error)) from error
         notification = await maybe_send_notifications(payload)
         shutil.rmtree(upload_dir)
         return {"success": True, "notification": notification}
@@ -573,9 +615,9 @@ async def health() -> dict:
     return {
         "status": "ok",
         "runtime": "python",
-        # DIAGNOSTICO TEMPORARIO: confirma se a funcao enxerga o token do Blob
-        # (nao revela o valor, so True/False). Remover depois de resolver.
         "blobConfigured": bool(BLOB_TOKEN),
+        "blobTokenSource": BLOB_TOKEN_SOURCE,
+        "storageMode": "vercel-blob" if BLOB_TOKEN else ("unavailable" if _is_vercel_runtime() else "local-disk"),
     }
 
 
