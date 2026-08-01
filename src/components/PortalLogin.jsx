@@ -26,7 +26,7 @@ export function PortalLogin({ onAuthenticated }) {
   return (
     <main className="login-shell">
       <section className="login-panel">
-        <div className="login-brand"><span>I</span><div><strong>Ital in House</strong><small>Franchise Intelligence</small></div></div>
+        <div className="login-brand"><span>IH</span><div><strong>Ital in House</strong><small>Franchise Intelligence</small></div></div>
         <div className="login-copy">
           <span className="eyebrow">ACESSO PROTEGIDO</span>
           <h1>Dados da rede protegidos por perfil de acesso.</h1>
