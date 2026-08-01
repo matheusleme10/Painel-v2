@@ -426,19 +426,33 @@ def _send_emails(subject: str, body: str, recipients: list[str], sender_email: s
     message["To"] = sender_email
     message["Bcc"] = ", ".join(recipients)
     message.set_content(body)
+    host = os.environ["SMTP_HOST"].strip()
+    username = os.environ["SMTP_USER"].strip()
+    password = os.environ["SMTP_PASSWORD"].strip()
+    if host.lower() in {"smtp.gmail.com", "smtp.googlemail.com"}:
+        password = password.replace(" ", "")
     port = int(os.getenv("SMTP_PORT", "465"))
     security = os.getenv("SMTP_SECURITY", "ssl" if port == 465 else "starttls").strip().lower()
-    if security == "starttls":
-        with smtplib.SMTP(os.environ["SMTP_HOST"], port, timeout=20) as smtp:
-            smtp.ehlo()
-            smtp.starttls()
-            smtp.ehlo()
-            smtp.login(os.environ["SMTP_USER"], os.environ["SMTP_PASSWORD"])
-            smtp.send_message(message)
-    else:
-        with smtplib.SMTP_SSL(os.environ["SMTP_HOST"], port, timeout=20) as smtp:
-            smtp.login(os.environ["SMTP_USER"], os.environ["SMTP_PASSWORD"])
-            smtp.send_message(message)
+    try:
+        if security == "starttls":
+            with smtplib.SMTP(host, port, timeout=20) as smtp:
+                smtp.ehlo()
+                smtp.starttls()
+                smtp.ehlo()
+                smtp.login(username, password)
+                smtp.send_message(message)
+        else:
+            with smtplib.SMTP_SSL(host, port, timeout=20) as smtp:
+                smtp.login(username, password)
+                smtp.send_message(message)
+    except smtplib.SMTPAuthenticationError as error:
+        provider_hint = (
+            " Para Gmail, use o e-mail completo em SMTP_USER e uma Senha de app de 16 caracteres; "
+            "a senha normal da conta não funciona."
+            if host.lower() in {"smtp.gmail.com", "smtp.googlemail.com"}
+            else " Confira o usuário e a senha SMTP fornecidos pelo seu provedor."
+        )
+        raise RuntimeError(f"O servidor recusou o usuário ou a senha SMTP.{provider_hint}") from error
     return len(recipients)
 
 
