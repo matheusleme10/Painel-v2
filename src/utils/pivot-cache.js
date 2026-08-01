@@ -1,4 +1,5 @@
 const decoder = new TextDecoder();
+import { storeKey } from './stores.js';
 
 function findZipEntry(arrayBuffer, targetName) {
   const view = new DataView(arrayBuffer);
@@ -236,7 +237,7 @@ export function decodeCatalogCube(cube, {
   store = 'all',
 } = {}) {
   if (!cube?.records?.length) return [];
-  const normalizedStore = String(store || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  const normalizedStore = storeKey(store);
   return cube.records.flatMap((record) => {
     const [storeIndex, itemIndex, categoryIndex, dateIndex, shiftIndex, paused, price] = record;
     const loja = cube.stores[storeIndex];
@@ -247,8 +248,7 @@ export function decodeCatalogCube(cube, {
     if (shift && rowShift !== shift) return [];
     if (brand !== 'all' && brandId(loja) !== brand) return [];
     if (store !== 'all') {
-      const candidate = loja.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-      if (!candidate.includes(normalizedStore) && !normalizedStore.includes(candidate)) return [];
+      if (storeKey(loja) !== normalizedStore) return [];
     }
     return [{
       loja,
