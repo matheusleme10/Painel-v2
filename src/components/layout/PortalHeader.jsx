@@ -9,7 +9,7 @@ export function PortalHeader({ tab, onTabChange, all, lastDate, shift, syncing, 
       <div className="portal-header-inner">
         <button className="brand-lockup" onClick={() => onTabChange(role === 'admin' ? 'network' : 'dash')} aria-label="Ir ao dashboard">
           <span className="brand-mark"><img src={LOGO} alt="" /></span>
-          <span><strong>Ital in House</strong><small>{role === 'admin' ? 'Control Center' : 'Portal do Franqueado'}</small></span>
+          <span className="brand-context"><strong>Operação</strong><small>{role === 'admin' ? 'Inteligência da Rede' : 'Portal do Franqueado'}</small></span>
         </button>
         <nav className="portal-nav" aria-label="Navegação principal">
           {tabs.map(({ id, label, icon }) => {
