@@ -180,3 +180,34 @@
 .data-status strong{color:#fff}.data-status small{color:rgba(255,255,255,.68)}
 .header-actions button{border-color:rgba(255,255,255,.3);color:#fff;background:rgba(255,255,255,.11)}
 .header-actions button:hover{background:rgba(255,255,255,.2)}
+
+/* Redesign isolado: login, logo e cabeçalho. */
+.portal-header{padding:12px 18px;background:rgba(255,255,255,.94);border-top:4px solid #c8102e;border-bottom:1px solid #e7e9ef;box-shadow:0 8px 28px rgba(16,24,40,.07);backdrop-filter:blur(22px) saturate(150%)}
+.portal-header-inner{min-height:66px;gap:22px}
+.brand-lockup{gap:13px}.brand-mark{width:92px;height:58px;padding:8px 11px;border:0;border-radius:16px;background:linear-gradient(145deg,#db1739 0%,#a40729 100%);box-shadow:0 12px 26px rgba(190,16,48,.22)}
+.brand-lockup strong{color:#15171c;font-size:14px}.brand-lockup small{color:#98a2b3;font-size:8px}
+.portal-nav{padding:5px;border:1px solid #e6e9ef;border-radius:17px;background:#f7f8fb;box-shadow:none}
+.nav-item{padding:10px 12px;border-radius:12px}.nav-item.active{color:#b50d31;background:#fff;box-shadow:0 5px 16px rgba(16,24,40,.08),inset 0 0 0 1px rgba(200,16,46,.16)}
+.data-status strong{color:#344054}.data-status small{color:#98a2b3}
+.header-actions button{min-height:38px;padding:0 13px;border-color:#dfe3eb;border-radius:11px;color:#475467;background:#fff;box-shadow:0 4px 12px rgba(16,24,40,.04)}
+.header-actions button:hover{border-color:#fecdd3;color:#b50d31;background:#fff7f8}
+
+.login-shell{position:relative;isolation:isolate;display:grid;min-height:100vh;place-items:center;overflow:hidden;padding:40px;background:linear-gradient(135deg,#be0c31 0%,#e62247 46%,#fff7f8 46.1%,#fff 100%)}
+.login-shell:before,.login-shell:after{content:"";position:absolute;z-index:-1;border-radius:50%;filter:blur(2px)}
+.login-shell:before{width:460px;height:460px;top:-190px;right:-120px;background:rgba(200,16,46,.08)}
+.login-shell:after{width:360px;height:360px;bottom:-170px;left:-90px;background:rgba(255,255,255,.09)}
+.login-panel{position:relative;z-index:3;display:flex;width:min(530px,100%);min-height:auto;justify-content:flex-start;padding:38px 42px 34px;border:1px solid rgba(255,255,255,.72);border-radius:30px;background:rgba(255,255,255,.97);box-shadow:0 34px 90px rgba(77,2,18,.24),inset 0 1px rgba(255,255,255,.9)}
+.login-brand{position:static;align-self:center;flex-direction:column;gap:11px;margin-bottom:30px;text-align:center}
+.login-logo-badge{width:190px;height:108px;padding:13px 19px;border-radius:23px;background:linear-gradient(145deg,#df173b,#9d0627);box-shadow:0 20px 42px rgba(190,16,48,.27)}
+.login-brand>div{align-items:center}.login-brand strong{font-size:15px}.login-brand small{font-size:8px;letter-spacing:.2em}
+.login-copy{max-width:none;text-align:center}.login-copy .eyebrow{font-size:9px;letter-spacing:.2em}.login-copy h1{max-width:none;margin:12px auto 10px;font-size:clamp(34px,4vw,48px);line-height:1.02}.login-copy p{max-width:410px;margin:0 auto;color:#667085;font-size:13px;line-height:1.65}
+.login-form{width:100%;max-width:none;margin-top:26px}.login-form label{color:#344054}.login-form input{min-height:56px;border-color:#dfe3eb;border-radius:15px;background:#fff}.login-form input:focus{border-color:#c8102e;box-shadow:0 0 0 4px rgba(200,16,46,.09)}
+.login-form button{min-height:54px;border-radius:15px;background:linear-gradient(90deg,#dc173b,#aa092c);box-shadow:0 14px 30px rgba(190,16,48,.23)}
+.security-note{align-self:center;margin-top:17px;color:#98a2b3}
+.login-visual{position:absolute;z-index:1;inset:0;overflow:hidden;background:transparent;pointer-events:none}
+.login-visual:before{display:none}.login-visual-copy{display:none}
+.login-visual .brand-orbit{position:absolute;display:grid;place-items:center;min-width:118px;min-height:46px;padding:10px 18px;border:1px solid rgba(255,255,255,.82);border-radius:999px;background:rgba(255,255,255,.94);box-shadow:0 18px 40px rgba(73,2,17,.17);font-size:13px}
+.login-visual .orbit-orange{top:13%;left:8%;transform:rotate(-5deg)}.login-visual .orbit-blue{top:16%;right:8%;transform:rotate(4deg)}.login-visual .orbit-green{bottom:12%;left:9%;transform:rotate(3deg)}.login-visual .orbit-red{right:8%;bottom:14%;transform:rotate(-4deg)}
+@media(max-width:1200px){.brand-lockup>span:last-child{display:none}.brand-mark{width:82px}.portal-header-inner{gap:14px}.nav-item{padding:9px 10px}}
+@media(max-width:900px){.login-shell{display:grid;padding:24px;background:linear-gradient(145deg,#bd0b30 0%,#e41d43 34%,#fff7f8 34.1%,#fff 100%)}.login-panel{min-height:auto;padding:32px 28px}.login-brand{position:static;margin-bottom:26px}.login-visual{display:block}.login-visual .brand-orbit{display:none}.portal-header-inner{grid-template-columns:auto 1fr auto}.portal-nav{grid-row:2;grid-column:1/-1}.header-actions{justify-content:flex-end}}
+@media(max-width:640px){.portal-header{padding:8px 10px;border-top-width:3px}.portal-header-inner{min-height:54px;gap:8px}.brand-mark{width:70px;height:48px;padding:7px 9px}.login-shell{padding:16px}.login-panel{padding:28px 20px 24px;border-radius:24px}.login-logo-badge{width:154px;height:90px}.login-copy h1{font-size:34px}.login-copy p{font-size:12px}}
