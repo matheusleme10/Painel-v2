@@ -73,6 +73,19 @@ def _report_blob_error(operation: str, error: Exception) -> None:
     }))
 
 
+async def _blob_result_bytes(result) -> bytes | None:
+    """Extrai o corpo nas versões atuais e anteriores do SDK do Vercel Blob."""
+    if result is None or getattr(result, "status_code", 0) != 200:
+        return None
+    content = getattr(result, "content", None)
+    if isinstance(content, bytes):
+        return content
+    stream = getattr(result, "stream", None)
+    if stream is None:
+        return None
+    return b"".join([chunk async for chunk in stream])
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     app.state.ifood = IFoodClient()
@@ -251,9 +264,9 @@ async def read_current_payload() -> dict | None:
         try:
             async with AsyncBlobClient(token=BLOB_TOKEN) as blob_client:
                 result = await blob_client.get(BLOB_PATH, access="private")
-                if result is None or result.status_code != 200 or result.stream is None:
+                compressed = await _blob_result_bytes(result)
+                if compressed is None:
                     return None
-                compressed = b"".join([chunk async for chunk in result.stream])
         except BlobNotFoundError:
             return None
         except Exception as error:
@@ -330,9 +343,9 @@ async def read_notification_settings() -> dict:
         try:
             async with AsyncBlobClient(token=BLOB_TOKEN) as blob_client:
                 result = await blob_client.get(NOTIFICATION_SETTINGS_BLOB_PATH, access="private")
-                if result is None or result.status_code != 200 or result.stream is None:
+                raw = await _blob_result_bytes(result)
+                if raw is None:
                     return defaults
-                raw = b"".join([chunk async for chunk in result.stream])
         except BlobNotFoundError:
             # Primeiro uso: o arquivo de preferências ainda será criado pelo administrador.
             return defaults
