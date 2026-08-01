@@ -5,6 +5,7 @@ import { Ic } from '../components/ui/Icon.jsx';
 import { Pill } from '../components/ui/Pill.jsx';
 import { brl, formatDateBR } from '../utils/format.js';
 import { buildStoreMetrics } from '../utils/analytics.js';
+import { isSameStore } from '../utils/stores.js';
 
 // ─── helpers ─────────────────────────────────────────────────────────────────
 
@@ -14,10 +15,6 @@ function medalColor(rank) {
   if (rank === 3) return { bg: '#FFF0E8', color: '#CD7F32', border: '#CD7F32' }; // bronze
   return { bg: C.bg, color: C.muted, border: C.border };
 }
-
-const normalizeStore = (value) => String(value || '')
-  .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-  .toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 
 function SortIcon({ col, sortCol, sortDir }) {
   if (sortCol !== col)
@@ -125,7 +122,18 @@ export function RankPage({ today, periodFrom, periodTo, showFinancials = false, 
   const totalRisco    = rows.reduce((s, r) => s + r.risco, 0);
   const abaixoMedia   = rows.filter((r) => r.disponib < mediaRede).length;
   const criticas      = rows.filter((r) => r.disponib < 60).length;
-  const selectedMetric = rows.find((row) => normalizeStore(row.loja) === normalizeStore(selectedStore));
+  const selectedMetric = rows.find((row) => isSameStore(row.loja, selectedStore));
+  const visibleRows = useMemo(() => {
+    if (!selectedMetric || search || filter !== 'todos' || sortCol !== 'rank' || sortDir !== 'asc' || selectedMetric.rank <= 5) {
+      return sorted;
+    }
+    const topFive = sorted.slice(0, 5);
+    return [
+      ...topFive,
+      selectedMetric,
+      ...sorted.slice(5).filter((row) => row.loja !== selectedMetric.loja),
+    ];
+  }, [sorted, selectedMetric, search, filter, sortCol, sortDir]);
 
   const chipStyle = (active) => ({
     padding: '5px 11px',
@@ -270,13 +278,14 @@ export function RankPage({ today, periodFrom, periodTo, showFinancials = false, 
               </tr>
             </thead>
             <tbody>
-              {sorted.map((r) => {
+              {visibleRows.map((r) => {
                 const medal    = medalColor(r.rank);
                 const vsRede   = r.disponib - mediaRede;
                 const abaixo   = vsRede < 0;
                 const dispColor = r.disponib >= 80 ? C.green : r.disponib >= 60 ? C.amber : C.red;
                 const dispBg    = r.disponib >= 80 ? C.greenL : r.disponib >= 60 ? C.amberL : C.redL;
                 const isSelected = selectedMetric?.loja === r.loja;
+                const isPinnedOwnUnit = isSelected && r.rank > 5 && !search && filter === 'todos' && sortCol === 'rank' && sortDir === 'asc';
 
                 return (
                   <tr
@@ -312,7 +321,7 @@ export function RankPage({ today, periodFrom, periodTo, showFinancials = false, 
 
                     {/* Franquia */}
                     <td style={{ padding: '10px 12px', fontWeight: 600, fontSize: 13, color: C.text, minWidth: 160 }}>
-                      {r.loja} {isSelected && <Pill color={C.red} bg={C.redL} s={9}>Sua unidade</Pill>}
+                      {r.loja} {isSelected && <Pill color={C.red} bg={C.redL} s={9}>{isPinnedOwnUnit ? 'Sua unidade · destacada após Top 5' : 'Sua unidade'}</Pill>}
                     </td>
 
                     {/* Disponibilidade */}
