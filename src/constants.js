@@ -14,7 +14,7 @@ export const PAL = [
   C.red, C.blue, C.amber, C.green, C.purple, C.orange, C.teal, '#BE185D', '#065F46', '#1E3A8A'
 ];
 
-export const LOGO = 'https://d7jztl9hjt0p1.cloudfront.net/1.0.0.119/assets/images/home/logo@3x.png';
+export const LOGO = '/ih-logo.png';
 
 export const ADMIN_TABS = [
   { id: 'network', label: 'Geral da Rede', icon: 'network' },
