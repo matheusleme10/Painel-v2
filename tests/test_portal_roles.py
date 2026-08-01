@@ -62,7 +62,59 @@ def test_session_cookie_authenticates_without_exposing_hash_to_frontend(monkeypa
 
         session = client.get("/api/session")
         assert session.status_code == 200
-        assert session.json() == {"authenticated": True, "role": "admin"}
+        assert session.json() == {
+            "authenticated": True,
+            "role": "admin",
+            "identified": True,
+            "identity": None,
+        }
+
+
+def test_franchise_identification_and_unit_access_are_audited(monkeypatch, tmp_path):
+    LOGIN_ATTEMPTS.clear()
+    franchise_password = "senha-franqueado-auditoria"
+    admin_password = "senha-admin-auditoria"
+    monkeypatch.setenv("FRANCHISE_PASSWORD_HASH", hashlib.sha256(franchise_password.encode()).hexdigest())
+    monkeypatch.setenv("ADMIN_PASSWORD_HASH", hashlib.sha256(admin_password.encode()).hexdigest())
+    monkeypatch.setenv("SESSION_SECRET", "segredo-de-sessao-com-mais-de-trinta-e-dois-caracteres")
+    monkeypatch.setattr(main_module, "BLOB_TOKEN", "")
+    monkeypatch.setattr(main_module, "ACCESS_LOG_PATH", tmp_path / "access-logs.jsonl")
+
+    with TestClient(app) as franchise:
+        login = franchise.post("/api/session", json={"password": franchise_password})
+        assert login.status_code == 200
+        assert login.json()["identified"] is False
+        assert franchise.get("/api/session").json()["identified"] is False
+
+        identity = franchise.post("/api/access/identify", json={
+            "name": "  Maria   da Silva  ",
+            "email": "MARIA@EXEMPLO.COM.BR",
+        })
+        assert identity.status_code == 200
+        assert identity.json()["identity"] == {
+            "name": "Maria da Silva",
+            "email": "maria@exemplo.com.br",
+        }
+        assert "HttpOnly" in identity.headers["set-cookie"]
+        selected = franchise.post("/api/access/context", json={
+            "brandId": "ih",
+            "store": "Ital in House - São Carlos - 123456",
+        })
+        assert selected.status_code == 200
+        assert franchise.get("/api/access-logs").status_code == 403
+
+    with TestClient(app) as admin:
+        assert admin.post("/api/session", json={"password": admin_password}).status_code == 200
+        response = admin.get("/api/access-logs")
+        assert response.status_code == 200
+        events = response.json()["events"]
+        assert len(events) == 2
+        selected_event = next(event for event in events if event["action"] == "unit_selected")
+        assert selected_event["name"] == "Maria da Silva"
+        assert selected_event["email"] == "maria@exemplo.com.br"
+        assert selected_event["store"] == "Ital in House - São Carlos - 123456"
+        assert selected_event["brandId"] == "ih"
+        assert selected_event["accessedAt"]
 
 
 def test_franchise_potential_requires_separate_password(monkeypatch):
