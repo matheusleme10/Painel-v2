@@ -19,6 +19,8 @@ import { loadDataRemote } from './utils/remote-storage.js';
 import { PortalLogin } from './components/PortalLogin.jsx';
 import { BrandSelector } from './components/BrandSelector.jsx';
 import { PotentialAccessGate } from './components/PotentialAccessGate.jsx';
+import { FranchiseIdentityGate } from './components/FranchiseIdentityGate.jsx';
+import { AccessLogsPage } from './pages/AccessLogsPage.jsx';
 import { brandById, identifyBrand } from './utils/brands.js';
 import { decodeCatalogCube } from './utils/pivot-cache.js';
 import { isSameStore, resolveStoreSelection } from './utils/stores.js';
@@ -74,12 +76,14 @@ export function App() {
     localStorage.removeItem('italinhouse_v6');
     fetch('/api/session', { credentials: 'same-origin', cache: 'no-store' })
       .then((response) => response.ok ? response.json() : null)
-      .then((session) => setAuth(session?.authenticated ? { role: session.role } : null))
+      .then((session) => setAuth(session?.authenticated ? {
+        role: session.role, identified: session.identified, identity: session.identity,
+      } : null))
       .finally(() => setSessionReady(true));
   }, []);
 
   useEffect(() => {
-    if (!auth?.role) return;
+    if (!auth?.role || (auth.role === 'franchise' && !auth.identified)) return;
     setSyncing(true);
     setAll([]);
     loadDataRemote()
@@ -215,14 +219,27 @@ export function App() {
     setTab('network');
   }
 
+  async function selectFranchiseContext(next) {
+    await fetch('/api/access/context', {
+      method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(next),
+    }).catch(() => {});
+    setContext({ ...next, role: 'franchise' });
+    setTab('dash');
+  }
+
   if (splash || !sessionReady) return <Splash onDone={() => setSplash(false)} />;
 
   if (!auth?.role) {
     return <PortalLogin onAuthenticated={authenticated} />;
   }
 
+  if (auth.role === 'franchise' && !auth.identified) {
+    return <FranchiseIdentityGate onIdentified={(identity) => setAuth((current) => ({ ...current, identified: true, identity }))} />;
+  }
+
   if (auth.role === 'franchise' && !context) {
-    return <BrandSelector rows={all} onSelect={(next) => { setContext({ ...next, role: 'franchise' }); setTab('dash'); }} />;
+    return <BrandSelector rows={all} onSelect={selectFranchiseContext} />;
   }
 
   const activeBrand = context?.brandId ? brandById(context.brandId) : null;
@@ -234,7 +251,7 @@ export function App() {
         shift={displayShift} syncing={syncing} context={context} role={auth.role}
         onChangeContext={isAdmin ? null : () => { setContext(null); setTab('dash'); }} onLogout={logout} />
 
-      {all.length > 0 && !['notify', 'update'].includes(tab) && (
+      {all.length > 0 && !['notify', 'update', 'access'].includes(tab) && (
         <AnalysisFilters
           dates={sortedDates}
           value={{ from: effectiveFrom, to: effectiveTo, shift: effectiveShift }}
@@ -242,14 +259,14 @@ export function App() {
           dataShift={metadata.dataShift}
         />
       )}
-      {all.length > 0 && isAdmin && !['notify', 'update'].includes(tab) && (
+      {all.length > 0 && isAdmin && !['notify', 'update', 'access'].includes(tab) && (
         <BrandScopeBar
           value={scopeBrand}
           stores={brandStores}
           onChange={(brandId) => setFilters((current) => ({ ...current, brandId }))}
         />
       )}
-      {all.length > 0 && !['notify', 'update'].includes(tab) && !shiftHasNetworkData && (
+      {all.length > 0 && !['notify', 'update', 'access'].includes(tab) && !shiftHasNetworkData && (
         <div className="shift-data-notice">
           A carga geral deste XLSX foi exportada para {metadata.dataShift || 'outro turno'}.
           Para {effectiveShift}, este arquivo possui consolidado específico somente de Cannoli, Crostini e Palha na Forneria.
@@ -276,6 +293,7 @@ export function App() {
           ? <RevenueProjectionPage rows={detailRows} summaryRows={networkRows} isAdmin />
           : <PotentialAccessGate><RevenueProjectionPage rows={detailRows} summaryRows={networkRows} /></PotentialAccessGate>)}
         {tab === 'notify' && isAdmin && <AutomatedNotificationPage />}
+        {tab === 'access' && isAdmin && <AccessLogsPage />}
         {tab === 'update' && isAdmin && (
           <AdminPage all={all} initialAuth
             onUpdate={(rows) => {
