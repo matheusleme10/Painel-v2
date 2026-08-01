@@ -56,9 +56,11 @@ export function Splash({ onDone }) {
         src={LOGO}
         alt="Ital In House"
         style={{
-          height: 90,
+          width: 'min(270px, 64vw)',
+          height: 'auto',
           objectFit: 'contain',
-          marginBottom: 20,
+          marginBottom: 22,
+          filter: 'drop-shadow(0 18px 34px rgba(67, 3, 16, .24))',
           animation: 'fadeInUp 0.8s ease-out',
         }}
         onError={(e) => {
