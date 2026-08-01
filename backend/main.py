@@ -37,6 +37,8 @@ CURRENT_DATA = DATA_DIR / "current.json.gz"
 BLOB_PATH = "ital-dashboard/current.json.gz"
 ACCESS_LOG_PATH = DATA_DIR / "access-logs.jsonl"
 ACCESS_LOG_PREFIX = "ital-dashboard/access-logs/"
+ACCESS_SETTINGS_PATH = DATA_DIR / "access-settings.json"
+ACCESS_SETTINGS_BLOB_PATH = "ital-dashboard/access-settings.json"
 NOTIFICATION_SETTINGS_PATH = DATA_DIR / "notification-settings.json"
 NOTIFICATION_SETTINGS_BLOB_PATH = "ital-dashboard/notification-settings.json"
 load_dotenv(ROOT / ".env")
@@ -175,6 +177,10 @@ class FranchiseContextRequest(BaseModel):
     store: str = Field(min_length=2, max_length=180)
 
 
+class AccessSettingsRequest(BaseModel):
+    allowedDomains: list[str] = Field(default_factory=list, max_length=100)
+
+
 def client() -> IFoodClient:
     return app.state.ifood
 
@@ -284,12 +290,23 @@ async def _save_access_event(event: dict) -> None:
                 serialized,
                 access="private",
                 content_type="application/json",
-                overwrite=False,
+                overwrite=True,
+                cache_control_max_age=0,
             )
         return
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     with ACCESS_LOG_PATH.open("a", encoding="utf-8") as file:
         file.write(serialized.decode("utf-8") + "\n")
+
+
+async def _record_access_event(event: dict) -> bool:
+    """Auditoria não pode impedir o franqueado de acessar o portal."""
+    try:
+        await _save_access_event(event)
+        return True
+    except Exception as error:
+        _report_blob_error("access-log-write", error)
+        return False
 
 
 async def _read_access_events(limit: int = 250) -> list[dict]:
@@ -320,6 +337,72 @@ async def _read_access_events(limit: int = 250) -> list[dict]:
         except json.JSONDecodeError:
             continue
     return sorted(events, key=lambda entry: entry["accessedAt"], reverse=True)
+
+
+def _normalize_domains(domains: list[str]) -> list[str]:
+    normalized = []
+    for domain in domains:
+        value = str(domain).strip().lower().lstrip("@").rstrip(".")
+        if not re.fullmatch(r"[a-z0-9](?:[a-z0-9.-]{0,251}[a-z0-9])?\.[a-z]{2,63}", value):
+            raise HTTPException(status_code=400, detail=f"Domínio de e-mail inválido: {domain}")
+        if value not in normalized:
+            normalized.append(value)
+    if not normalized:
+        raise HTTPException(status_code=400, detail="Cadastre pelo menos um domínio permitido.")
+    return normalized
+
+
+async def read_access_settings() -> dict:
+    defaults = {"allowedDomains": ["italinhouse.com"]}
+    if BLOB_TOKEN:
+        from vercel.blob import AsyncBlobClient, BlobNotFoundError
+        try:
+            async with AsyncBlobClient(token=BLOB_TOKEN) as blob_client:
+                result = await blob_client.get(ACCESS_SETTINGS_BLOB_PATH, access="private")
+                raw = await _blob_result_bytes(result)
+                return {**defaults, **(json.loads(raw.decode("utf-8")) if raw else {})}
+        except BlobNotFoundError:
+            return defaults
+        except Exception as error:
+            _report_blob_error("access-settings-read", error)
+            return defaults
+    if not ACCESS_SETTINGS_PATH.is_file():
+        return defaults
+    return {**defaults, **json.loads(ACCESS_SETTINGS_PATH.read_text(encoding="utf-8"))}
+
+
+async def write_access_settings(settings: dict) -> None:
+    serialized = json.dumps(settings, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+    if BLOB_TOKEN:
+        from vercel.blob import AsyncBlobClient
+        async with AsyncBlobClient(token=BLOB_TOKEN) as blob_client:
+            await blob_client.put(
+                ACCESS_SETTINGS_BLOB_PATH, serialized, access="private",
+                content_type="application/json", overwrite=True, cache_control_max_age=0,
+            )
+        return
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    ACCESS_SETTINGS_PATH.write_bytes(serialized)
+
+
+async def delete_access_events() -> int:
+    if BLOB_TOKEN:
+        from vercel.blob import AsyncBlobClient
+        deleted = 0
+        async with AsyncBlobClient(token=BLOB_TOKEN) as blob_client:
+            while True:
+                listing = await blob_client.list_objects(prefix=ACCESS_LOG_PREFIX, limit=1000)
+                paths = [item.pathname for item in listing.blobs]
+                if not paths:
+                    break
+                await blob_client.delete(paths)
+                deleted += len(paths)
+        return deleted
+    if not ACCESS_LOG_PATH.exists():
+        return 0
+    count = len(ACCESS_LOG_PATH.read_text(encoding="utf-8").splitlines())
+    ACCESS_LOG_PATH.unlink()
+    return count
 
 
 def _has_potential_access(request: Request) -> bool:
@@ -704,8 +787,15 @@ async def identify_franchise(action: FranchiseIdentityRequest, request: Request,
     email = action.email.strip().lower()
     if len(name) < 2 or not EMAIL_PATTERN.match(email):
         raise HTTPException(status_code=400, detail="Informe nome e e-mail válidos.")
+    settings = await read_access_settings()
+    email_domain = email.rsplit("@", 1)[-1]
+    if email_domain not in settings["allowedDomains"]:
+        raise HTTPException(
+            status_code=403,
+            detail=f"E-mail @{email_domain} não autorizado. Solicite a liberação ao administrador.",
+        )
     identity = {"name": name, "email": email}
-    await _save_access_event(_access_event(request, identity, "login"))
+    audit_recorded = await _record_access_event(_access_event(request, identity, "login"))
     response.set_cookie(
         IDENTITY_COOKIE,
         _create_identity(name, email),
@@ -715,7 +805,7 @@ async def identify_franchise(action: FranchiseIdentityRequest, request: Request,
         samesite="strict",
         path="/",
     )
-    return {"identified": True, "identity": identity}
+    return {"identified": True, "identity": identity, "auditRecorded": audit_recorded}
 
 
 @app.post("/api/access/context")
@@ -725,14 +815,14 @@ async def register_franchise_context(action: FranchiseContextRequest, request: R
     identity = _get_identity(request)
     if identity is None:
         raise HTTPException(status_code=401, detail="Identifique-se antes de selecionar a unidade.")
-    await _save_access_event(_access_event(
+    audit_recorded = await _record_access_event(_access_event(
         request,
         identity,
         "unit_selected",
         brandId=action.brandId.strip(),
         store=" ".join(action.store.strip().split()),
     ))
-    return {"recorded": True}
+    return {"recorded": audit_recorded}
 
 
 @app.get("/api/access-logs")
@@ -742,6 +832,29 @@ async def access_logs(request: Request, limit: int = 250) -> dict:
     safe_limit = max(1, min(limit, 500))
     events = await _read_access_events(safe_limit)
     return {"events": events, "total": len(events)}
+
+
+@app.get("/api/access-settings")
+async def access_settings(request: Request) -> dict:
+    if require_session(request) != "admin":
+        raise HTTPException(status_code=403, detail="Apenas administradores podem consultar esta configuração.")
+    return await read_access_settings()
+
+
+@app.put("/api/access-settings")
+async def update_access_settings(action: AccessSettingsRequest, request: Request) -> dict:
+    if require_session(request) != "admin":
+        raise HTTPException(status_code=403, detail="Apenas administradores podem alterar esta configuração.")
+    settings = {"allowedDomains": _normalize_domains(action.allowedDomains)}
+    await write_access_settings(settings)
+    return settings
+
+
+@app.delete("/api/access-logs")
+async def clear_access_logs(request: Request) -> dict:
+    if require_session(request) != "admin":
+        raise HTTPException(status_code=403, detail="Apenas administradores podem apagar os acessos.")
+    return {"deleted": await delete_access_events()}
 
 
 @app.get("/api/potential/session")
