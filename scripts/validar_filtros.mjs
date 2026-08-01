@@ -1,10 +1,21 @@
 import fs from 'node:fs';
 import zlib from 'node:zlib';
+import { isSameStore, resolveStoreSelection } from '../src/utils/stores.js';
 
 const root = new URL('../', import.meta.url);
 const payload = JSON.parse(zlib.gunzipSync(fs.readFileSync(new URL('data/current.json.gz', root))));
 const metadata = payload.rows.find((row) => row.networkHistory || row.catalogRows) || {};
 const history = metadata.unitHistory || [];
+const storeCandidates = [...new Set(history.map((entry) => entry.label).filter(Boolean))];
+const saoCarlosLegacy = 'Italin House Macarrao Gourmet - Sao Carlos';
+const saoCarlos = resolveStoreSelection(saoCarlosLegacy, storeCandidates.filter((name) => /italin house/i.test(name)));
+if (!/2327101$/.test(saoCarlos)) {
+  throw new Error('Seleção antiga de São Carlos não foi migrada para a unidade canônica.');
+}
+const santoAndreStores = storeCandidates.filter((name) => /italin house.*santo andre/i.test(name));
+if (santoAndreStores.length >= 2 && isSameStore(santoAndreStores[0], santoAndreStores[1])) {
+  throw new Error('Unidades homônimas de Santo André foram misturadas.');
+}
 const dates = [...new Set(history.map((entry) => entry.date))].sort();
 const shifts = [...new Set(history.map((entry) => entry.shift))].sort();
 if (dates.length < 2) throw new Error('Histórico de datas insuficiente.');
