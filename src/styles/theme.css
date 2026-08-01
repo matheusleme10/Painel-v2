@@ -151,3 +151,32 @@
 .login-visual .orbit-green{bottom:10%;left:14%;transform:rotate(-2deg)}
 .login-visual .orbit-red{right:10%;bottom:14%;transform:rotate(3deg)}
 @media(max-width:640px){.brand-lockup>span:last-child{display:none}.brand-mark{width:48px}.login-brand{left:24px;right:24px}.login-panel{padding-top:120px}}
+
+/* Refinamento visual vermelho e branco. */
+.date-filter{position:relative;top:auto;z-index:20;box-shadow:0 8px 24px rgba(16,24,40,.035)}
+.brand-mark{width:72px;height:50px;padding:7px 9px;border-radius:13px;background:linear-gradient(135deg,#df1739 0%,#a50827 100%)}
+.brand-lockup{gap:12px}.brand-lockup strong{font-size:14px}.brand-lockup small{font-size:8px;letter-spacing:.18em}
+.login-shell{grid-template-columns:minmax(430px,38%) 1fr;background:linear-gradient(90deg,#fff 0%,#fff 36%,#e61a3e 36.1%,#a80729 100%)}
+.login-panel{position:relative;z-index:2;padding:clamp(38px,6vw,92px);background:linear-gradient(135deg,#fff 0%,#fff 72%,#fff5f6 100%);box-shadow:24px 0 70px rgba(72,3,18,.12)}
+.login-brand{top:clamp(28px,5vh,54px)}
+.login-logo-badge{width:126px;height:74px;padding:10px 14px;border-radius:17px;background:linear-gradient(135deg,#e6173d,#a80829);box-shadow:0 18px 38px rgba(200,16,46,.28)}
+.login-brand strong{color:#15171c;font-size:14px}.login-brand small{margin-top:4px;color:#98a2b3;font-size:8px}
+.login-copy{max-width:480px}.login-copy h1{max-width:470px;font-size:clamp(34px,3.7vw,57px);line-height:1.01}.login-copy p{max-width:455px;font-size:14px;line-height:1.72}
+.login-form{max-width:455px}.login-form input{min-height:54px;border-radius:15px}.login-form button{min-height:52px;border-radius:15px;background:linear-gradient(90deg,#e51a40 0%,#b40c30 100%);box-shadow:0 16px 34px rgba(190,16,48,.25);transition:transform .18s ease,box-shadow .18s ease}.login-form button:not(:disabled):hover{transform:translateY(-2px);box-shadow:0 20px 40px rgba(190,16,48,.32)}
+.login-visual{background:linear-gradient(135deg,#eb2347 0%,#c30d34 48%,#93031f 100%)}
+.login-visual:before{background:linear-gradient(120deg,rgba(255,255,255,.13),transparent 32%),radial-gradient(circle at 88% 12%,rgba(255,255,255,.12),transparent 23%),radial-gradient(circle at 12% 88%,rgba(255,255,255,.08),transparent 28%)}
+.login-visual-copy{left:13%;max-width:650px;color:#fff}.login-visual-copy span{color:rgba(255,255,255,.78)}.login-visual-copy strong{max-width:620px;color:#fff;font-size:clamp(44px,5vw,78px);line-height:.96}.login-visual-copy small{max-width:440px;color:rgba(255,255,255,.82);font-size:14px}
+.login-visual .brand-orbit{padding:12px 20px;border:1px solid rgba(255,255,255,.72);border-radius:999px;background:rgba(255,255,255,.94);box-shadow:0 18px 42px rgba(79,2,18,.2);backdrop-filter:blur(12px)}
+.login-visual .orbit-orange{color:#ea580c}.login-visual .orbit-blue{color:#1769e0}.login-visual .orbit-green{color:#059669}.login-visual .orbit-red{color:#c8102e}
+@media(max-width:1100px){.login-shell{grid-template-columns:minmax(400px,46%) 1fr}.login-visual-copy{left:9%}.login-visual-copy strong{font-size:clamp(38px,5vw,60px)}}
+@media(max-width:900px){.login-shell{display:block;background:#fff}.login-panel{min-height:100vh;padding:140px clamp(24px,8vw,72px) 44px;box-shadow:none}.login-brand{left:clamp(24px,8vw,72px)}.login-copy,.login-form{max-width:560px}.login-copy h1{font-size:clamp(36px,8vw,56px)}}
+@media(max-width:640px){.brand-mark{width:64px;height:46px}.login-logo-badge{width:112px;height:66px}.login-panel{padding-top:130px}.login-copy h1{font-size:clamp(32px,10vw,46px)}}
+
+.app-shell{background:linear-gradient(135deg,#fff7f8 0%,#f8f9fc 32%,#f4f7fb 72%,#eef4fb 100%)}
+.portal-header{background:linear-gradient(100deg,rgba(204,13,48,.97) 0%,rgba(169,5,38,.97) 58%,rgba(126,3,29,.98) 100%);border-bottom-color:rgba(255,255,255,.14);box-shadow:0 10px 30px rgba(93,3,22,.18)}
+.brand-mark{border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);box-shadow:none}
+.brand-lockup strong{color:#fff}.brand-lockup small{color:rgba(255,255,255,.68)}
+.portal-nav{border-color:rgba(255,255,255,.42);background:rgba(255,255,255,.96);box-shadow:0 10px 30px rgba(80,2,19,.16)}
+.data-status strong{color:#fff}.data-status small{color:rgba(255,255,255,.68)}
+.header-actions button{border-color:rgba(255,255,255,.3);color:#fff;background:rgba(255,255,255,.11)}
+.header-actions button:hover{background:rgba(255,255,255,.2)}
