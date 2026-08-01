@@ -32,16 +32,16 @@ export function PortalLogin({ onAuthenticated }) {
           <div><strong>Portal de inteligência</strong><small>Gestão da rede</small></div>
         </div>
         <div className="login-copy">
-          <span className="eyebrow">INTELIGÊNCIA OPERACIONAL</span>
-          <h1>Decisões mais rápidas para uma rede mais disponível.</h1>
-          <p>Entre para acompanhar itens ativos, pausas e oportunidades da sua operação. O perfil é identificado automaticamente pela senha.</p>
+          <span className="eyebrow">PORTAL ITAL IN HOUSE</span>
+          <h1>Sua operação, clara e disponível.</h1>
+          <p>Acompanhe itens ativos, pausas e oportunidades da rede com uma leitura simples e objetiva.</p>
         </div>
         <form onSubmit={submit} className="login-form">
           <label htmlFor="portal-password">Senha de acesso</label>
           <input id="portal-password" type="password" autoComplete="current-password" value={password}
             onChange={(event) => setPassword(event.target.value)} autoFocus />
           {error && <div className="login-error">{error}</div>}
-          <button type="submit" disabled={busy || !password}>{busy ? 'Validando…' : 'Entrar no portal'}</button>
+          <button type="submit" disabled={busy || !password}>{busy ? 'Validando…' : 'Acessar dashboard'}</button>
         </form>
         <small className="security-note">A sessão termina ao fechar esta janela.</small>
       </section>
