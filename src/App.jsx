@@ -235,7 +235,8 @@ export function App() {
   }
 
   if (auth.role === 'franchise' && !auth.identified) {
-    return <FranchiseIdentityGate onIdentified={(identity) => setAuth((current) => ({ ...current, identified: true, identity }))} />;
+    return <FranchiseIdentityGate onCancel={logout}
+      onIdentified={(identity) => setAuth((current) => ({ ...current, identified: true, identity }))} />;
   }
 
   if (auth.role === 'franchise' && !context) {
