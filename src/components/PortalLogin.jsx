@@ -32,9 +32,9 @@ export function PortalLogin({ onAuthenticated }) {
           <div><strong>Portal de inteligência</strong><small>Gestão da rede</small></div>
         </div>
         <div className="login-copy">
-          <span className="eyebrow">ACESSO PROTEGIDO</span>
-          <h1>Dados da rede protegidos por perfil de acesso.</h1>
-          <p>A senha identifica automaticamente se o acesso é Administrativo ou de Franqueado.</p>
+          <span className="eyebrow">INTELIGÊNCIA OPERACIONAL</span>
+          <h1>Decisões mais rápidas para uma rede mais disponível.</h1>
+          <p>Entre para acompanhar itens ativos, pausas e oportunidades da sua operação. O perfil é identificado automaticamente pela senha.</p>
         </div>
         <form onSubmit={submit} className="login-form">
           <label htmlFor="portal-password">Senha de acesso</label>
@@ -47,9 +47,9 @@ export function PortalLogin({ onAuthenticated }) {
       </section>
       <aside className="login-visual" aria-hidden="true">
         <div className="login-visual-copy">
-          <span>VISÃO OPERACIONAL</span>
-          <strong>Uma rede inteira.<br />Uma leitura simples.</strong>
-          <small>Itens ativos, pausas e oportunidades em um só lugar.</small>
+          <span>CONTROLE EM UM SÓ LUGAR</span>
+          <strong>Clareza para agir.<br />Dados para evoluir.</strong>
+          <small>Da visão geral da rede ao detalhe de cada unidade.</small>
         </div>
         <div className="brand-orbit orbit-orange">Fast Food Caipira</div>
         <div className="brand-orbit orbit-blue">City Burger</div>
