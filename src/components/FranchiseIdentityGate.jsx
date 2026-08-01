@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-export function FranchiseIdentityGate({ onIdentified }) {
+export function FranchiseIdentityGate({ onIdentified, onCancel }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [busy, setBusy] = useState(false);
@@ -18,7 +18,9 @@ export function FranchiseIdentityGate({ onIdentified }) {
         body: JSON.stringify({ name, email }),
       });
       const payload = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(payload.detail || 'Não foi possível registrar o acesso.');
+      if (!response.ok) {
+        throw new Error(payload.detail || `Não foi possível registrar o acesso (erro ${response.status}).`);
+      }
       onIdentified(payload.identity);
     } catch (reason) {
       setError(reason.message);
@@ -44,6 +46,7 @@ export function FranchiseIdentityGate({ onIdentified }) {
           {error && <div className="identity-error" role="alert">{error}</div>}
           <button disabled={busy}>{busy ? 'Registrando…' : 'Continuar para as marcas'}</button>
         </form>
+        <button className="identity-back" type="button" onClick={onCancel} disabled={busy}>← Voltar e trocar perfil</button>
         <small>🔒 A sessão é protegida e o histórico fica visível apenas para administradores.</small>
       </section>
     </main>
