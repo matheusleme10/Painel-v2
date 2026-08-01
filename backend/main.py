@@ -35,6 +35,8 @@ DATA_DIR = ROOT / "data"
 STAGING_DIR = DATA_DIR / "staging"
 CURRENT_DATA = DATA_DIR / "current.json.gz"
 BLOB_PATH = "ital-dashboard/current.json.gz"
+ACCESS_LOG_PATH = DATA_DIR / "access-logs.jsonl"
+ACCESS_LOG_PREFIX = "ital-dashboard/access-logs/"
 NOTIFICATION_SETTINGS_PATH = DATA_DIR / "notification-settings.json"
 NOTIFICATION_SETTINGS_BLOB_PATH = "ital-dashboard/notification-settings.json"
 load_dotenv(ROOT / ".env")
@@ -163,6 +165,16 @@ class PotentialAccessRequest(BaseModel):
     password: str = Field(min_length=1, max_length=256)
 
 
+class FranchiseIdentityRequest(BaseModel):
+    name: str = Field(min_length=2, max_length=100)
+    email: str = Field(min_length=5, max_length=254)
+
+
+class FranchiseContextRequest(BaseModel):
+    brandId: str = Field(min_length=1, max_length=30)
+    store: str = Field(min_length=2, max_length=180)
+
+
 def client() -> IFoodClient:
     return app.state.ifood
 
@@ -173,6 +185,7 @@ def api_error(error: IFoodAPIError) -> HTTPException:
 
 SESSION_COOKIE = "ital_portal_session"
 POTENTIAL_COOKIE = "ital_potential_access"
+IDENTITY_COOKIE = "ital_franchise_identity"
 SESSION_TTL_SECONDS = 8 * 60 * 60
 LOGIN_WINDOW_SECONDS = 15 * 60
 LOGIN_MAX_ATTEMPTS = 5
@@ -209,6 +222,104 @@ def _create_potential_access() -> str:
     payload = f"potential:{int(time.time()) + SESSION_TTL_SECONDS}"
     signature = hmac.new(_session_secret(), payload.encode("utf-8"), hashlib.sha256).hexdigest()
     return base64.urlsafe_b64encode(f"{payload}:{signature}".encode("utf-8")).decode("ascii")
+
+
+def _create_identity(name: str, email: str) -> str:
+    identity = {
+        "name": name,
+        "email": email,
+        "expires": int(time.time()) + SESSION_TTL_SECONDS,
+    }
+    encoded = base64.urlsafe_b64encode(
+        json.dumps(identity, ensure_ascii=True, separators=(",", ":")).encode("utf-8")
+    ).decode("ascii").rstrip("=")
+    signature = hmac.new(_session_secret(), encoded.encode("ascii"), hashlib.sha256).hexdigest()
+    return f"{encoded}.{signature}"
+
+
+def _get_identity(request: Request) -> dict | None:
+    token = request.cookies.get(IDENTITY_COOKIE, "")
+    try:
+        encoded, signature = token.split(".", 1)
+        expected = hmac.new(_session_secret(), encoded.encode("ascii"), hashlib.sha256).hexdigest()
+        if not hmac.compare_digest(signature, expected):
+            return None
+        padding = "=" * (-len(encoded) % 4)
+        identity = json.loads(base64.urlsafe_b64decode(f"{encoded}{padding}").decode("utf-8"))
+        if int(identity.get("expires", 0)) <= int(time.time()):
+            return None
+        if not identity.get("name") or not EMAIL_PATTERN.match(str(identity.get("email", ""))):
+            return None
+        return identity
+    except (ValueError, TypeError, UnicodeError, json.JSONDecodeError):
+        return None
+
+
+def _access_event(request: Request, identity: dict, action: str, **details) -> dict:
+    forwarded = request.headers.get("x-forwarded-for", "").split(",", 1)[0].strip()
+    address = forwarded or (request.client.host if request.client else "unknown")
+    address_hash = hmac.new(_session_secret(), address.encode("utf-8"), hashlib.sha256).hexdigest()[:16]
+    return {
+        "id": secrets.token_hex(12),
+        "name": identity["name"],
+        "email": identity["email"],
+        "action": action,
+        "accessedAt": datetime.now(timezone.utc).isoformat(),
+        "clientHash": address_hash,
+        "userAgent": request.headers.get("user-agent", "")[:220],
+        **details,
+    }
+
+
+async def _save_access_event(event: dict) -> None:
+    serialized = json.dumps(event, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+    if BLOB_TOKEN:
+        from vercel.blob import AsyncBlobClient
+
+        reverse_timestamp = 9_999_999_999_999 - int(time.time() * 1000)
+        path = f"{ACCESS_LOG_PREFIX}{reverse_timestamp:013d}-{event['id']}.json"
+        async with AsyncBlobClient(token=BLOB_TOKEN) as blob_client:
+            await blob_client.put(
+                path,
+                serialized,
+                access="private",
+                content_type="application/json",
+                overwrite=False,
+            )
+        return
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    with ACCESS_LOG_PATH.open("a", encoding="utf-8") as file:
+        file.write(serialized.decode("utf-8") + "\n")
+
+
+async def _read_access_events(limit: int = 250) -> list[dict]:
+    if BLOB_TOKEN:
+        from vercel.blob import AsyncBlobClient
+
+        async with AsyncBlobClient(token=BLOB_TOKEN) as blob_client:
+            listing = await blob_client.list_objects(prefix=ACCESS_LOG_PREFIX, limit=limit)
+            semaphore = asyncio.Semaphore(12)
+
+            async def read_event(item) -> dict | None:
+                async with semaphore:
+                    result = await blob_client.get(item.pathname, access="private")
+                    raw = await _blob_result_bytes(result)
+                    try:
+                        return json.loads(raw.decode("utf-8")) if raw else None
+                    except (UnicodeError, json.JSONDecodeError):
+                        return None
+
+            events = await asyncio.gather(*(read_event(item) for item in listing.blobs))
+            return sorted((event for event in events if event), key=lambda entry: entry["accessedAt"], reverse=True)
+    if not ACCESS_LOG_PATH.exists():
+        return []
+    events = []
+    for line in ACCESS_LOG_PATH.read_text(encoding="utf-8").splitlines()[-limit:]:
+        try:
+            events.append(json.loads(line))
+        except json.JSONDecodeError:
+            continue
+    return sorted(events, key=lambda entry: entry["accessedAt"], reverse=True)
 
 
 def _has_potential_access(request: Request) -> bool:
@@ -552,6 +663,7 @@ async def login_session(credentials: LoginRequest, request: Request, response: R
         LOGIN_ATTEMPTS.setdefault(attempt_key, []).append(time.time())
         raise HTTPException(status_code=401, detail="Senha incorreta.")
     LOGIN_ATTEMPTS.pop(attempt_key, None)
+    response.delete_cookie(IDENTITY_COOKIE, path="/", samesite="strict")
     response.set_cookie(
         SESSION_COOKIE,
         _create_session(role),
@@ -561,19 +673,75 @@ async def login_session(credentials: LoginRequest, request: Request, response: R
         samesite="strict",
         path="/",
     )
-    return {"authenticated": True, "role": role}
+    return {"authenticated": True, "role": role, "identified": role == "admin"}
 
 
 @app.get("/api/session")
 async def session_status(request: Request) -> dict:
-    return {"authenticated": True, "role": require_session(request)}
+    role = require_session(request)
+    identity = _get_identity(request) if role == "franchise" else None
+    return {
+        "authenticated": True,
+        "role": role,
+        "identified": role == "admin" or identity is not None,
+        "identity": {"name": identity["name"], "email": identity["email"]} if identity else None,
+    }
 
 
 @app.delete("/api/session")
 async def logout_session(response: Response) -> dict:
     response.delete_cookie(SESSION_COOKIE, path="/", samesite="strict")
     response.delete_cookie(POTENTIAL_COOKIE, path="/", samesite="strict")
+    response.delete_cookie(IDENTITY_COOKIE, path="/", samesite="strict")
     return {"authenticated": False}
+
+
+@app.post("/api/access/identify")
+async def identify_franchise(action: FranchiseIdentityRequest, request: Request, response: Response) -> dict:
+    if require_session(request) != "franchise":
+        raise HTTPException(status_code=403, detail="Identificação disponível somente para franqueados.")
+    name = " ".join(action.name.strip().split())
+    email = action.email.strip().lower()
+    if len(name) < 2 or not EMAIL_PATTERN.match(email):
+        raise HTTPException(status_code=400, detail="Informe nome e e-mail válidos.")
+    identity = {"name": name, "email": email}
+    await _save_access_event(_access_event(request, identity, "login"))
+    response.set_cookie(
+        IDENTITY_COOKIE,
+        _create_identity(name, email),
+        max_age=SESSION_TTL_SECONDS,
+        httponly=True,
+        secure=os.getenv("NODE_ENV") == "production" or bool(os.getenv("VERCEL")),
+        samesite="strict",
+        path="/",
+    )
+    return {"identified": True, "identity": identity}
+
+
+@app.post("/api/access/context")
+async def register_franchise_context(action: FranchiseContextRequest, request: Request) -> dict:
+    if require_session(request) != "franchise":
+        raise HTTPException(status_code=403, detail="Registro disponível somente para franqueados.")
+    identity = _get_identity(request)
+    if identity is None:
+        raise HTTPException(status_code=401, detail="Identifique-se antes de selecionar a unidade.")
+    await _save_access_event(_access_event(
+        request,
+        identity,
+        "unit_selected",
+        brandId=action.brandId.strip(),
+        store=" ".join(action.store.strip().split()),
+    ))
+    return {"recorded": True}
+
+
+@app.get("/api/access-logs")
+async def access_logs(request: Request, limit: int = 250) -> dict:
+    if require_session(request) != "admin":
+        raise HTTPException(status_code=403, detail="Apenas administradores podem consultar os acessos.")
+    safe_limit = max(1, min(limit, 500))
+    events = await _read_access_events(safe_limit)
+    return {"events": events, "total": len(events)}
 
 
 @app.get("/api/potential/session")
