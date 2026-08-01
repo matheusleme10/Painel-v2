@@ -2,7 +2,7 @@ import { ADMIN_TABS, C, FRANCHISE_TABS } from '../../constants.js';
 import { Ic } from '../ui/Icon.jsx';
 import { formatDateBR } from '../../utils/format.js';
 
-export function PortalHeader({ tab, onTabChange, all, lastDate, shift, syncing, context, role, theme, onToggleTheme, onChangeContext, onLogout }) {
+export function PortalHeader({ tab, onTabChange, all, lastDate, shift, syncing, context, role, onChangeContext, onLogout }) {
   const tabs = role === 'admin' ? ADMIN_TABS : FRANCHISE_TABS;
   return (
     <header className="portal-header">
@@ -29,9 +29,7 @@ export function PortalHeader({ tab, onTabChange, all, lastDate, shift, syncing, 
           </span>
         </div>
         <div className="header-actions">
-          <button onClick={onToggleTheme} title={theme === 'dark' ? 'Usar modo claro' : 'Usar modo escuro'} aria-label={theme === 'dark' ? 'Usar modo claro' : 'Usar modo escuro'}>
-            {theme === 'dark' ? '☀ Claro' : '☾ Escuro'}
-          </button>
+          {onChangeContext && context?.store && <button onClick={onChangeContext} title="Trocar marca ou unidade">Trocar unidade</button>}
           <button onClick={onLogout}>Sair</button>
         </div>
       </div>

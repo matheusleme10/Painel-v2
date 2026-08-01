@@ -18,6 +18,7 @@ import { AdminPage } from './pages/AdminPage.jsx';
 import { loadDataRemote } from './utils/remote-storage.js';
 import { PortalLogin } from './components/PortalLogin.jsx';
 import { BrandSelector } from './components/BrandSelector.jsx';
+import { PotentialAccessGate } from './components/PotentialAccessGate.jsx';
 import { brandById, identifyBrand } from './utils/brands.js';
 import { decodeCatalogCube } from './utils/pivot-cache.js';
 
@@ -71,7 +72,6 @@ export function App() {
   const [tab, setTab] = useState('network');
   const [all, setAll] = useState([]);
   const [syncing, setSyncing] = useState(false);
-  const [theme, setTheme] = useState(() => localStorage.getItem('ital_theme') || 'light');
   const [filters, setFilters] = useState({
     from: null,
     to: null,
@@ -231,28 +231,11 @@ export function App() {
   const activeBrand = context?.brandId ? brandById(context.brandId) : null;
   const displayShift = effectiveShift;
 
-  function toggleTheme() {
-    setTheme((current) => {
-      const next = current === 'dark' ? 'light' : 'dark';
-      localStorage.setItem('ital_theme', next);
-      return next;
-    });
-  }
-
   return (
-    <div className={`app-shell ${theme === 'dark' ? 'dark' : ''}`} style={activeBrand ? { '--portal-accent': activeBrand.color, '--portal-accent-soft': activeBrand.soft } : undefined}>
+    <div className="app-shell" style={activeBrand ? { '--portal-accent': activeBrand.color, '--portal-accent-soft': activeBrand.soft } : undefined}>
       <PortalHeader tab={tab} onTabChange={setTab} all={pageRows} lastDate={lastDate}
         shift={displayShift} syncing={syncing} context={context} role={auth.role}
-        theme={theme} onToggleTheme={toggleTheme}
         onChangeContext={isAdmin ? null : () => { setContext(null); setTab('dash'); }} onLogout={logout} />
-
-      {!isAdmin && context?.store && (
-        <div className="franchise-context-bar">
-          <span className="franchise-context-mark">IH</span>
-          <span><small>Sua unidade selecionada</small><strong>{context.store}</strong></span>
-          <button type="button" onClick={() => { setContext(null); setTab('dash'); }}>Trocar unidade</button>
-        </div>
-      )}
 
       {all.length > 0 && !['notify', 'update'].includes(tab) && (
         <AnalysisFilters
@@ -292,7 +275,9 @@ export function App() {
         {tab === 'forneria' && <ForneriaPage rows={exactSnapshotDates.length ? detailRows : productRows}
           summaryRows={!metadata.catalogCube?.records?.length && effectiveShift === 'Almoço' ? forneriaSummaries : []}
           showFinancials={isAdmin} />}
-        {tab === 'revenue' && <RevenueProjectionPage rows={detailRows} summaryRows={networkRows} isAdmin={isAdmin} />}
+        {tab === 'revenue' && (isAdmin
+          ? <RevenueProjectionPage rows={detailRows} summaryRows={networkRows} isAdmin />
+          : <PotentialAccessGate><RevenueProjectionPage rows={detailRows} summaryRows={networkRows} /></PotentialAccessGate>)}
         {tab === 'notify' && isAdmin && <AutomatedNotificationPage />}
         {tab === 'update' && isAdmin && (
           <AdminPage all={all} initialAuth

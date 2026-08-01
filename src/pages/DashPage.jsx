@@ -6,6 +6,7 @@ import { Pill } from '../components/ui/Pill.jsx';
 import { pct, brl, clamp, formatDateBR } from '../utils/format.js';
 import { parseDate } from '../utils/date.js';
 import { StatusItemsPanel } from '../components/ui/StatusItemsPanel.jsx';
+import { displayStoreName } from '../utils/stores.js';
 
 export function DashPage({ all, today, systemicRows = today, lastDate, periodFrom, periodTo, historical = false, showPausedRevenue = false }) {
   const unitSummary = today.find((r) => r.unitTotal > 0);
@@ -14,6 +15,8 @@ export function DashPage({ all, today, systemicRows = today, lastDate, periodFro
   const ativos = unitSummary?.unitActive ?? total - pausados;
   const disponib = pct(ativos, total);
   const lojas = [...new Set(today.map((r) => r.loja))];
+  const activePrices = all.filter((row) => row.status === 'Ativo' && Number(row.precoNum) > 0).map((row) => Number(row.precoNum));
+  const averageActivePrice = activePrices.length ? activePrices.reduce((sum, price) => sum + price, 0) / activePrices.length : 0;
   const risco = today
     .filter((r) => r.status === 'Pausado' && r.precoNum > 0)
     .reduce((s, r) => s + r.precoNum, 0);
@@ -64,16 +67,13 @@ export function DashPage({ all, today, systemicRows = today, lastDate, periodFro
       <div className="unit-hero">
         <div>
           <span className="eyebrow">VISÃO OPERACIONAL DA UNIDADE</span>
-          <h1>{lojas[0] || 'Minha Unidade'}</h1>
+          <h1>{displayStoreName(lojas[0]) || 'Minha Unidade'}</h1>
           <p>
             {periodFrom && periodTo && periodFrom !== periodTo
               ? <>Período de <b>{formatDateBR(periodFrom)}</b> até <b>{formatDateBR(periodTo)}</b></>
               : <>Posição do cardápio em <b>{formatDateBR(lastDate)}</b></>
             }
           </p>
-        </div>
-        <div className={`unit-health ${disponib >= 80 ? 'healthy' : disponib >= 60 ? 'attention' : 'critical'}`}>
-          <strong>{disponib}%</strong><span>disponibilidade</span>
         </div>
       </div>
 
@@ -83,7 +83,7 @@ export function DashPage({ all, today, systemicRows = today, lastDate, periodFro
         </div>
       )}
 
-      <div style={{ order: -10, display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))', gap: 12 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))', gap: 12 }}>
         <Kpi
           label="Disponibilidade da Unidade"
           value={`${disponib}%`}
@@ -120,12 +120,13 @@ export function DashPage({ all, today, systemicRows = today, lastDate, periodFro
           />
         )}
         <Kpi
-          label="Itens Únicos Pausados"
-          value={Object.keys(itemMap).length}
-          icon="item"
+          label="Preço Médio dos Ativos"
+          value={brl(averageActivePrice)}
+          icon="money"
           accent={C.blue}
           accentBg={C.blueL}
-          sub={`de ${[...new Set(today.map((r) => r.item))].length} itens totais`}
+          sub={`${activePrices.length} itens ativos com preço`}
+          small
         />
       </div>
 
