@@ -27,35 +27,38 @@ export function PortalLogin({ onAuthenticated }) {
   return (
     <main className="login-shell">
       <section className="login-panel">
-        <div className="login-brand">
-          <span className="login-logo-badge"><img src={LOGO} alt="Ital in House" /></span>
-          <div><strong>Portal de inteligência</strong><small>Gestão da rede</small></div>
+        <div className="login-intro">
+          <img className="login-main-logo" src={LOGO} alt="Ital in House Macarrão Gourmet" />
+          <div className="login-intro-content">
+            <span className="login-kicker">OPERAÇÃO</span>
+            <h1>Portal de Itens<br /><strong>Pausados <b>×</b> Ativos</strong></h1>
+            <p>Visibilidade para agir rápido e manter o cardápio da rede sempre disponível.</p>
+          </div>
+          <div className="login-brand-list" aria-label="Marcas acompanhadas">
+            <span>Ital in House</span><span>Fast Food Caipira</span><span>City Burger</span><span>Green</span>
+          </div>
         </div>
-        <div className="login-copy">
-          <span className="eyebrow">PORTAL ITAL IN HOUSE</span>
-          <h1>Sua operação, clara e disponível.</h1>
-          <p>Acompanhe itens ativos, pausas e oportunidades da rede com uma leitura simples e objetiva.</p>
+        <div className="login-access">
+          <div className="login-access-heading">
+            <span className="eyebrow">ACESSO AO PAINEL</span>
+            <h2>Bem-vindo de volta</h2>
+            <p>Use sua senha para entrar como administrador ou franqueado.</p>
+          </div>
+          <form onSubmit={submit} className="login-form">
+            <label htmlFor="portal-password">Senha de acesso</label>
+            <input id="portal-password" type="password" autoComplete="current-password" value={password}
+              placeholder="Digite sua senha"
+              onChange={(event) => setPassword(event.target.value)} autoFocus />
+            {error && <div className="login-error">{error}</div>}
+            <button type="submit" disabled={busy || !password}>{busy ? 'Validando…' : 'Entrar no portal'}</button>
+          </form>
+          <div className="login-security">
+            <span aria-hidden="true">✓</span>
+            <small>Acesso protegido. Sua sessão termina ao fechar esta janela.</small>
+          </div>
         </div>
-        <form onSubmit={submit} className="login-form">
-          <label htmlFor="portal-password">Senha de acesso</label>
-          <input id="portal-password" type="password" autoComplete="current-password" value={password}
-            onChange={(event) => setPassword(event.target.value)} autoFocus />
-          {error && <div className="login-error">{error}</div>}
-          <button type="submit" disabled={busy || !password}>{busy ? 'Validando…' : 'Acessar dashboard'}</button>
-        </form>
-        <small className="security-note">A sessão termina ao fechar esta janela.</small>
       </section>
-      <aside className="login-visual" aria-hidden="true">
-        <div className="login-visual-copy">
-          <span>CONTROLE EM UM SÓ LUGAR</span>
-          <strong>Clareza para agir.<br />Dados para evoluir.</strong>
-          <small>Da visão geral da rede ao detalhe de cada unidade.</small>
-        </div>
-        <div className="brand-orbit orbit-orange">Fast Food Caipira</div>
-        <div className="brand-orbit orbit-blue">City Burger</div>
-        <div className="brand-orbit orbit-green">Green</div>
-        <div className="brand-orbit orbit-red">Ital in House</div>
-      </aside>
+      <footer className="login-footer">ITAL IN HOUSE · INTELIGÊNCIA OPERACIONAL</footer>
     </main>
   );
 }
