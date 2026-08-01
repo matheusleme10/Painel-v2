@@ -1,13 +1,23 @@
 import { useMemo, useState } from 'react';
 import { BRANDS, identifyBrand } from '../utils/brands.js';
+import { storeKey } from '../utils/stores.js';
 
 export function BrandSelector({ rows, onSelect }) {
   const [brandId, setBrandId] = useState('');
   const [store, setStore] = useState('');
   const [query, setQuery] = useState('');
-  const stores = useMemo(() => [...new Set(rows
-    .filter((row) => identifyBrand(row.loja) === brandId)
-    .map((row) => row.loja))].sort((a, b) => a.localeCompare(b, 'pt-BR')), [rows, brandId]);
+  const canonicalStores = useMemo(() => {
+    const metadata = rows.find((row) => row.unitHistory?.length || row.catalogCube?.stores?.length) || {};
+    const source = metadata.unitHistory?.length
+      ? metadata.unitHistory.map((entry) => entry.label)
+      : (metadata.catalogCube?.stores?.length ? metadata.catalogCube.stores : rows.map((row) => row.loja));
+    const unique = new Map();
+    source.filter(Boolean).forEach((name) => unique.set(storeKey(name), name));
+    return [...unique.values()];
+  }, [rows]);
+  const stores = useMemo(() => canonicalStores
+    .filter((name) => identifyBrand(name) === brandId)
+    .sort((a, b) => a.localeCompare(b, 'pt-BR')), [canonicalStores, brandId]);
   const suggestions = stores.filter((name) =>
     name.toLocaleLowerCase('pt-BR').includes(query.toLocaleLowerCase('pt-BR'))
   ).slice(0, 8);
@@ -27,7 +37,7 @@ export function BrandSelector({ rows, onSelect }) {
             <span className="brand-monogram">{brand.short.charAt(0)}</span>
             <strong>{brand.name}</strong>
             <small>{brand.description}</small>
-            <span className="brand-count">{new Set(rows.filter((row) => identifyBrand(row.loja) === brand.id).map((row) => row.loja)).size} unidades</span>
+            <span className="brand-count">{canonicalStores.filter((name) => identifyBrand(name) === brand.id).length} unidades</span>
           </button>
         ))}
       </section>
