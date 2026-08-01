@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { LOGO } from '../constants.js';
 
 export function PortalLogin({ onAuthenticated }) {
   const [password, setPassword] = useState('');
@@ -26,7 +27,10 @@ export function PortalLogin({ onAuthenticated }) {
   return (
     <main className="login-shell">
       <section className="login-panel">
-        <div className="login-brand"><span>IH</span><div><strong>Ital in House</strong><small>Franchise Intelligence</small></div></div>
+        <div className="login-brand">
+          <span className="login-logo-badge"><img src={LOGO} alt="Ital in House" /></span>
+          <div><strong>Portal de inteligência</strong><small>Gestão da rede</small></div>
+        </div>
         <div className="login-copy">
           <span className="eyebrow">ACESSO PROTEGIDO</span>
           <h1>Dados da rede protegidos por perfil de acesso.</h1>
@@ -42,10 +46,15 @@ export function PortalLogin({ onAuthenticated }) {
         <small className="security-note">A sessão termina ao fechar esta janela.</small>
       </section>
       <aside className="login-visual" aria-hidden="true">
+        <div className="login-visual-copy">
+          <span>VISÃO OPERACIONAL</span>
+          <strong>Uma rede inteira.<br />Uma leitura simples.</strong>
+          <small>Itens ativos, pausas e oportunidades em um só lugar.</small>
+        </div>
         <div className="brand-orbit orbit-orange">Fast Food Caipira</div>
         <div className="brand-orbit orbit-blue">City Burger</div>
         <div className="brand-orbit orbit-green">Green</div>
-        <div className="brand-orbit orbit-red">IH · Ital in House</div>
+        <div className="brand-orbit orbit-red">Ital in House</div>
       </aside>
     </main>
   );
