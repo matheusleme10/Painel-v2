@@ -18,7 +18,11 @@ export function PortalLogin({ onAuthenticated }) {
     });
     if (response.ok) {
       const session = await response.json();
-      return onAuthenticated({ role: session.role });
+      return onAuthenticated({
+        role: session.role,
+        identified: session.identified,
+        identity: session.identity || null,
+      });
     }
     setError(response.status === 503 ? 'As senhas do portal ainda não foram configuradas.' : 'Senha incorreta.');
     setBusy(false);
