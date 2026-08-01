@@ -31,6 +31,38 @@ function sameStore(left, right) {
   return a === b || a.includes(b) || b.includes(a);
 }
 
+function summarizeUnits(entries, effectiveTo, effectiveShift) {
+  const range = new Map();
+  entries.forEach((entry) => {
+    const current = range.get(entry.label) || {
+      ...entry, total: 0, active: 0, paused: 0, pausedRevenue: 0, observations: 0,
+    };
+    current.total += entry.total;
+    current.active += entry.active;
+    current.paused += entry.paused;
+    current.pausedRevenue += Number(entry.pausedRevenue) || 0;
+    current.observations += 1;
+    current.pausedPct = current.total ? current.paused / current.total : 0;
+    range.set(entry.label, current);
+  });
+  return [...range.values()].map((entry) => ({
+    loja: entry.label,
+    categoria: '',
+    item: '',
+    dia: effectiveTo,
+    shift: effectiveShift,
+    status: 'Resumo',
+    precoNum: 0,
+    unitTotal: entry.total,
+    unitActive: entry.active,
+    unitPaused: entry.paused,
+    unitPausedPct: entry.pausedPct,
+    unitPausedRevenue: entry.pausedRevenue,
+    observations: entry.observations,
+    summaryOnly: true,
+  }));
+}
+
 export function App() {
   const [splash, setSplash] = useState(true);
   const [auth, setAuth] = useState(null);
@@ -39,6 +71,7 @@ export function App() {
   const [tab, setTab] = useState('network');
   const [all, setAll] = useState([]);
   const [syncing, setSyncing] = useState(false);
+  const [theme, setTheme] = useState(() => localStorage.getItem('ital_theme') || 'light');
   const [filters, setFilters] = useState({
     from: null,
     to: null,
@@ -99,35 +132,14 @@ export function App() {
     && matchesShift(entry.shift)
     && matchesScope(entry.label)
   ));
-  const unitRangeMap = new Map();
-  unitEntries.forEach((entry) => {
-    const current = unitRangeMap.get(entry.label) || {
-      ...entry, total: 0, active: 0, paused: 0, pausedRevenue: 0, observations: 0,
-    };
-    current.total += entry.total;
-    current.active += entry.active;
-    current.paused += entry.paused;
-    current.pausedRevenue += Number(entry.pausedRevenue) || 0;
-    current.observations += 1;
-    current.pausedPct = current.total ? current.paused / current.total : 0;
-    unitRangeMap.set(entry.label, current);
-  });
-  const networkRows = [...unitRangeMap.values()].map((entry) => ({
-    loja: entry.label,
-    categoria: '',
-    item: '',
-    dia: effectiveTo,
-    shift: effectiveShift,
-    status: 'Resumo',
-    precoNum: 0,
-    unitTotal: entry.total,
-    unitActive: entry.active,
-    unitPaused: entry.paused,
-    unitPausedPct: entry.pausedPct,
-    unitPausedRevenue: entry.pausedRevenue,
-    observations: entry.observations,
-    summaryOnly: true,
-  }));
+  const networkRows = summarizeUnits(unitEntries, effectiveTo, effectiveShift);
+  const rankingEntries = unitHistory.filter((entry) => (
+    entry.date >= effectiveFrom
+    && entry.date <= effectiveTo
+    && matchesShift(entry.shift)
+    && (scopeBrand === 'all' || identifyBrand(entry.label) === scopeBrand)
+  ));
+  const rankingRows = summarizeUnits(rankingEntries, effectiveTo, effectiveShift);
   const scopedSnapshot = networkRows.reduce((summary, row) => ({
     activeItems: summary.activeItems + row.unitActive,
     pausedItems: summary.pausedItems + row.unitPaused,
@@ -219,11 +231,28 @@ export function App() {
   const activeBrand = context?.brandId ? brandById(context.brandId) : null;
   const displayShift = effectiveShift;
 
+  function toggleTheme() {
+    setTheme((current) => {
+      const next = current === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('ital_theme', next);
+      return next;
+    });
+  }
+
   return (
-    <div className="app-shell" style={activeBrand ? { '--portal-accent': activeBrand.color, '--portal-accent-soft': activeBrand.soft } : undefined}>
+    <div className={`app-shell ${theme === 'dark' ? 'dark' : ''}`} style={activeBrand ? { '--portal-accent': activeBrand.color, '--portal-accent-soft': activeBrand.soft } : undefined}>
       <PortalHeader tab={tab} onTabChange={setTab} all={pageRows} lastDate={lastDate}
         shift={displayShift} syncing={syncing} context={context} role={auth.role}
+        theme={theme} onToggleTheme={toggleTheme}
         onChangeContext={isAdmin ? null : () => { setContext(null); setTab('dash'); }} onLogout={logout} />
+
+      {!isAdmin && context?.store && (
+        <div className="franchise-context-bar">
+          <span className="franchise-context-mark">IH</span>
+          <span><small>Sua unidade selecionada</small><strong>{context.store}</strong></span>
+          <button type="button" onClick={() => { setContext(null); setTab('dash'); }}>Trocar unidade</button>
+        </div>
+      )}
 
       {all.length > 0 && !['notify', 'update'].includes(tab) && (
         <AnalysisFilters
@@ -258,7 +287,8 @@ export function App() {
         {tab === 'items' && (isAdmin ? <ItemsOverviewPage rows={exactSnapshotDates.length ? detailRows : productRows} /> : <FranchiseCatalogPage rows={detailRows} />)}
         {tab === 'cats' && <CatPage today={isAdmin && productRows.length ? productRows : detailRows} showFinancials={isAdmin} />}
         {tab === 'alerts' && isAdmin && <AlertsPage today={detailRows} all={detailRows} />}
-        {tab === 'rank' && <RankPage today={networkRows} periodFrom={effectiveFrom} periodTo={effectiveTo} showFinancials={isAdmin} />}
+        {tab === 'rank' && <RankPage today={isAdmin ? networkRows : rankingRows} periodFrom={effectiveFrom} periodTo={effectiveTo}
+          showFinancials={isAdmin} selectedStore={isAdmin ? '' : context?.store} />}
         {tab === 'forneria' && <ForneriaPage rows={exactSnapshotDates.length ? detailRows : productRows}
           summaryRows={!metadata.catalogCube?.records?.length && effectiveShift === 'Almoço' ? forneriaSummaries : []}
           showFinancials={isAdmin} />}
