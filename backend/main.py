@@ -246,7 +246,7 @@ def redact_paused_revenue(payload: dict) -> dict:
 
 async def read_current_payload() -> dict | None:
     if BLOB_TOKEN:
-        from vercel.blob import AsyncBlobClient
+        from vercel.blob import AsyncBlobClient, BlobNotFoundError
 
         try:
             async with AsyncBlobClient(token=BLOB_TOKEN) as blob_client:
@@ -254,6 +254,8 @@ async def read_current_payload() -> dict | None:
                 if result is None or result.status_code != 200 or result.stream is None:
                     return None
                 compressed = b"".join([chunk async for chunk in result.stream])
+        except BlobNotFoundError:
+            return None
         except Exception as error:
             _report_blob_error("read", error)
             raise CloudStorageError(
@@ -323,13 +325,17 @@ def _default_notification_settings() -> dict:
 async def read_notification_settings() -> dict:
     defaults = _default_notification_settings()
     if BLOB_TOKEN:
-        from vercel.blob import AsyncBlobClient
+        from vercel.blob import AsyncBlobClient, BlobNotFoundError
 
-        async with AsyncBlobClient(token=BLOB_TOKEN) as blob_client:
-            result = await blob_client.get(NOTIFICATION_SETTINGS_BLOB_PATH, access="private")
-            if result is None or result.status_code != 200 or result.stream is None:
-                return defaults
-            raw = b"".join([chunk async for chunk in result.stream])
+        try:
+            async with AsyncBlobClient(token=BLOB_TOKEN) as blob_client:
+                result = await blob_client.get(NOTIFICATION_SETTINGS_BLOB_PATH, access="private")
+                if result is None or result.status_code != 200 or result.stream is None:
+                    return defaults
+                raw = b"".join([chunk async for chunk in result.stream])
+        except BlobNotFoundError:
+            # Primeiro uso: o arquivo de preferências ainda será criado pelo administrador.
+            return defaults
         saved = json.loads(raw.decode("utf-8"))
         return {**defaults, **saved}
 
@@ -474,12 +480,13 @@ async def send_notifications(payload: dict, message: str | None = None, subject:
 
 
 async def maybe_send_notifications(payload: dict) -> dict:
-    settings = await read_notification_settings()
-    if not settings["autoEnabled"]:
-        return {"status": "disabled"}
     try:
+        settings = await read_notification_settings()
+        if not settings["autoEnabled"]:
+            return {"status": "disabled"}
         return await send_notifications(payload)
-    except (RuntimeError, OSError, smtplib.SMTPException, httpx.HTTPError) as error:
+    except Exception as error:
+        _report_blob_error("notification", error)
         LAST_NOTIFICATION.update({
             "status": "error",
             "sentAt": datetime.now(timezone.utc).isoformat(),
