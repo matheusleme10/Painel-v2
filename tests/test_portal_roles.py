@@ -65,6 +65,23 @@ def test_session_cookie_authenticates_without_exposing_hash_to_frontend(monkeypa
         assert session.json() == {"authenticated": True, "role": "admin"}
 
 
+def test_franchise_potential_requires_separate_password(monkeypatch):
+    franchise_password = "senha-franqueado-teste"
+    potential_password = "senha-potencial-teste"
+    monkeypatch.setenv("FRANCHISE_PASSWORD_HASH", hashlib.sha256(franchise_password.encode()).hexdigest())
+    monkeypatch.setenv("FRANCHISE_POTENTIAL_PASSWORD_HASH", hashlib.sha256(potential_password.encode()).hexdigest())
+    monkeypatch.setenv("SESSION_SECRET", "segredo-de-sessao-com-mais-de-trinta-e-dois-caracteres")
+
+    with TestClient(app) as client:
+        assert client.post("/api/session", json={"password": franchise_password}).status_code == 200
+        assert client.get("/api/potential/session").json() == {"authorized": False}
+        assert client.post("/api/potential/session", json={"password": "incorreta"}).status_code == 401
+        unlocked = client.post("/api/potential/session", json={"password": potential_password})
+        assert unlocked.status_code == 200
+        assert "HttpOnly" in unlocked.headers["set-cookie"]
+        assert client.get("/api/potential/session").json() == {"authorized": True}
+
+
 def test_login_rate_limit_and_security_headers(monkeypatch):
     LOGIN_ATTEMPTS.clear()
     monkeypatch.setenv("ADMIN_PASSWORD_HASH", hashlib.sha256(b"senha-correta").hexdigest())
