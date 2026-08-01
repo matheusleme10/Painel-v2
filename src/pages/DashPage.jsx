@@ -3,11 +3,6 @@ import { C } from '../constants.js';
 import { Card } from '../components/ui/Card.jsx';
 import { Kpi } from '../components/ui/Kpi.jsx';
 import { Pill } from '../components/ui/Pill.jsx';
-import { Ic } from '../components/ui/Icon.jsx';
-import { Ring } from '../components/ui/charts/Ring.jsx';
-import { Gauge } from '../components/ui/charts/Gauge.jsx';
-import { HBar } from '../components/ui/charts/HBar.jsx';
-import { AlertBanner } from '../components/ui/AlertBanner.jsx';
 import { pct, brl, clamp, formatDateBR } from '../utils/format.js';
 import { parseDate } from '../utils/date.js';
 import { StatusItemsPanel } from '../components/ui/StatusItemsPanel.jsx';
@@ -35,24 +30,7 @@ export function DashPage({ all, today, systemicRows = today, lastDate, periodFro
     return [...map.values()].sort((a, b) => b.count - a.count).slice(0, 10);
   }, [all]);
 
-  const { lojaStats, mediaRede, criticas, itemMap, sistematicos, dias } = useMemo(() => {
-    const lojaMap = {};
-    today.forEach((r) => {
-      if (!lojaMap[r.loja]) lojaMap[r.loja] = { t: 0, p: 0 };
-      lojaMap[r.loja].t++;
-      if (r.status === 'Pausado') lojaMap[r.loja].p++;
-    });
-    const lojaStats = Object.entries(lojaMap).map(([n, v]) => {
-      const sample = today.find((row) => row.loja === n && row.unitTotal > 0);
-      return {
-        n,
-        score: sample ? pct(sample.unitActive, sample.unitTotal) : pct(v.t - v.p, v.t),
-        p: sample?.unitPaused ?? v.p,
-      };
-    });
-    const mediaRede = Math.round(lojaStats.reduce((s, l) => s + l.score, 0) / (lojaStats.length || 1));
-    const criticas = lojaStats.filter((l) => l.score < 60).length;
-
+  const { itemMap, dias } = useMemo(() => {
     const itemMap = {};
     systemicRows
       .filter((r) => r.status === 'Pausado')
@@ -63,10 +41,6 @@ export function DashPage({ all, today, systemicRows = today, lastDate, periodFro
         itemMap[r.item].risco += r.precoNum;
         itemMap[r.item].lojas.add(r.loja);
       });
-    const sistematicos = Object.values(itemMap)
-      .filter((x) => x.lojas.size > 1)
-      .sort((a, b) => b.lojas.size - a.lojas.size);
-
     const diaMap = {};
     all.filter((r) => r.status === 'Pausado').forEach((r) => {
       if (r.dia) diaMap[r.dia] = (diaMap[r.dia] || 0) + 1;
@@ -77,58 +51,31 @@ export function DashPage({ all, today, systemicRows = today, lastDate, periodFro
       return !da || !db ? 0 : da - db;
     });
 
-    return { lojaStats, mediaRede, criticas, itemMap, sistematicos, dias };
-  }, [all, today, systemicRows]);
+    return { itemMap, dias };
+  }, [all, systemicRows]);
 
   const topRisco = Object.values(itemMap)
     .filter((x) => x.risco > 0)
     .sort((a, b) => b.risco - a.risco)
     .slice(0, 5);
 
-  const alerts = [];
-  if (criticas > 0)
-    alerts.push({
-      lvl: 'crit',
-      msg: `${criticas} franquia${criticas > 1 ? 's' : ''} com disponibilidade abaixo de 60%`,
-    });
-  if (pct(pausados, total) > 30)
-    alerts.push({
-      lvl: 'crit',
-      msg: `${pct(pausados, total)}% dos itens pausados — acima do limite recomendado de 30%`,
-    });
-  if (sistematicos.length > 0)
-    alerts.push({
-      lvl: 'warn',
-      msg: `"${sistematicos[0].n}" pausado em ${sistematicos[0].lojas.size} franquias — possível problema de fornecedor`,
-    });
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
-          padding: '7px 13px',
-          background: C.blueL,
-          borderRadius: 10,
-          border: `1px solid ${C.blueM}`,
-          fontSize: 12,
-          color: C.blue,
-          fontWeight: 600,
-          alignSelf: 'flex-start',
-        }}
-      >
-        <Ic n="network" s={13} c={C.blue} />
-        {periodFrom && periodTo && periodFrom !== periodTo
-          ? <>Período: <b>{formatDateBR(periodFrom)}</b> até <b>{formatDateBR(periodTo)}</b></>
-          : <>Dados de: <b>{lastDate || 'todos'}</b></>
-        }
-        &nbsp;·&nbsp; {lojas.length} franquias &nbsp;·&nbsp;
-        {total} itens
+      <div className="unit-hero">
+        <div>
+          <span className="eyebrow">VISÃO OPERACIONAL DA UNIDADE</span>
+          <h1>{lojas[0] || 'Minha Unidade'}</h1>
+          <p>
+            {periodFrom && periodTo && periodFrom !== periodTo
+              ? <>Período de <b>{formatDateBR(periodFrom)}</b> até <b>{formatDateBR(periodTo)}</b></>
+              : <>Posição do cardápio em <b>{formatDateBR(lastDate)}</b></>
+            }
+          </p>
+        </div>
+        <div className={`unit-health ${disponib >= 80 ? 'healthy' : disponib >= 60 ? 'attention' : 'critical'}`}>
+          <strong>{disponib}%</strong><span>disponibilidade</span>
+        </div>
       </div>
-
-      <AlertBanner items={alerts} />
 
       {historical && (
         <div style={{ padding: '10px 13px', borderRadius: 10, background: C.amberL, color: C.amber, fontSize: 12, fontWeight: 600 }}>
@@ -138,12 +85,12 @@ export function DashPage({ all, today, systemicRows = today, lastDate, periodFro
 
       <div style={{ order: -10, display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))', gap: 12 }}>
         <Kpi
-          label="Disponibilidade da Rede"
+          label="Disponibilidade da Unidade"
           value={`${disponib}%`}
           icon="check"
           accent={disponib >= 80 ? C.green : disponib >= 60 ? C.amber : C.red}
           accentBg={disponib >= 80 ? C.greenL : disponib >= 60 ? C.amberL : C.redL}
-          sub={`Média: ${mediaRede}% entre ${lojas.length} franquias`}
+          sub={`${ativos} de ${total} itens disponíveis`}
         />
       <Kpi
         label="Itens Pausados"
@@ -172,14 +119,6 @@ export function DashPage({ all, today, systemicRows = today, lastDate, periodFro
             small
           />
         )}
-        <Kpi
-          label="Franquias Críticas"
-          value={criticas}
-          icon="alert"
-          accent={criticas > 0 ? C.red : C.green}
-          accentBg={criticas > 0 ? C.redL : C.greenL}
-          sub="< 60% de disponibilidade"
-        />
         <Kpi
           label="Itens Únicos Pausados"
           value={Object.keys(itemMap).length}
@@ -210,28 +149,8 @@ export function DashPage({ all, today, systemicRows = today, lastDate, periodFro
       </div>
     </Card>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(270px,1fr))', gap: 16 }}>
+      {showPausedRevenue && <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(270px,1fr))', gap: 16 }}>
         <Card>
-          <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 12 }}>
-            Saúde Geral da Rede
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 12 }}>
-            <Gauge value={disponib} />
-          </div>
-          <div style={{ display: 'flex', gap: 10 }}>
-            {[
-              ['Ótimo', '≥80%', C.green, C.greenL],
-              [' Atenção', '60-79%', C.amber, C.amberL],
-              ['Crítico', '<60%', C.red, C.redL],
-            ].map(([l, r, c, bg]) => (
-              <div key={l} style={{ flex: 1, background: bg, borderRadius: 8, padding: '7px 10px', textAlign: 'center' }}>
-                <div style={{ fontSize: 10, fontWeight: 700, color: c }}>{l}</div>
-                <div style={{ fontSize: 10, color: C.muted }}>{r}</div>
-              </div>
-            ))}
-          </div>
-        </Card>
-        {showPausedRevenue && <Card>
           <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 12 }}>
             🔥 Top Itens por Receita em Risco
           </div>
@@ -292,27 +211,8 @@ export function DashPage({ all, today, systemicRows = today, lastDate, periodFro
               Nenhum preço disponível nos dados
             </div>
           )}
-        </Card>}
-      </div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(270px,1fr))', gap: 16 }}>
-        <Card>
-          <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 12 }}>
-            Top Itens Pausados na Rede
-          </div>
-          <HBar
-            data={Object.values(itemMap)
-              .sort((a, b) => b.v - a.v)
-              .slice(0, 8)
-              .map((x) => ({ n: x.n, v: x.v }))}
-            maxItems={8}
-            color={(d, i) => {
-              const colors = [C.red, C.blue, C.amber, C.green, C.purple, C.orange, C.teal, '#BE185D'];
-              return colors[i % colors.length];
-            }}
-          />
         </Card>
-      </div>
+      </div>}
 
       {dias.length > 1 && (
         <Card>

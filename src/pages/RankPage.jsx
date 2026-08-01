@@ -15,6 +15,10 @@ function medalColor(rank) {
   return { bg: C.bg, color: C.muted, border: C.border };
 }
 
+const normalizeStore = (value) => String(value || '')
+  .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+  .toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+
 function SortIcon({ col, sortCol, sortDir }) {
   if (sortCol !== col)
     return <span style={{ color: C.border, fontSize: 10 }}>⇅</span>;
@@ -64,13 +68,11 @@ function Empty() {
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
-export function RankPage({ today, periodFrom, periodTo, showFinancials = false }) {
+export function RankPage({ today, periodFrom, periodTo, showFinancials = false, selectedStore = '' }) {
   const [search,  setSearch]  = useState('');
   const [sortCol, setSortCol] = useState('rank');
   const [sortDir, setSortDir] = useState('asc');
   const [filter,  setFilter]  = useState('todos'); // todos | critico | atencao | ok | abaixo
-
-  if (!today.length) return <Empty />;
 
   // ── Calcular estatísticas por franquia ──────────────────────────────────────
   const { rows, mediaRede } = useMemo(() => {
@@ -123,6 +125,7 @@ export function RankPage({ today, periodFrom, periodTo, showFinancials = false }
   const totalRisco    = rows.reduce((s, r) => s + r.risco, 0);
   const abaixoMedia   = rows.filter((r) => r.disponib < mediaRede).length;
   const criticas      = rows.filter((r) => r.disponib < 60).length;
+  const selectedMetric = rows.find((row) => normalizeStore(row.loja) === normalizeStore(selectedStore));
 
   const chipStyle = (active) => ({
     padding: '5px 11px',
@@ -136,6 +139,8 @@ export function RankPage({ today, periodFrom, periodTo, showFinancials = false }
     color: active ? 'white' : C.muted,
     whiteSpace: 'nowrap',
   });
+
+  if (!today.length) return <Empty />;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -183,6 +188,17 @@ export function RankPage({ today, periodFrom, periodTo, showFinancials = false }
           </div>
         ))}
       </div>
+
+      {selectedMetric && (
+        <div className="ranking-own-position">
+          <span className="ranking-own-rank">#{selectedMetric.rank}</span>
+          <span>
+            <small>Sua posição entre {rows.length} unidades da mesma marca</small>
+            <strong>{selectedMetric.loja}</strong>
+          </span>
+          <b>{selectedMetric.disponib}% disponível</b>
+        </div>
+      )}
 
       {/* Tabela */}
       <Card style={{ padding: 0, overflow: 'hidden' }}>
@@ -260,16 +276,18 @@ export function RankPage({ today, periodFrom, periodTo, showFinancials = false }
                 const abaixo   = vsRede < 0;
                 const dispColor = r.disponib >= 80 ? C.green : r.disponib >= 60 ? C.amber : C.red;
                 const dispBg    = r.disponib >= 80 ? C.greenL : r.disponib >= 60 ? C.amberL : C.redL;
+                const isSelected = selectedMetric?.loja === r.loja;
 
                 return (
                   <tr
                     key={r.loja}
+                    className={isSelected ? 'ranking-row-selected' : ''}
                     style={{
                       borderTop: `1px solid ${C.border}`,
                       transition: 'background .1s',
                     }}
-                    onMouseEnter={(e) => (e.currentTarget.style.background = C.bg)}
-                    onMouseLeave={(e) => (e.currentTarget.style.background = 'white')}
+                    onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.background = C.bg; }}
+                    onMouseLeave={(e) => { if (!isSelected) e.currentTarget.style.background = 'white'; }}
                   >
                     {/* Ranking */}
                     <td style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>
@@ -294,7 +312,7 @@ export function RankPage({ today, periodFrom, periodTo, showFinancials = false }
 
                     {/* Franquia */}
                     <td style={{ padding: '10px 12px', fontWeight: 600, fontSize: 13, color: C.text, minWidth: 160 }}>
-                      {r.loja}
+                      {r.loja} {isSelected && <Pill color={C.red} bg={C.redL} s={9}>Sua unidade</Pill>}
                     </td>
 
                     {/* Disponibilidade */}
