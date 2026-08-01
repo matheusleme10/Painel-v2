@@ -88,12 +88,12 @@ def test_franchise_identification_and_unit_access_are_audited(monkeypatch, tmp_p
 
         identity = franchise.post("/api/access/identify", json={
             "name": "  Maria   da Silva  ",
-            "email": "MARIA@EXEMPLO.COM.BR",
+            "email": "MARIA@ITALINHOUSE.COM",
         })
         assert identity.status_code == 200
         assert identity.json()["identity"] == {
             "name": "Maria da Silva",
-            "email": "maria@exemplo.com.br",
+            "email": "maria@italinhouse.com",
         }
         assert "HttpOnly" in identity.headers["set-cookie"]
         selected = franchise.post("/api/access/context", json={
@@ -111,10 +111,72 @@ def test_franchise_identification_and_unit_access_are_audited(monkeypatch, tmp_p
         assert len(events) == 2
         selected_event = next(event for event in events if event["action"] == "unit_selected")
         assert selected_event["name"] == "Maria da Silva"
-        assert selected_event["email"] == "maria@exemplo.com.br"
+        assert selected_event["email"] == "maria@italinhouse.com"
         assert selected_event["store"] == "Ital in House - São Carlos - 123456"
         assert selected_event["brandId"] == "ih"
         assert selected_event["accessedAt"]
+
+
+def test_access_log_storage_failure_does_not_block_franchise(monkeypatch):
+    LOGIN_ATTEMPTS.clear()
+    franchise_password = "senha-franqueado-fallback"
+    monkeypatch.setenv("FRANCHISE_PASSWORD_HASH", hashlib.sha256(franchise_password.encode()).hexdigest())
+    monkeypatch.setenv("ADMIN_PASSWORD_HASH", hashlib.sha256(b"admin-fallback").hexdigest())
+    monkeypatch.setenv("SESSION_SECRET", "segredo-de-sessao-com-mais-de-trinta-e-dois-caracteres")
+
+    async def failing_writer(_event):
+        raise RuntimeError("blob indisponivel")
+
+    monkeypatch.setattr(main_module, "_save_access_event", failing_writer)
+    with TestClient(app) as client:
+        assert client.post("/api/session", json={"password": franchise_password}).status_code == 200
+        response = client.post("/api/access/identify", json={
+            "name": "Pessoa Teste",
+            "email": "pessoa@italinhouse.com",
+        })
+        assert response.status_code == 200
+        assert response.json()["identified"] is True
+        assert response.json()["auditRecorded"] is False
+        assert client.get("/api/session").json()["identified"] is True
+
+
+def test_admin_controls_email_domains_and_can_clear_logs(monkeypatch, tmp_path):
+    LOGIN_ATTEMPTS.clear()
+    admin_password = "admin-dominios"
+    franchise_password = "franqueado-dominios"
+    monkeypatch.setenv("ADMIN_PASSWORD_HASH", hashlib.sha256(admin_password.encode()).hexdigest())
+    monkeypatch.setenv("FRANCHISE_PASSWORD_HASH", hashlib.sha256(franchise_password.encode()).hexdigest())
+    monkeypatch.setenv("SESSION_SECRET", "segredo-de-sessao-com-mais-de-trinta-e-dois-caracteres")
+    monkeypatch.setattr(main_module, "BLOB_TOKEN", "")
+    monkeypatch.setattr(main_module, "ACCESS_SETTINGS_PATH", tmp_path / "access-settings.json")
+    monkeypatch.setattr(main_module, "ACCESS_LOG_PATH", tmp_path / "access-logs.jsonl")
+
+    with TestClient(app) as admin:
+        admin.post("/api/session", json={"password": admin_password})
+        settings = admin.put("/api/access-settings", json={
+            "allowedDomains": ["@italinhouse.com", "GMAIL.COM", "gmail.com"],
+        })
+        assert settings.status_code == 200
+        assert settings.json()["allowedDomains"] == ["italinhouse.com", "gmail.com"]
+
+    with TestClient(app) as franchise:
+        franchise.post("/api/session", json={"password": franchise_password})
+        denied = franchise.post("/api/access/identify", json={
+            "name": "Pessoa Bloqueada", "email": "pessoa@outro.com",
+        })
+        assert denied.status_code == 403
+        allowed = franchise.post("/api/access/identify", json={
+            "name": "Pessoa Gmail", "email": "pessoa@gmail.com",
+        })
+        assert allowed.status_code == 200
+
+    with TestClient(app) as admin:
+        admin.post("/api/session", json={"password": admin_password})
+        assert admin.get("/api/access-logs").json()["total"] == 1
+        cleared = admin.delete("/api/access-logs")
+        assert cleared.status_code == 200
+        assert cleared.json()["deleted"] == 1
+        assert admin.get("/api/access-logs").json()["total"] == 0
 
 
 def test_franchise_potential_requires_separate_password(monkeypatch):
