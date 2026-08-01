@@ -6,26 +6,30 @@ import { HBar } from '../components/ui/charts/HBar.jsx';
 import { brl } from '../utils/format.js';
 import { rowsByStatus } from '../utils/analytics.js';
 
+const normalize = (value) => String(value || '')
+  .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+  .toLocaleLowerCase('pt-BR').replace(/[^a-z0-9]+/g, ' ').trim();
+
 export function RevenueProjectionPage({ rows, summaryRows = [], isAdmin = false }) {
   const [ordersPerDay, setOrdersPerDay] = useState(30);
   const [days, setDays] = useState(30);
   const [query, setQuery] = useState('');
-  const term = query.trim().toLocaleLowerCase('pt-BR');
+  const term = normalize(query);
   const filteredRows = useMemo(() => (
-    term ? rows.filter((row) => (row.loja || '').toLocaleLowerCase('pt-BR').includes(term)) : rows
+    term ? rows.filter((row) => normalize(row.loja).includes(term)) : rows
   ), [rows, term]);
   const filteredSummaryRows = useMemo(() => (
-    term ? summaryRows.filter((row) => (row.loja || '').toLocaleLowerCase('pt-BR').includes(term)) : summaryRows
+    term ? summaryRows.filter((row) => normalize(row.loja).includes(term)) : summaryRows
   ), [summaryRows, term]);
-  const stores = useMemo(() => (
-    [...new Set(filteredRows.map((row) => row.loja).filter(Boolean))]
-  ), [filteredRows]);
+  const allStores = useMemo(() => [...new Set(rows.map((row) => row.loja).filter(Boolean))].sort(), [rows]);
+  const stores = useMemo(() => [...new Set(filteredRows.map((row) => row.loja).filter(Boolean))], [filteredRows]);
   const active = useMemo(() => rowsByStatus(filteredRows, 'Ativo'), [filteredRows]);
   const priced = active.filter((row) => row.precoNum > 0);
   const averageTicket = priced.length
     ? priced.reduce((sum, row) => sum + row.precoNum, 0) / priced.length
     : 0;
-  const dailyPotential = averageTicket * ordersPerDay;
+  const storeCount = stores.length;
+  const dailyPotential = averageTicket * ordersPerDay * storeCount;
   const monthlyPotential = dailyPotential * days;
   const pausedOccurrences = filteredSummaryRows.reduce((sum, row) => sum + (Number(row.unitPaused) || 0), 0);
   const totalOccurrences = filteredSummaryRows.reduce((sum, row) => sum + (Number(row.unitTotal) || 0), 0);
@@ -45,15 +49,19 @@ export function RevenueProjectionPage({ rows, summaryRows = [], isAdmin = false 
       {isAdmin && (
         <div className="network-store-search">
           <input type="search" value={query} placeholder="Pesquisar uma unidade..."
-            onChange={(event) => setQuery(event.target.value)} />
+            list="projection-store-options" onChange={(event) => setQuery(event.target.value)} />
+          <datalist id="projection-store-options">
+            {allStores.map((store) => <option key={store} value={store} />)}
+          </datalist>
           {term && <span>{stores.length} unidade(s) encontrada(s)</span>}
         </div>
       )}
       <div className="network-kpis">
         <Kpi label="Itens ativos identificados" value={active.length} icon="check" accent={C.green} accentBg={C.greenL} />
+        <Kpi label="Unidades no cenário" value={storeCount} icon="store" accent={C.red} accentBg={C.redL} sub={term ? 'resultado da pesquisa' : 'rede no filtro atual'} />
         <Kpi label="Ativos com preço" value={priced.length} icon="money" accent={C.blue} accentBg={C.blueL} sub={`${active.length ? Math.round(priced.length / active.length * 100) : 0}% de cobertura`} />
         <Kpi label="Ticket médio ativo estimado" value={brl(averageTicket)} icon="item" accent={C.purple} accentBg={C.purpleL} sub="média simples dos preços ativos" />
-        <Kpi label="Potencial diário" value={brl(dailyPotential)} icon="money" accent={C.orange} accentBg={C.orangeL} />
+        <Kpi label="Potencial diário" value={brl(dailyPotential)} icon="money" accent={C.orange} accentBg={C.orangeL} sub={`${ordersPerDay} pedidos × ${storeCount} unidade(s)`} />
         <Kpi label="Potencial do período" value={brl(monthlyPotential)} icon="trophy" accent={C.green} accentBg={C.greenL} />
         <Kpi label="Potencial em risco estimado" value={brl(potentialAtRisk)} icon="alert" accent={C.red} accentBg={C.redL}
           sub={`${pausedOccurrences} pausas · ${totalOccurrences ? Math.round(pausedOccurrences / totalOccurrences * 100) : 0}% das observações`} />
