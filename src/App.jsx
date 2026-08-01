@@ -21,16 +21,7 @@ import { BrandSelector } from './components/BrandSelector.jsx';
 import { PotentialAccessGate } from './components/PotentialAccessGate.jsx';
 import { brandById, identifyBrand } from './utils/brands.js';
 import { decodeCatalogCube } from './utils/pivot-cache.js';
-
-const normalize = (value) => String(value || '')
-  .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-  .toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
-
-function sameStore(left, right) {
-  const a = normalize(left);
-  const b = normalize(right);
-  return a === b || a.includes(b) || b.includes(a);
-}
+import { isSameStore } from './utils/stores.js';
 
 function summarizeUnits(entries, effectiveTo, effectiveShift) {
   const range = new Map();
@@ -123,7 +114,7 @@ export function App() {
   const scopeStore = isAdmin ? 'all' : (context?.store || 'all');
   const matchesScope = (store) => (
     (scopeBrand === 'all' || identifyBrand(store) === scopeBrand)
-    && (scopeStore === 'all' || sameStore(store, scopeStore))
+    && (scopeStore === 'all' || isSameStore(store, scopeStore))
   );
   const matchesShift = (shift) => !shift || shift === effectiveShift;
   const unitEntries = unitHistory.filter((entry) => (
