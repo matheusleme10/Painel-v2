@@ -72,19 +72,19 @@ export function CatPage({ today, showFinancials = false }) {
           small
         />
         <Kpi
-          label="Cats > 50% pausado"
+          label="Categorias com maioria pausada"
           value={cats.filter((c) => pct(c.p, c.t) > 50).length}
           icon="alert"
           accent={C.red}
           accentBg={C.redL}
-          sub="categorias críticas"
+          sub="mais de 50% dos itens pausados"
         />
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(270px,1fr))', gap: 16 }}>
         <Card>
           <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 12 }}>
-            Categorias por Itens Pausados
+            Quantidade de itens pausados por categoria
           </div>
           <HBar
             data={cats.slice(0, 8).map((c) => ({ n: c.cat, v: c.p }))}
@@ -98,7 +98,7 @@ export function CatPage({ today, showFinancials = false }) {
 
         <Card>
           <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 12 }}>
-            Share de Pausados por Categoria
+            Distribuição dos itens pausados entre categorias
           </div>
           <Donut data={cats.slice(0, 7).map((c) => ({ n: c.cat, v: c.p }))} />
         </Card>
@@ -107,6 +107,11 @@ export function CatPage({ today, showFinancials = false }) {
       <Card>
         <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 12 }}>
           Detalhes por Categoria
+        </div>
+        <div className="category-guide">
+          <span><b>Pausados</b> itens indisponíveis agora</span>
+          <span><b>Ativos</b> itens disponíveis agora</span>
+          <span><b>Disponibilidade</b> percentual ativo da categoria</span>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
           {cats.map((c) => {
@@ -142,20 +147,15 @@ export function CatPage({ today, showFinancials = false }) {
                         {brl(c.risco)}
                       </Pill>
                     )}
-                    <span
-                      style={{
-                        fontSize: 11,
-                        color: on ? 'rgba(255,255,255,.7)' : C.muted,
-                      }}
-                    >
-                      {c.p}/{c.t}
+                    <span className="category-counts" style={{ color: on ? 'rgba(255,255,255,.82)' : C.muted }}>
+                      <b>{c.p}</b> pausados · <b>{c.a}</b> ativos · {c.t} no total
                     </span>
                     <Pill
                       color={on ? 'white' : scColor}
                       bg={on ? 'rgba(255,255,255,.2)' : scColor + '1A'}
                       s={10}
                     >
-                      {sc}%
+                      {sc}% ativos
                     </Pill>
                   </div>
                 </div>
