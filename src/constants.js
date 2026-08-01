@@ -21,7 +21,6 @@ export const ADMIN_TABS = [
   { id: 'franch', label: 'Franquias',  icon: 'store'  },
   { id: 'items',  label: 'Itens',      icon: 'item'   },
   { id: 'cats',   label: 'Categorias', icon: 'cat'    },
-  { id: 'alerts', label: 'Alertas',    icon: 'alert'  },
   { id: 'rank',   label: 'Ranking',    icon: 'trophy' },
   { id: 'forneria', label: 'Forneria', icon: 'bakery' },
   { id: 'revenue', label: 'Potencial', icon: 'money' },
