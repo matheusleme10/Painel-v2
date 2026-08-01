@@ -159,6 +159,10 @@ class NotificationTestRequest(BaseModel):
     recipient: str
 
 
+class PotentialAccessRequest(BaseModel):
+    password: str = Field(min_length=1, max_length=256)
+
+
 def client() -> IFoodClient:
     return app.state.ifood
 
@@ -168,6 +172,7 @@ def api_error(error: IFoodAPIError) -> HTTPException:
 
 
 SESSION_COOKIE = "ital_portal_session"
+POTENTIAL_COOKIE = "ital_potential_access"
 SESSION_TTL_SECONDS = 8 * 60 * 60
 LOGIN_WINDOW_SECONDS = 15 * 60
 LOGIN_MAX_ATTEMPTS = 5
@@ -198,6 +203,23 @@ def _create_session(role: str) -> str:
     payload = f"{role}:{int(time.time()) + SESSION_TTL_SECONDS}"
     signature = hmac.new(_session_secret(), payload.encode("utf-8"), hashlib.sha256).hexdigest()
     return base64.urlsafe_b64encode(f"{payload}:{signature}".encode("utf-8")).decode("ascii")
+
+
+def _create_potential_access() -> str:
+    payload = f"potential:{int(time.time()) + SESSION_TTL_SECONDS}"
+    signature = hmac.new(_session_secret(), payload.encode("utf-8"), hashlib.sha256).hexdigest()
+    return base64.urlsafe_b64encode(f"{payload}:{signature}".encode("utf-8")).decode("ascii")
+
+
+def _has_potential_access(request: Request) -> bool:
+    token = request.cookies.get(POTENTIAL_COOKIE, "")
+    try:
+        scope, expires, signature = base64.urlsafe_b64decode(token.encode("ascii")).decode("utf-8").split(":")
+        payload = f"{scope}:{expires}"
+        expected = hmac.new(_session_secret(), payload.encode("utf-8"), hashlib.sha256).hexdigest()
+        return scope == "potential" and int(expires) > int(time.time()) and hmac.compare_digest(signature, expected)
+    except (ValueError, TypeError, UnicodeError):
+        return False
 
 
 def _login_key(request: Request) -> str:
@@ -550,7 +572,37 @@ async def session_status(request: Request) -> dict:
 @app.delete("/api/session")
 async def logout_session(response: Response) -> dict:
     response.delete_cookie(SESSION_COOKIE, path="/", samesite="strict")
+    response.delete_cookie(POTENTIAL_COOKIE, path="/", samesite="strict")
     return {"authenticated": False}
+
+
+@app.get("/api/potential/session")
+async def potential_session_status(request: Request) -> dict:
+    role = require_session(request)
+    return {"authorized": role == "admin" or _has_potential_access(request)}
+
+
+@app.post("/api/potential/session")
+async def unlock_potential(action: PotentialAccessRequest, request: Request, response: Response) -> dict:
+    role = require_session(request)
+    if role == "admin":
+        return {"authorized": True}
+    configured_hash = os.getenv("FRANCHISE_POTENTIAL_PASSWORD_HASH", "").strip()
+    if not configured_hash:
+        raise HTTPException(status_code=503, detail="Senha adicional do Potencial não configurada.")
+    supplied_hash = hashlib.sha256(action.password.strip().encode("utf-8")).hexdigest()
+    if not hmac.compare_digest(supplied_hash, configured_hash):
+        raise HTTPException(status_code=401, detail="Senha do Potencial incorreta.")
+    response.set_cookie(
+        POTENTIAL_COOKIE,
+        _create_potential_access(),
+        max_age=SESSION_TTL_SECONDS,
+        httponly=True,
+        secure=os.getenv("NODE_ENV") == "production" or bool(os.getenv("VERCEL")),
+        samesite="strict",
+        path="/",
+    )
+    return {"authorized": True}
 
 
 @app.get("/api/data")
