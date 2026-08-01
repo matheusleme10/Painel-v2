@@ -21,7 +21,7 @@ import { BrandSelector } from './components/BrandSelector.jsx';
 import { PotentialAccessGate } from './components/PotentialAccessGate.jsx';
 import { brandById, identifyBrand } from './utils/brands.js';
 import { decodeCatalogCube } from './utils/pivot-cache.js';
-import { isSameStore } from './utils/stores.js';
+import { isSameStore, resolveStoreSelection } from './utils/stores.js';
 
 function summarizeUnits(entries, effectiveTo, effectiveShift) {
   const range = new Map();
@@ -111,7 +111,13 @@ export function App() {
   const selectedDate = effectiveTo;
   const isAdmin = auth?.role === 'admin';
   const scopeBrand = isAdmin ? filters.brandId : (context?.brandId || 'all');
-  const scopeStore = isAdmin ? 'all' : (context?.store || 'all');
+  const franchiseStoreCandidates = useMemo(() => [...new Set(unitHistory
+    .map((entry) => entry.label)
+    .filter((label) => label && (scopeBrand === 'all' || identifyBrand(label) === scopeBrand)))], [unitHistory, scopeBrand]);
+  const resolvedFranchiseStore = useMemo(() => (
+    resolveStoreSelection(context?.store, franchiseStoreCandidates)
+  ), [context?.store, franchiseStoreCandidates]);
+  const scopeStore = isAdmin ? 'all' : (resolvedFranchiseStore || context?.store || 'all');
   const matchesScope = (store) => (
     (scopeBrand === 'all' || identifyBrand(store) === scopeBrand)
     && (scopeStore === 'all' || isSameStore(store, scopeStore))
