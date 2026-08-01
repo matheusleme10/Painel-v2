@@ -7,7 +7,6 @@ import { DashPage } from './pages/DashPage.jsx';
 import { FranchPage } from './pages/FranchPage.jsx';
 import { ItemsOverviewPage } from './pages/ItemsOverviewPage.jsx';
 import { CatPage } from './pages/CatPage.jsx';
-import { AlertsPage } from './pages/AlertsPage.jsx';
 import { RankPage } from './pages/RankPage.jsx';
 import { NetworkPage } from './pages/NetworkPage.jsx';
 import { AutomatedNotificationPage } from './pages/AutomatedNotificationPage.jsx';
@@ -284,7 +283,6 @@ export function App() {
         {tab === 'franch' && isAdmin && <FranchPage today={pageRows} detailRows={detailRows} historical={!isLatestSingle} />}
         {tab === 'items' && (isAdmin ? <ItemsOverviewPage rows={exactSnapshotDates.length ? detailRows : productRows} /> : <FranchiseCatalogPage rows={detailRows} />)}
         {tab === 'cats' && <CatPage today={isAdmin && productRows.length ? productRows : detailRows} showFinancials={isAdmin} />}
-        {tab === 'alerts' && isAdmin && <AlertsPage today={detailRows} all={detailRows} />}
         {tab === 'rank' && <RankPage today={isAdmin ? networkRows : rankingRows} periodFrom={effectiveFrom} periodTo={effectiveTo}
           showFinancials={isAdmin} selectedStore={isAdmin ? '' : context?.store} />}
         {tab === 'forneria' && <ForneriaPage rows={exactSnapshotDates.length ? detailRows : productRows}
