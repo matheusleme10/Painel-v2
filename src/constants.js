@@ -14,8 +14,6 @@ export const PAL = [
   C.red, C.blue, C.amber, C.green, C.purple, C.orange, C.teal, '#BE185D', '#065F46', '#1E3A8A'
 ];
 
-export const LOGO = '/ih-logo.png';
-
 export const ADMIN_TABS = [
   { id: 'network', label: 'Geral da Rede', icon: 'network' },
   { id: 'franch', label: 'Franquias',  icon: 'store'  },

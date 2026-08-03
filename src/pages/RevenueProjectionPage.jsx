@@ -18,12 +18,10 @@ export function RevenueProjectionPage({ rows, summaryRows = [], isAdmin = false 
   const filteredRows = useMemo(() => (
     term ? rows.filter((row) => normalize(row.loja).includes(term)) : rows
   ), [rows, term]);
-  const filteredSummaryRows = useMemo(() => (
-    term ? summaryRows.filter((row) => normalize(row.loja).includes(term)) : summaryRows
-  ), [summaryRows, term]);
   const allStores = useMemo(() => [...new Set(rows.map((row) => row.loja).filter(Boolean))].sort(), [rows]);
   const stores = useMemo(() => [...new Set(filteredRows.map((row) => row.loja).filter(Boolean))], [filteredRows]);
   const active = useMemo(() => rowsByStatus(filteredRows, 'Ativo'), [filteredRows]);
+  const paused = useMemo(() => rowsByStatus(filteredRows, 'Pausado'), [filteredRows]);
   const priced = active.filter((row) => row.precoNum > 0);
   const averageTicket = priced.length
     ? priced.reduce((sum, row) => sum + row.precoNum, 0) / priced.length
@@ -31,11 +29,31 @@ export function RevenueProjectionPage({ rows, summaryRows = [], isAdmin = false 
   const storeCount = stores.length;
   const dailyPotential = averageTicket * ordersPerDay * storeCount;
   const monthlyPotential = dailyPotential * days;
-  const pausedOccurrences = filteredSummaryRows.reduce((sum, row) => sum + (Number(row.unitPaused) || 0), 0);
-  const totalOccurrences = filteredSummaryRows.reduce((sum, row) => sum + (Number(row.unitTotal) || 0), 0);
+  const pausedOccurrences = paused.length;
+  const totalOccurrences = filteredRows.length;
   const potentialAtRisk = averageTicket * pausedOccurrences;
   const top = [...priced].sort((a, b) => b.precoNum - a.precoNum).slice(0, 8)
     .map((row) => ({ n: row.item, v: row.precoNum }));
+  const topEstimatedLosses = useMemo(() => {
+    const map = new Map();
+    paused.forEach((row) => {
+      if (!row.item) return;
+      const key = normalize(`${row.item} ${row.categoria}`);
+      const item = map.get(key) || { name: row.item, category: row.categoria || 'Sem categoria', occurrences: 0, priceSum: 0, priced: 0, stores: new Set() };
+      item.occurrences += 1;
+      item.stores.add(row.loja);
+      if (Number(row.precoNum) > 0) { item.priceSum += Number(row.precoNum); item.priced += 1; }
+      map.set(key, item);
+    });
+    const values = [...map.values()].map((item) => ({
+      ...item,
+      averagePrice: item.priced ? item.priceSum / item.priced : 0,
+      weight: item.occurrences * (item.priced ? item.priceSum / item.priced : averageTicket),
+    }));
+    const totalWeight = values.reduce((sum, item) => sum + item.weight, 0);
+    return values.map((item) => ({ ...item, estimate: totalWeight ? potentialAtRisk * item.weight / totalWeight : 0 }))
+      .sort((a, b) => b.estimate - a.estimate).slice(0, 10);
+  }, [paused, averageTicket, potentialAtRisk]);
 
   return (
     <div className="projection-page">
@@ -83,6 +101,25 @@ export function RevenueProjectionPage({ rows, summaryRows = [], isAdmin = false 
         </Card>
         <Card><h2>Itens ativos de maior preço</h2><HBar data={top} color={C.green} fmtVal={brl} /></Card>
       </div>
+      {isAdmin && (
+        <Card className="estimated-loss-card">
+          <div className="estimated-loss-heading">
+            <div><span className="eyebrow">OPORTUNIDADE ESTIMADA</span><h2>Itens com maior potencial em risco</h2></div>
+            <p>Estimativa proporcional às ocorrências pausadas, aos preços cadastrados e às premissas desta página. Não é faturamento perdido real.</p>
+          </div>
+          <div className="estimated-loss-list">
+            {topEstimatedLosses.map((item, index) => (
+              <article key={`${item.name}-${item.category}`}>
+                <span className="estimated-loss-rank">#{index + 1}</span>
+                <span><strong>{item.name}</strong><small>{item.category} · {item.occurrences} pausa(s) · {item.stores.size} unidade(s)</small></span>
+                <span><small>Preço médio cadastrado</small><b>{item.averagePrice ? brl(item.averagePrice) : 'Sem preço'}</b></span>
+                <span><small>Potencial em risco</small><b>{brl(item.estimate)} <em>estimado</em></b></span>
+              </article>
+            ))}
+            {!topEstimatedLosses.length && <div className="empty-state">Nenhum item pausado com dados suficientes neste filtro.</div>}
+          </div>
+        </Card>
+      )}
     </div>
   );
 }

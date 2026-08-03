@@ -4,6 +4,7 @@ import { Card } from '../components/ui/Card.jsx';
 import { Kpi } from '../components/ui/Kpi.jsx';
 import { Pill } from '../components/ui/Pill.jsx';
 import { brl } from '../utils/format.js';
+import { DailyItemsMatrix } from '../components/ui/DailyItemsMatrix.jsx';
 
 const PAGE_SIZE = 10;
 
@@ -130,6 +131,7 @@ export function ItemsOverviewPage({ rows }) {
           </div>
         )}
       </Card>
+      <DailyItemsMatrix rows={rows} title="Evolução diária dos itens da rede" />
     </section>
   );
 }

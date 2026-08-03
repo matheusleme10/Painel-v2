@@ -1,6 +1,7 @@
-import { ADMIN_TABS, C, FRANCHISE_TABS, LOGO } from '../../constants.js';
+import { ADMIN_TABS, C, FRANCHISE_TABS } from '../../constants.js';
 import { Ic } from '../ui/Icon.jsx';
 import { formatDateBR } from '../../utils/format.js';
+import { IHMonogram } from '../ui/IHMonogram.jsx';
 
 export function PortalHeader({ tab, onTabChange, all, lastDate, shift, syncing, context, role, onChangeContext, onLogout }) {
   const tabs = role === 'admin' ? ADMIN_TABS : FRANCHISE_TABS;
@@ -8,7 +9,7 @@ export function PortalHeader({ tab, onTabChange, all, lastDate, shift, syncing, 
     <header className="portal-header">
       <div className="portal-header-inner">
         <button className="brand-lockup" onClick={() => onTabChange(role === 'admin' ? 'network' : 'dash')} aria-label="Ir ao dashboard">
-          <span className="brand-mark"><img src={LOGO} alt="" /></span>
+          <span className="brand-mark"><IHMonogram /></span>
           <span className="brand-context"><strong>Operação</strong><small>{role === 'admin' ? 'Inteligência da Rede' : 'Portal do Franqueado'}</small></span>
         </button>
         <nav className="portal-nav" aria-label="Navegação principal">

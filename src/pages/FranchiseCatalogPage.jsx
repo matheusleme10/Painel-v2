@@ -1,4 +1,5 @@
 import { StatusItemsPanel } from '../components/ui/StatusItemsPanel.jsx';
+import { DailyItemsMatrix } from '../components/ui/DailyItemsMatrix.jsx';
 
 export function FranchiseCatalogPage({ rows }) {
   return (
@@ -11,6 +12,7 @@ export function FranchiseCatalogPage({ rows }) {
         </div>
       </div>
       <StatusItemsPanel rows={rows} title="Catálogo operacional" />
+      <DailyItemsMatrix rows={rows} title="Evolução diária do cardápio" />
     </div>
   );
 }

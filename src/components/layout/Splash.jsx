@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { C, LOGO } from '../../constants.js';
+import { IHMonogram } from '../ui/IHMonogram.jsx';
 
 export function Splash({ onDone }) {
   const [out, setOut] = useState(false);
@@ -52,21 +52,7 @@ export function Splash({ onDone }) {
         left: -40,
       }} />
 
-      <img
-        src={LOGO}
-        alt="Ital In House"
-        style={{
-          width: 'min(270px, 64vw)',
-          height: 'auto',
-          objectFit: 'contain',
-          marginBottom: 22,
-          filter: 'drop-shadow(0 18px 34px rgba(67, 3, 16, .24))',
-          animation: 'fadeInUp 0.8s ease-out',
-        }}
-        onError={(e) => {
-          e.target.style.display = 'none';
-        }}
-      />
+      <IHMonogram className="splash-monogram" />
       <div style={{
         fontSize: 11,
         color: 'rgba(255,255,255,.6)',

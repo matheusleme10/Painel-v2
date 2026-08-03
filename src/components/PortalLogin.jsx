@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { LOGO } from '../constants.js';
+import { IHMonogram } from './ui/IHMonogram.jsx';
 
 export function PortalLogin({ onAuthenticated }) {
   const [password, setPassword] = useState('');
@@ -32,7 +32,7 @@ export function PortalLogin({ onAuthenticated }) {
     <main className="login-shell">
       <section className="login-panel">
         <div className="login-intro">
-          <img className="login-main-logo" src={LOGO} alt="Ital in House Macarrão Gourmet" />
+          <IHMonogram className="login-main-logo" />
           <div className="login-intro-content">
             <span className="login-kicker">OPERAÇÃO</span>
             <h1>Portal de Itens<br /><strong>Pausados <b>×</b> Ativos</strong></h1>
@@ -62,7 +62,7 @@ export function PortalLogin({ onAuthenticated }) {
           </div>
         </div>
       </section>
-      <footer className="login-footer">ITAL IN HOUSE · INTELIGÊNCIA OPERACIONAL</footer>
+      <footer className="login-footer">IH · INTELIGÊNCIA OPERACIONAL</footer>
     </main>
   );
 }

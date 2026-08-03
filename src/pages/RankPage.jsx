@@ -37,6 +37,9 @@ function Th({ col, label, sortCol, sortDir, onSort, right = false }) {
         userSelect: 'none',
         background: C.bg,
         borderBottom: `2px solid ${sortCol === col ? C.red : C.border}`,
+        position: 'sticky',
+        top: 0,
+        zIndex: 3,
       }}
     >
       <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
@@ -124,16 +127,11 @@ export function RankPage({ today, periodFrom, periodTo, showFinancials = false, 
   const criticas      = rows.filter((r) => r.disponib < 60).length;
   const selectedMetric = rows.find((row) => isSameStore(row.loja, selectedStore));
   const visibleRows = useMemo(() => {
-    if (!selectedMetric || search || filter !== 'todos' || sortCol !== 'rank' || sortDir !== 'asc' || selectedMetric.rank <= 5) {
-      return sorted;
-    }
+    if (showFinancials) return sorted;
     const topFive = sorted.slice(0, 5);
-    return [
-      ...topFive,
-      selectedMetric,
-      ...sorted.slice(5).filter((row) => row.loja !== selectedMetric.loja),
-    ];
-  }, [sorted, selectedMetric, search, filter, sortCol, sortDir]);
+    if (!selectedMetric || topFive.some((row) => isSameStore(row.loja, selectedMetric.loja))) return topFive;
+    return [...topFive, selectedMetric];
+  }, [sorted, selectedMetric, showFinancials]);
 
   const chipStyle = (active) => ({
     padding: '5px 11px',
@@ -262,7 +260,7 @@ export function RankPage({ today, periodFrom, periodTo, showFinancials = false, 
         </div>
 
         {/* Tabela propriamente dita */}
-        <div style={{ overflowX: 'auto' }}>
+        <div className="ranking-table-scroll">
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr>
@@ -272,7 +270,7 @@ export function RankPage({ today, periodFrom, periodTo, showFinancials = false, 
                 <Th col="a"        label="Ativos"           sortCol={sortCol} sortDir={sortDir} onSort={toggleSort} right />
                 <Th col="p"        label="Pausados"         sortCol={sortCol} sortDir={sortDir} onSort={toggleSort} right />
                 {showFinancials && <Th col="risco" label="Receita Pausada" sortCol={sortCol} sortDir={sortDir} onSort={toggleSort} right />}
-                <th style={{ padding: '10px 12px', textAlign: 'center', color: C.muted, fontWeight: 700, fontSize: 11, whiteSpace: 'nowrap', background: C.bg, borderBottom: `2px solid ${C.border}` }}>
+                <th style={{ padding: '10px 12px', textAlign: 'center', color: C.muted, fontWeight: 700, fontSize: 11, whiteSpace: 'nowrap', background: C.bg, borderBottom: `2px solid ${C.border}`, position: 'sticky', top: 0, zIndex: 3 }}>
                   vs. Média da Rede
                 </th>
               </tr>
@@ -284,8 +282,8 @@ export function RankPage({ today, periodFrom, periodTo, showFinancials = false, 
                 const abaixo   = vsRede < 0;
                 const dispColor = r.disponib >= 80 ? C.green : r.disponib >= 60 ? C.amber : C.red;
                 const dispBg    = r.disponib >= 80 ? C.greenL : r.disponib >= 60 ? C.amberL : C.redL;
-                const isSelected = selectedMetric?.loja === r.loja;
-                const isPinnedOwnUnit = isSelected && r.rank > 5 && !search && filter === 'todos' && sortCol === 'rank' && sortDir === 'asc';
+                const isSelected = selectedMetric && isSameStore(selectedMetric.loja, r.loja);
+                const isPinnedOwnUnit = !showFinancials && isSelected && !visibleRows.slice(0, 5).some((row) => isSameStore(row.loja, r.loja));
 
                 return (
                   <tr
