@@ -41,6 +41,8 @@ ACCESS_SETTINGS_PATH = DATA_DIR / "access-settings.json"
 ACCESS_SETTINGS_BLOB_PATH = "ital-dashboard/access-settings.json"
 NOTIFICATION_SETTINGS_PATH = DATA_DIR / "notification-settings.json"
 NOTIFICATION_SETTINGS_BLOB_PATH = "ital-dashboard/notification-settings.json"
+FEEDBACK_SETTINGS_PATH = DATA_DIR / "feedback-settings.json"
+FEEDBACK_SETTINGS_BLOB_PATH = "ital-dashboard/feedback-settings.json"
 load_dotenv(ROOT / ".env")
 load_dotenv(ROOT / ".env.local", override=True)
 
@@ -161,6 +163,10 @@ class NotificationSettingsRequest(BaseModel):
 
 class NotificationTestRequest(BaseModel):
     recipient: str
+
+
+class FeedbackSettingsRequest(BaseModel):
+    sheetCsvUrl: str = ""
 
 
 class PotentialAccessRequest(BaseModel):
@@ -595,6 +601,54 @@ async def write_notification_settings(settings: dict) -> None:
     temporary.replace(NOTIFICATION_SETTINGS_PATH)
 
 
+def _default_feedback_settings() -> dict:
+    return {"sheetCsvUrl": ""}
+
+
+async def read_feedback_settings() -> dict:
+    defaults = _default_feedback_settings()
+    if BLOB_TOKEN:
+        from vercel.blob import AsyncBlobClient, BlobNotFoundError
+
+        try:
+            async with AsyncBlobClient(token=BLOB_TOKEN) as blob_client:
+                result = await blob_client.get(FEEDBACK_SETTINGS_BLOB_PATH, access="private")
+                raw = await _blob_result_bytes(result)
+                if raw is None:
+                    return defaults
+        except BlobNotFoundError:
+            # Primeiro uso: o admin ainda não salvou o link da planilha.
+            return defaults
+        saved = json.loads(raw.decode("utf-8"))
+        return {**defaults, **saved}
+
+    if not FEEDBACK_SETTINGS_PATH.is_file():
+        return defaults
+    return {**defaults, **json.loads(FEEDBACK_SETTINGS_PATH.read_text(encoding="utf-8"))}
+
+
+async def write_feedback_settings(settings: dict) -> None:
+    serialized = json.dumps(settings, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+    if BLOB_TOKEN:
+        from vercel.blob import AsyncBlobClient
+
+        async with AsyncBlobClient(token=BLOB_TOKEN) as blob_client:
+            await blob_client.put(
+                FEEDBACK_SETTINGS_BLOB_PATH,
+                serialized,
+                access="private",
+                content_type="application/json",
+                overwrite=True,
+                cache_control_max_age=0,
+            )
+        return
+
+    DATA_DIR.mkdir(exist_ok=True)
+    temporary = DATA_DIR / "feedback-settings.next.json"
+    temporary.write_bytes(serialized)
+    temporary.replace(FEEDBACK_SETTINGS_PATH)
+
+
 def _notification_context(payload: dict) -> dict[str, str]:
     rows = payload.get("rows") or []
     metadata = next((row for row in rows if row.get("networkHistory") or row.get("networkSummary")), {})
@@ -857,11 +911,41 @@ async def clear_access_logs(request: Request) -> dict:
     return {"deleted": await delete_access_events()}
 
 
+@app.get("/api/feedback/settings")
+async def feedback_settings_status(request: Request) -> dict:
+    if require_session(request) != "admin":
+        raise HTTPException(status_code=403, detail="Apenas administradores podem consultar essa configuração.")
+    settings = await read_feedback_settings()
+    env_url = os.getenv("FEEDBACK_SHEET_CSV_URL", "").strip()
+    return {
+        "sheetCsvUrl": settings.get("sheetCsvUrl", ""),
+        "envConfigured": bool(env_url),
+    }
+
+
+@app.put("/api/feedback/settings")
+async def update_feedback_settings(action: FeedbackSettingsRequest, request: Request) -> dict:
+    if require_session(request) != "admin":
+        raise HTTPException(status_code=403, detail="Apenas administradores podem configurar essa opção.")
+    url = action.sheetCsvUrl.strip()
+    if url and not url.startswith("https://"):
+        raise HTTPException(status_code=400, detail="Use um link https:// válido.")
+    if url and "output=csv" not in url and "/pub" not in url:
+        raise HTTPException(
+            status_code=400,
+            detail="Use o link de exportação CSV da planilha (com output=csv ou /pub), não o link de edição do Google Sheets.",
+        )
+    await write_feedback_settings({"sheetCsvUrl": url})
+    return {"success": True, "sheetCsvUrl": url}
+
+
 @app.get("/api/feedback", response_class=PlainTextResponse)
 async def feedback_responses(request: Request) -> PlainTextResponse:
     if require_session(request) != "admin":
         raise HTTPException(status_code=403, detail="Apenas administradores podem consultar feedbacks.")
     sheet_url = os.getenv("FEEDBACK_SHEET_CSV_URL", "").strip()
+    if not sheet_url:
+        sheet_url = (await read_feedback_settings()).get("sheetCsvUrl", "").strip()
     if not sheet_url:
         raise HTTPException(status_code=503, detail="Planilha de feedback ainda não configurada.")
     try:
@@ -870,6 +954,13 @@ async def feedback_responses(request: Request) -> PlainTextResponse:
             response.raise_for_status()
     except httpx.HTTPError as error:
         raise HTTPException(status_code=502, detail="Não foi possível consultar o Google Sheets.") from error
+    content_type = response.headers.get("content-type", "").lower()
+    content = response.text.lstrip()
+    if "text/html" in content_type or content.lower().startswith(("<!doctype html", "<html")):
+        raise HTTPException(
+            status_code=422,
+            detail="A URL configurada retornou HTML. Use a URL CSV publicada da planilha de respostas, não o link do formulário ou do dashboard.",
+        )
     return PlainTextResponse(response.text, media_type="text/csv; charset=utf-8", headers={"Cache-Control": "no-store"})
 
 
