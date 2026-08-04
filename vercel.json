@@ -9,6 +9,8 @@
     { "source": "/api/access/(.*)", "destination": "/api/index" },
     { "source": "/api/access-logs", "destination": "/api/index" },
     { "source": "/api/access-settings", "destination": "/api/index" },
+    { "source": "/api/feedback", "destination": "/api/index" },
+    { "source": "/api/feedback/(.*)", "destination": "/api/index" },
     { "source": "/api/potential/(.*)", "destination": "/api/index" },
     { "source": "/api/notifications/(.*)", "destination": "/api/index" },
     { "source": "/api/data/upload", "destination": "/api/index" },
