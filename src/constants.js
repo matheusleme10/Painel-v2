@@ -22,7 +22,7 @@ export const ADMIN_TABS = [
   { id: 'rank',   label: 'Ranking',    icon: 'trophy' },
   { id: 'forneria', label: 'Forneria', icon: 'bakery' },
   { id: 'revenue', label: 'Potencial', icon: 'money' },
-  { id: 'access', label: 'Acessos', icon: 'access' },
+  { id: 'access', label: 'Gestão', icon: 'access' },
   { id: 'notify', label: 'Avisos',     icon: 'alert'  },
   { id: 'update', label: 'Atualizar Dados', icon: 'upload' },
 ];
@@ -34,4 +34,5 @@ export const FRANCHISE_TABS = [
   { id: 'cats',  label: 'Categorias', icon: 'cat' },
   { id: 'rank',  label: 'Ranking', icon: 'trophy' },
   { id: 'forneria', label: 'Forneria', icon: 'bakery' },
+  { id: 'feedback', label: 'Feedback', icon: 'access' },
 ];

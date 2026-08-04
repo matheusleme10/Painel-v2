@@ -19,7 +19,8 @@ import { PortalLogin } from './components/PortalLogin.jsx';
 import { BrandSelector } from './components/BrandSelector.jsx';
 import { PotentialAccessGate } from './components/PotentialAccessGate.jsx';
 import { FranchiseIdentityGate } from './components/FranchiseIdentityGate.jsx';
-import { AccessLogsPage } from './pages/AccessLogsPage.jsx';
+import { ManagementPage } from './pages/ManagementPage.jsx';
+import { FranchiseFeedbackPage } from './pages/FranchiseFeedbackPage.jsx';
 import { brandById, identifyBrand } from './utils/brands.js';
 import { decodeCatalogCube } from './utils/pivot-cache.js';
 import { isSameStore, resolveStoreSelection } from './utils/stores.js';
@@ -292,7 +293,8 @@ export function App() {
           ? <PotentialPageV2 rows={detailRows} isAdmin />
           : <PotentialAccessGate><PotentialPageV2 rows={detailRows} /></PotentialAccessGate>)}
         {tab === 'notify' && isAdmin && <AutomatedNotificationPage />}
-        {tab === 'access' && isAdmin && <AccessLogsPage />}
+        {tab === 'access' && isAdmin && <ManagementPage />}
+        {tab === 'feedback' && !isAdmin && <FranchiseFeedbackPage />}
         {tab === 'update' && isAdmin && (
           <AdminPage all={all} initialAuth
             onUpdate={(rows) => {

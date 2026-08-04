@@ -10,6 +10,8 @@ const keyOf = (row) => `${normalize(row.item)}::${normalize(row.categoria)}`;
 export function DailyItemsMatrix({ rows, title = 'Histórico diário dos itens' }) {
   const [query, setQuery] = useState('');
   const [onlyLongPauses, setOnlyLongPauses] = useState(false);
+  const [sortCol, setSortCol] = useState('streak');
+  const [sortDir, setSortDir] = useState('desc');
 
   const { dates, items, isSingleStore } = useMemo(() => {
     const datesAsc = [...new Set(rows.map((row) => row.dia).filter(Boolean))].sort();
@@ -61,11 +63,24 @@ export function DailyItemsMatrix({ rows, title = 'Histórico diário dos itens' 
 
   const visible = useMemo(() => {
     const term = normalize(query);
-    return items.filter((item) => {
+    const filtered = items.filter((item) => {
       if (onlyLongPauses && item.currentStreak < 2) return false;
       return !term || normalize(`${item.name} ${item.category}`).includes(term);
     });
-  }, [items, onlyLongPauses, query]);
+    const direction = sortDir === 'asc' ? 1 : -1;
+    return [...filtered].sort((a, b) => {
+      if (sortCol === 'product') return a.name.localeCompare(b.name, 'pt-BR') * direction;
+      if (sortCol === 'streak') return (a.currentStreak - b.currentStreak || a.pausedDays - b.pausedDays) * direction;
+      return ((a.byDate.get(sortCol)?.paused || 0) - (b.byDate.get(sortCol)?.paused || 0)) * direction;
+    });
+  }, [items, onlyLongPauses, query, sortCol, sortDir]);
+
+  function toggleSort(column) {
+    if (sortCol === column) setSortDir((current) => current === 'asc' ? 'desc' : 'asc');
+    else { setSortCol(column); setSortDir(column === 'product' ? 'asc' : 'desc'); }
+  }
+
+  const sortMark = (column) => sortCol === column ? (sortDir === 'asc' ? '▲' : '▼') : '⇅';
 
   return (
     <section className="daily-matrix-card">
@@ -86,8 +101,9 @@ export function DailyItemsMatrix({ rows, title = 'Histórico diário dos itens' 
       <div className="daily-matrix-wrap">
         <table className="daily-matrix">
           <thead><tr>
-            <th>Produto</th><th>Dias com pausa</th>
-            {dates.map((date) => <th key={date}>{formatDateBR(date)}</th>)}
+            <th><button className="matrix-sort" type="button" onClick={() => toggleSort('product')}>Produto <span>{sortMark('product')}</span></button></th>
+            <th><button className="matrix-sort" type="button" onClick={() => toggleSort('streak')}>Dias com pausa <span>{sortMark('streak')}</span></button></th>
+            {dates.map((date) => <th key={date}><button className="matrix-sort" type="button" onClick={() => toggleSort(date)}>{formatDateBR(date)} <span>{sortMark(date)}</span></button></th>)}
           </tr></thead>
           <tbody>
             {visible.map((item) => (

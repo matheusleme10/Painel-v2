@@ -15,7 +15,10 @@ const normalize = (value) => String(value || '')
 export function ItemsOverviewPage({ rows }) {
   const [query, setQuery] = useState('');
   const [storeQuery, setStoreQuery] = useState('');
+  const [storeOpen, setStoreOpen] = useState(false);
   const [status, setStatus] = useState('all');
+  const [sortCol, setSortCol] = useState('paused');
+  const [sortDir, setSortDir] = useState('desc');
   const [page, setPage] = useState(0);
 
   const stores = useMemo(() => [...new Set(rows.map((row) => row.loja).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'pt-BR')), [rows]);
@@ -23,6 +26,11 @@ export function ItemsOverviewPage({ rows }) {
     const term = normalize(storeQuery);
     return term ? rows.filter((row) => normalize(row.loja).includes(term)) : rows;
   }, [rows, storeQuery]);
+  const storeSuggestions = useMemo(() => {
+    const term = normalize(storeQuery);
+    if (!term) return [];
+    return stores.filter((store) => normalize(store).includes(term)).slice(0, 8);
+  }, [stores, storeQuery]);
 
   const items = useMemo(() => {
     const map = new Map();
@@ -61,13 +69,28 @@ export function ItemsOverviewPage({ rows }) {
       return matchesText && matchesStatus;
     });
   }, [items, query, status]);
+  const sortedVisible = useMemo(() => {
+    const direction = sortDir === 'asc' ? 1 : -1;
+    return [...visible].sort((a, b) => {
+      const values = { name: [a.name, b.name], category: [a.category, b.category], active: [a.active, b.active], paused: [a.paused, b.paused], affected: [a.pausedStores.size, b.pausedStores.size], risk: [a.risk, b.risk] }[sortCol];
+      return typeof values[0] === 'number' ? (values[0] - values[1]) * direction : String(values[0] || '').localeCompare(String(values[1] || ''), 'pt-BR') * direction;
+    });
+  }, [visible, sortCol, sortDir]);
 
   const totalPaused = items.reduce((sum, item) => sum + item.paused, 0);
   const totalActive = items.reduce((sum, item) => sum + item.active, 0);
   const totalRisk = items.reduce((sum, item) => sum + item.risk, 0);
-  const pages = Math.max(1, Math.ceil(visible.length / PAGE_SIZE));
+  const pages = Math.max(1, Math.ceil(sortedVisible.length / PAGE_SIZE));
   const currentPage = Math.min(page, pages - 1);
-  const paginated = visible.slice(currentPage * PAGE_SIZE, currentPage * PAGE_SIZE + PAGE_SIZE);
+  const paginated = sortedVisible.slice(currentPage * PAGE_SIZE, currentPage * PAGE_SIZE + PAGE_SIZE);
+
+  function toggleSort(column) {
+    if (sortCol === column) setSortDir((current) => current === 'asc' ? 'desc' : 'asc');
+    else { setSortCol(column); setSortDir(['name', 'category'].includes(column) ? 'asc' : 'desc'); }
+    setPage(0);
+  }
+
+  const SortTh = ({ column, children }) => <th><button type="button" className={sortCol === column ? 'items-sort active' : 'items-sort'} onClick={() => toggleSort(column)}>{children}<span>{sortCol === column ? (sortDir === 'asc' ? '▲' : '▼') : '⇅'}</span></button></th>;
 
   function changeFilter(action) {
     action();
@@ -92,8 +115,9 @@ export function ItemsOverviewPage({ rows }) {
       <Card>
         <div className="items-toolbar">
           <div className="items-store-filter">
-            <input type="search" value={storeQuery} list="items-store-options" placeholder="Filtrar por unidade..." onChange={(event) => { setStoreQuery(event.target.value); setPage(0); }} />
-            <datalist id="items-store-options">{stores.map((store) => <option key={store} value={store} />)}</datalist>
+            <span className="items-store-search"><input type="search" value={storeQuery} placeholder="Pesquisar uma unidade..." onFocus={() => setStoreOpen(true)} onBlur={() => setTimeout(() => setStoreOpen(false), 120)} onChange={(event) => { setStoreQuery(event.target.value); setStoreOpen(true); setPage(0); }} />
+              {storeOpen && storeQuery && <span className="items-store-suggestions">{storeSuggestions.map((store) => <button type="button" key={store} onMouseDown={() => { setStoreQuery(store); setStoreOpen(false); setPage(0); }}>{store}</button>)}{!storeSuggestions.length && <small>Nenhuma unidade encontrada.</small>}</span>}
+            </span>
             {storeQuery && <button type="button" onClick={() => { setStoreQuery(''); setPage(0); }}>Limpar unidade</button>}
           </div>
           <input
@@ -102,22 +126,18 @@ export function ItemsOverviewPage({ rows }) {
             placeholder="Pesquisar produto ou categoria..."
             onChange={(event) => changeFilter(() => setQuery(event.target.value))}
           />
-          <select value={status} onChange={(event) => changeFilter(() => setStatus(event.target.value))}>
-            <option value="all">Todos os status</option>
-            <option value="active">Com ocorrência ativa</option>
-            <option value="paused">Com ocorrência pausada</option>
-          </select>
+          <div className="items-status-chips">{[['all','Todos'],['active','Ativos'],['paused','Pausados']].map(([value,label]) => <button type="button" key={value} className={status === value ? 'active' : ''} onClick={() => changeFilter(() => setStatus(value))}>{label}</button>)}</div>
         </div>
         <div className="items-table-wrap">
           <table className="items-table">
             <thead>
               <tr>
-                <th>Produto</th>
-                <th>Categoria</th>
-                <th>Ativo</th>
-                <th>Pausou no período</th>
-                <th>Marcas/unidades afetadas</th>
-                <th>Risco</th>
+                <SortTh column="name">Produto</SortTh>
+                <SortTh column="category">Categoria</SortTh>
+                <SortTh column="active">Ativo</SortTh>
+                <SortTh column="paused">Pausou no período</SortTh>
+                <SortTh column="affected">Unidades afetadas</SortTh>
+                <SortTh column="risk">Risco</SortTh>
               </tr>
             </thead>
             <tbody>

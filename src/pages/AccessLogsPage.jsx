@@ -5,7 +5,7 @@ function formatDate(value) {
   return new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(value));
 }
 
-export function AccessLogsPage() {
+export function AccessLogsPage({ section = 'all', embedded = false }) {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -77,12 +77,12 @@ export function AccessLogsPage() {
   }
 
   return (
-    <section className="access-page">
-      <header className="page-hero access-hero">
+    <section className={`access-page access-section-${section}`}>
+      {!embedded && <header className="page-hero access-hero">
         <div><span className="eyebrow">AUDITORIA DO PORTAL</span><h1>Log de acessos</h1>
           <p>Acompanhe quem entrou e qual unidade foi selecionada.</p></div>
         <button type="button" onClick={load} disabled={loading}>↻ Atualizar</button>
-      </header>
+      </header>}
       <section className="access-domain-card">
         <div className="access-section-heading"><div><h2>Domínios de e-mail permitidos</h2>
           <p>Somente endereços destes domínios poderão avançar como franqueado.</p></div>

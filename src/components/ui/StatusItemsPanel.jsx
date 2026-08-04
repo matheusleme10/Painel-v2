@@ -8,10 +8,23 @@ const PAGE_SIZE = 7;
 
 function StatusColumn({ title, rows, status, query }) {
   const [page, setPage] = useState(0);
-  const filtered = useMemo(() => rows.filter((row) => {
-    const haystack = `${row.item} ${row.categoria}`.toLocaleLowerCase('pt-BR');
-    return haystack.includes(query.toLocaleLowerCase('pt-BR'));
-  }), [rows, query]);
+  const [sortCol, setSortCol] = useState('occurrences');
+  const [sortDir, setSortDir] = useState('desc');
+  const filtered = useMemo(() => {
+    const map = new Map();
+    rows.forEach((row) => {
+      const key = `${row.item}|${row.categoria}`;
+      const item = map.get(key) || { item: row.item, categoria: row.categoria, occurrences: 0, priceSum: 0, priced: 0 };
+      item.occurrences += 1;
+      if (Number(row.precoNum) > 0) { item.priceSum += Number(row.precoNum); item.priced += 1; }
+      map.set(key, item);
+    });
+    const needle = query.toLocaleLowerCase('pt-BR');
+    const direction = sortDir === 'asc' ? 1 : -1;
+    return [...map.values()].map((item) => ({ ...item, precoNum: item.priced ? item.priceSum / item.priced : 0 }))
+      .filter((row) => `${row.item} ${row.categoria}`.toLocaleLowerCase('pt-BR').includes(needle))
+      .sort((a, b) => sortCol === 'item' ? a.item.localeCompare(b.item, 'pt-BR') * direction : (a[sortCol] - b[sortCol]) * direction);
+  }, [rows, query, sortCol, sortDir]);
   const pages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   useEffect(() => setPage(0), [query, rows]);
   const visible = filtered.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
@@ -20,10 +33,11 @@ function StatusColumn({ title, rows, status, query }) {
   return (
     <section className="status-column">
       <header><span style={{ background, color }}><Ic n={status === 'Ativo' ? 'check' : 'pause'} s={13} c={color} />{title}</span><strong>{filtered.length}</strong></header>
+      <div className="status-sort-row">{[['item','Item'],['occurrences','Ocorrências'],['precoNum','Preço']].map(([column,label]) => <button type="button" key={column} className={sortCol === column ? 'active' : ''} onClick={() => { if (sortCol === column) setSortDir((current) => current === 'asc' ? 'desc' : 'asc'); else { setSortCol(column); setSortDir(column === 'item' ? 'asc' : 'desc'); } }}>{label} <span>{sortCol === column ? (sortDir === 'asc' ? '▲' : '▼') : '⇅'}</span></button>)}</div>
       <div>
         {visible.map((row, index) => (
           <article key={`${row.item}-${index}`}>
-            <span><strong>{row.item}</strong><small>{row.categoria}</small></span>
+            <span><strong>{row.item}</strong><small>{row.categoria} · {row.occurrences}× no período</small></span>
             {row.precoNum > 0 && <b style={{ color }}>{brl(row.precoNum)}</b>}
           </article>
         ))}
