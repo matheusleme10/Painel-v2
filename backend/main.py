@@ -23,7 +23,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, PlainTextResponse
 from pydantic import BaseModel, Field
 
 from .catalog import items_to_csv, normalize_categories
@@ -855,6 +855,22 @@ async def clear_access_logs(request: Request) -> dict:
     if require_session(request) != "admin":
         raise HTTPException(status_code=403, detail="Apenas administradores podem apagar os acessos.")
     return {"deleted": await delete_access_events()}
+
+
+@app.get("/api/feedback", response_class=PlainTextResponse)
+async def feedback_responses(request: Request) -> PlainTextResponse:
+    if require_session(request) != "admin":
+        raise HTTPException(status_code=403, detail="Apenas administradores podem consultar feedbacks.")
+    sheet_url = os.getenv("FEEDBACK_SHEET_CSV_URL", "").strip()
+    if not sheet_url:
+        raise HTTPException(status_code=503, detail="Planilha de feedback ainda não configurada.")
+    try:
+        async with httpx.AsyncClient(timeout=20, follow_redirects=True) as client:
+            response = await client.get(sheet_url)
+            response.raise_for_status()
+    except httpx.HTTPError as error:
+        raise HTTPException(status_code=502, detail="Não foi possível consultar o Google Sheets.") from error
+    return PlainTextResponse(response.text, media_type="text/csv; charset=utf-8", headers={"Cache-Control": "no-store"})
 
 
 @app.get("/api/potential/session")
