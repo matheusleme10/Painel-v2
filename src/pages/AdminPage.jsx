@@ -32,6 +32,105 @@ function Empty() {
   );
 }
 
+function FeedbackSheetLink() {
+  const [url, setUrl] = useState('');
+  const [envConfigured, setEnvConfigured] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [feedback, setFeedback] = useState('');
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const response = await fetch('/api/feedback/settings', { credentials: 'same-origin', cache: 'no-store' });
+        if (!response.ok) return;
+        const data = await response.json();
+        setUrl(data.sheetCsvUrl || '');
+        setEnvConfigured(Boolean(data.envConfigured));
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  async function save() {
+    setSaving(true);
+    setFeedback('');
+    try {
+      const response = await fetch('/api/feedback/settings', {
+        method: 'PUT',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sheetCsvUrl: url.trim() }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.detail || 'Falha ao salvar o link.');
+      setUrl(result.sheetCsvUrl || '');
+      setFeedback('Link salvo! A aba de Feedbacks recebidos já vai usar ele.');
+    } catch (error) {
+      setFeedback(error.message);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <Card>
+      <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 6, display: 'flex', alignItems: 'center', gap: 8 }}>
+        <Ic n="alert" s={15} c={C.red} /> Planilha de Feedbacks
+      </div>
+      <p style={{ fontSize: 12, color: C.muted, marginTop: 0, marginBottom: 11 }}>
+        Cole o link de exportação CSV da planilha de respostas do formulário (link com <code>/export?format=csv&amp;gid=...</code>
+        {' '}ou publicado via Arquivo → Compartilhar → Publicar na web). Isso alimenta a aba "Feedbacks recebidos" em Gestão.
+        {envConfigured && ' Uma variável de ambiente já está configurada na Vercel e tem prioridade sobre este campo.'}
+      </p>
+      {loading ? (
+        <div style={{ fontSize: 12, color: C.muted }}>Carregando…</div>
+      ) : (
+        <div style={{ display: 'flex', gap: 9, flexWrap: 'wrap' }}>
+          <input
+            value={url}
+            onChange={(event) => setUrl(event.target.value)}
+            placeholder="https://docs.google.com/spreadsheets/d/.../export?format=csv&gid=..."
+            style={{
+              flex: 1,
+              minWidth: 260,
+              padding: '11px 13px',
+              borderRadius: 10,
+              border: `1px solid ${C.border}`,
+              fontFamily: 'inherit',
+              fontSize: 12,
+            }}
+          />
+          <button
+            type="button"
+            onClick={save}
+            disabled={saving}
+            style={{
+              padding: '11px 16px',
+              borderRadius: 10,
+              background: C.red,
+              color: '#fff',
+              border: 0,
+              fontWeight: 700,
+              fontSize: 13,
+              cursor: 'pointer',
+              fontFamily: 'inherit',
+            }}
+          >
+            {saving ? 'Salvando…' : 'Salvar link'}
+          </button>
+        </div>
+      )}
+      {feedback && (
+        <div style={{ marginTop: 9, fontSize: 12, fontWeight: 600, color: feedback.startsWith('Link salvo') ? C.green : C.red }}>
+          {feedback}
+        </div>
+      )}
+    </Card>
+  );
+}
+
 export function AdminPage({ all, onUpdate, correctHash, onClear, initialAuth = false }) {
   const [auth, setAuth] = useState(initialAuth);
   const [pwd, setPwd] = useState('');
@@ -537,6 +636,8 @@ export function AdminPage({ all, onUpdate, correctHash, onClear, initialAuth = f
           ))}
         </div>
       </Card>
+
+      <FeedbackSheetLink />
 
       <Card>
         <div
