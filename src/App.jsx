@@ -10,7 +10,7 @@ import { CatPage } from './pages/CatPage.jsx';
 import { RankPage } from './pages/RankPage.jsx';
 import { NetworkPage } from './pages/NetworkPage.jsx';
 import { AutomatedNotificationPage } from './pages/AutomatedNotificationPage.jsx';
-import { RevenueProjectionPage } from './pages/RevenueProjectionPage.jsx';
+import { PotentialPageV2 } from './pages/PotentialPageV2.jsx';
 import { FranchiseCatalogPage } from './pages/FranchiseCatalogPage.jsx';
 import { ForneriaPage } from './pages/ForneriaPage.jsx';
 import { AdminPage } from './pages/AdminPage.jsx';
@@ -289,8 +289,8 @@ export function App() {
           summaryRows={!metadata.catalogCube?.records?.length && effectiveShift === 'Almoço' ? forneriaSummaries : []}
           showFinancials={isAdmin} />}
         {tab === 'revenue' && (isAdmin
-          ? <RevenueProjectionPage rows={detailRows} summaryRows={networkRows} isAdmin />
-          : <PotentialAccessGate><RevenueProjectionPage rows={detailRows} summaryRows={networkRows} /></PotentialAccessGate>)}
+          ? <PotentialPageV2 rows={detailRows} isAdmin />
+          : <PotentialAccessGate><PotentialPageV2 rows={detailRows} /></PotentialAccessGate>)}
         {tab === 'notify' && isAdmin && <AutomatedNotificationPage />}
         {tab === 'access' && isAdmin && <AccessLogsPage />}
         {tab === 'update' && isAdmin && (

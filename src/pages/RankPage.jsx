@@ -126,12 +126,7 @@ export function RankPage({ today, periodFrom, periodTo, showFinancials = false, 
   const abaixoMedia   = rows.filter((r) => r.disponib < mediaRede).length;
   const criticas      = rows.filter((r) => r.disponib < 60).length;
   const selectedMetric = rows.find((row) => isSameStore(row.loja, selectedStore));
-  const visibleRows = useMemo(() => {
-    if (showFinancials) return sorted;
-    const topFive = sorted.slice(0, 5);
-    if (!selectedMetric || topFive.some((row) => isSameStore(row.loja, selectedMetric.loja))) return topFive;
-    return [...topFive, selectedMetric];
-  }, [sorted, selectedMetric, showFinancials]);
+  const visibleRows = sorted;
 
   const chipStyle = (active) => ({
     padding: '5px 11px',
@@ -283,7 +278,6 @@ export function RankPage({ today, periodFrom, periodTo, showFinancials = false, 
                 const dispColor = r.disponib >= 80 ? C.green : r.disponib >= 60 ? C.amber : C.red;
                 const dispBg    = r.disponib >= 80 ? C.greenL : r.disponib >= 60 ? C.amberL : C.redL;
                 const isSelected = selectedMetric && isSameStore(selectedMetric.loja, r.loja);
-                const isPinnedOwnUnit = !showFinancials && isSelected && !visibleRows.slice(0, 5).some((row) => isSameStore(row.loja, r.loja));
 
                 return (
                   <tr
@@ -319,7 +313,7 @@ export function RankPage({ today, periodFrom, periodTo, showFinancials = false, 
 
                     {/* Franquia */}
                     <td style={{ padding: '10px 12px', fontWeight: 600, fontSize: 13, color: C.text, minWidth: 160 }}>
-                      {r.loja} {isSelected && <Pill color={C.red} bg={C.redL} s={9}>{isPinnedOwnUnit ? 'Sua unidade · destacada após Top 5' : 'Sua unidade'}</Pill>}
+                      {r.loja} {isSelected && <Pill color={C.red} bg={C.redL} s={9}>Sua unidade</Pill>}
                     </td>
 
                     {/* Disponibilidade */}

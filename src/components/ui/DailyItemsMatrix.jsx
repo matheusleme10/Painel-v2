@@ -103,9 +103,11 @@ export function DailyItemsMatrix({ rows, title = 'Histórico diário dos itens' 
                   const price = prices.length ? prices.reduce((sum, value) => sum + value, 0) / prices.length : 0;
                   const paused = cell?.paused || 0;
                   const status = !cell ? '—' : paused > 0 ? (isSingleStore ? 'P' : `P ${paused}/${cell.total}`) : 'A';
-                  return <td key={date} className={paused ? 'matrix-paused' : cell ? 'matrix-active' : 'matrix-empty'}>
+                  const changed = item.changedDates.has(date);
+                  const cellClass = `${paused ? 'matrix-paused' : cell ? 'matrix-active' : 'matrix-empty'}${changed ? ' matrix-price-changed' : ''}`;
+                  return <td key={date} className={cellClass}>
                     <strong>{status}</strong>
-                    <small className={item.changedDates.has(date) ? 'price-changed' : ''}>{price > 0 ? brl(price) : 'sem preço'}</small>
+                    <small className={changed ? 'price-changed' : ''}>{price > 0 ? brl(price) : 'sem preço'}</small>
                   </td>;
                 })}
               </tr>

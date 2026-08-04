@@ -220,13 +220,13 @@ export function DashPage({ all, today, systemicRows = today, lastDate, periodFro
           <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 12 }}>
             Histórico — Itens Pausados por Dia
           </div>
-          <div style={{ display: 'flex', gap: 4, alignItems: 'flex-end', height: 96, overflowX: 'auto', paddingBottom: 4 }}>
+          <div style={{ display: 'flex', gap: 7, alignItems: 'flex-end', height: 112, overflowX: 'auto', padding: '0 2px 5px' }}>
             {dias.map(([d, v], i) => {
               const maxV = Math.max(...dias.map((x) => x[1]));
               const h = clamp(Math.round((v / maxV) * 76), 4, 76);
               const isLast = d === lastDate;
               return (
-                <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, minWidth: 44 }}>
+                <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, minWidth: 68 }}>
                   <div style={{ fontSize: 9, color: isLast ? C.red : C.muted, fontWeight: isLast ? 900 : 400 }}>
                     {v}
                   </div>
@@ -240,7 +240,7 @@ export function DashPage({ all, today, systemicRows = today, lastDate, periodFro
                     }}
                   />
                   <div style={{ fontSize: 8, color: isLast ? C.red : C.muted, textAlign: 'center', whiteSpace: 'nowrap', fontWeight: isLast ? 700 : 400 }}>
-                    {d.slice(0, 6)}
+                    {formatDateBR(d)}
                   </div>
                 </div>
               );

@@ -14,12 +14,19 @@ const normalize = (value) => String(value || '')
 
 export function ItemsOverviewPage({ rows }) {
   const [query, setQuery] = useState('');
+  const [storeQuery, setStoreQuery] = useState('');
   const [status, setStatus] = useState('all');
   const [page, setPage] = useState(0);
 
+  const stores = useMemo(() => [...new Set(rows.map((row) => row.loja).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'pt-BR')), [rows]);
+  const scopedRows = useMemo(() => {
+    const term = normalize(storeQuery);
+    return term ? rows.filter((row) => normalize(row.loja).includes(term)) : rows;
+  }, [rows, storeQuery]);
+
   const items = useMemo(() => {
     const map = new Map();
-    rows.forEach((row) => {
+    scopedRows.forEach((row) => {
       if (!row.item) return;
       const key = normalize(row.item);
       const item = map.get(key) || {
@@ -43,7 +50,7 @@ export function ItemsOverviewPage({ rows }) {
       map.set(key, item);
     });
     return [...map.values()].sort((a, b) => b.paused - a.paused || a.name.localeCompare(b.name, 'pt-BR'));
-  }, [rows]);
+  }, [scopedRows]);
 
   const visible = useMemo(() => {
     const term = normalize(query);
@@ -84,10 +91,15 @@ export function ItemsOverviewPage({ rows }) {
       </div>
       <Card>
         <div className="items-toolbar">
+          <div className="items-store-filter">
+            <input type="search" value={storeQuery} list="items-store-options" placeholder="Filtrar por unidade..." onChange={(event) => { setStoreQuery(event.target.value); setPage(0); }} />
+            <datalist id="items-store-options">{stores.map((store) => <option key={store} value={store} />)}</datalist>
+            {storeQuery && <button type="button" onClick={() => { setStoreQuery(''); setPage(0); }}>Limpar unidade</button>}
+          </div>
           <input
             type="search"
             value={query}
-            placeholder="Pesquisar produto, categoria, marca ou unidade..."
+            placeholder="Pesquisar produto ou categoria..."
             onChange={(event) => changeFilter(() => setQuery(event.target.value))}
           />
           <select value={status} onChange={(event) => changeFilter(() => setStatus(event.target.value))}>
@@ -131,7 +143,7 @@ export function ItemsOverviewPage({ rows }) {
           </div>
         )}
       </Card>
-      <DailyItemsMatrix rows={rows} title="Evolução diária dos itens da rede" />
+      <DailyItemsMatrix rows={scopedRows} title={storeQuery ? `Evolução diária · ${storeQuery}` : 'Evolução diária dos itens da rede'} />
     </section>
   );
 }
