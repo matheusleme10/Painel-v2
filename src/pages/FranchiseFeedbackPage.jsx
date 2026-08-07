@@ -1,4 +1,4 @@
-const FORM_URL = import.meta.env.VITE_FEEDBACK_FORM_URL || '';
+const FORM_URL = 'https://forms.gle/3S2LKF2L8yQggnbY6';
 
 const questions = [
   'Qual é o seu nome, e-mail e unidade?',
