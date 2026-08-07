@@ -433,10 +433,21 @@ export function parseXLSX(ab) {
     if (!pausedGroups.has(row.loja)) pausedGroups.set(row.loja, []);
     pausedGroups.get(row.loja).push(row);
   }
+  // Antes isto cortava a lista de pausados de cada loja no total informado
+  // pela aba "alertas" (row.unitPaused). Quando esse total vinha desatualizado
+  // ou menor que a contagem real (planilhas divergentes, loja não encontrada
+  // em "alertas", etc.), itens pausados de verdade eram descartados em silêncio.
+  // Agora só removemos duplicatas exatas (mesma loja + mesmo item), preservando
+  // todo item pausado distinto.
   const authoritativePaused = [];
   for (const rows of pausedGroups.values()) {
-    const expected = rows.find((row) => Number.isFinite(row.unitPaused))?.unitPaused ?? rows.length;
-    authoritativePaused.push(...rows.slice(0, expected));
+    const seen = new Set();
+    for (const row of rows) {
+      const itemKey = normalized(row.item);
+      if (seen.has(itemKey)) continue;
+      seen.add(itemKey);
+      authoritativePaused.push(row);
+    }
   }
   const currentPausedKeys = new Set(
     authoritativePaused.map((row) => `${normalized(row.loja)}|${normalized(row.item)}`)

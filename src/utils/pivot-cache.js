@@ -1,7 +1,14 @@
 const decoder = new TextDecoder();
 import { storeKey } from './stores.js';
 
-function findZipEntry(arrayBuffer, targetName) {
+// Varre o diretório central do ZIP uma única vez e devolve todas as entradas
+// (nome -> {method, compressed}). Antes só procurávamos por um nome exato
+// ("pivotCacheDefinition7.xml"/"pivotCacheRecords7.xml"), mas esse número
+// depende de quantas tabelas dinâmicas existem no arquivo do Excel — se o
+// relatório for regerado com outra ordem de abas/pivôs, o índice muda e a
+// extração falhava silenciosamente, fazendo o portal cair para o caminho
+// antigo (mais limitado) de leitura de planilha.
+function listZipEntries(arrayBuffer) {
   const view = new DataView(arrayBuffer);
   let eocd = -1;
   for (let offset = arrayBuffer.byteLength - 22; offset >= Math.max(0, arrayBuffer.byteLength - 65_557); offset -= 1) {
@@ -13,6 +20,7 @@ function findZipEntry(arrayBuffer, targetName) {
   if (eocd < 0) throw new Error('Estrutura ZIP do XLSX não encontrada.');
   const totalEntries = view.getUint16(eocd + 10, true);
   let offset = view.getUint32(eocd + 16, true);
+  const entries = new Map();
   for (let index = 0; index < totalEntries; index += 1) {
     if (view.getUint32(offset, true) !== 0x02014b50) break;
     const method = view.getUint16(offset + 10, true);
@@ -22,18 +30,23 @@ function findZipEntry(arrayBuffer, targetName) {
     const commentLength = view.getUint16(offset + 32, true);
     const localOffset = view.getUint32(offset + 42, true);
     const name = decoder.decode(new Uint8Array(arrayBuffer, offset + 46, nameLength));
-    if (name === targetName) {
-      const localNameLength = view.getUint16(localOffset + 26, true);
-      const localExtraLength = view.getUint16(localOffset + 28, true);
-      const dataOffset = localOffset + 30 + localNameLength + localExtraLength;
-      return {
-        method,
-        compressed: arrayBuffer.slice(dataOffset, dataOffset + compressedSize),
-      };
-    }
+    entries.set(name, { localOffset, method, compressedSize });
     offset += 46 + nameLength + extraLength + commentLength;
   }
-  return null;
+  return {
+    names: [...entries.keys()],
+    read(name) {
+      const meta = entries.get(name);
+      if (!meta) return null;
+      const localNameLength = view.getUint16(meta.localOffset + 26, true);
+      const localExtraLength = view.getUint16(meta.localOffset + 28, true);
+      const dataOffset = meta.localOffset + 30 + localNameLength + localExtraLength;
+      return {
+        method: meta.method,
+        compressed: arrayBuffer.slice(dataOffset, dataOffset + meta.compressedSize),
+      };
+    },
+  };
 }
 
 function decompressedStream(entry) {
@@ -101,17 +114,36 @@ function dictionaryIndex(value, values, indexes) {
   return index;
 }
 
-export async function parsePivotCatalog(arrayBuffer, allowedDates = []) {
-  const definitionEntry = findZipEntry(arrayBuffer, 'xl/pivotCache/pivotCacheDefinition7.xml');
-  const recordsEntry = findZipEntry(arrayBuffer, 'xl/pivotCache/pivotCacheRecords7.xml');
-  if (!definitionEntry || !recordsEntry) return null;
+const REQUIRED_PIVOT_FIELDS = ['lojasName', 'categoriesName', 'data', 'rowsName', 'priceValue', 'status', 'Horario'];
 
-  const fields = parseDefinition(await readEntryText(definitionEntry));
-  const fieldIndex = new Map(fields.map((field, index) => [field.name, index]));
-  const required = ['lojasName', 'categoriesName', 'data', 'rowsName', 'priceValue', 'status', 'Horario'];
-  if (required.some((field) => !fieldIndex.has(field))) {
-    throw new Error('O cache do XLSX não possui todos os campos necessários.');
+// Encontra, entre todos os caches de tabela dinâmica do arquivo, o par
+// definition/records que contém os campos necessários. O número
+// ("...Definition7.xml") não é fixo: muda conforme quantas tabelas
+// dinâmicas o Excel cria, então testamos todos em vez de assumir um índice.
+async function findUsablePivotCache(entries) {
+  const candidates = entries.names
+    .map((name) => name.match(/^xl\/pivotCache\/pivotCacheDefinition(\d+)\.xml$/)?.[1])
+    .filter(Boolean)
+    .sort((a, b) => Number(a) - Number(b));
+
+  for (const index of candidates) {
+    const definitionEntry = entries.read(`xl/pivotCache/pivotCacheDefinition${index}.xml`);
+    const recordsEntry = entries.read(`xl/pivotCache/pivotCacheRecords${index}.xml`);
+    if (!definitionEntry || !recordsEntry) continue;
+    const fields = parseDefinition(await readEntryText(definitionEntry));
+    const fieldIndex = new Map(fields.map((field, fieldPos) => [field.name, fieldPos]));
+    if (REQUIRED_PIVOT_FIELDS.every((field) => fieldIndex.has(field))) {
+      return { fields, fieldIndex, recordsEntry };
+    }
   }
+  return null;
+}
+
+export async function parsePivotCatalog(arrayBuffer, allowedDates = []) {
+  const entries = listZipEntries(arrayBuffer);
+  const usable = await findUsablePivotCache(entries);
+  if (!usable) return null;
+  const { fields, fieldIndex, recordsEntry } = usable;
 
   const allowed = new Set(allowedDates);
   const stores = [];
