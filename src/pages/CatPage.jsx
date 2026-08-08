@@ -172,7 +172,7 @@ export function CatPage({ today, showFinancials = false }) {
                         style={{
                           flex: 1,
                           height: 10,
-                          background: 'white',
+                          background: C.card,
                           borderRadius: 5,
                           overflow: 'hidden',
                         }}
@@ -201,7 +201,8 @@ export function CatPage({ today, showFinancials = false }) {
                               gap: 7,
                               alignItems: 'center',
                               padding: '6px 10px',
-                              background: 'white',
+                              background: C.card,
+                              border: `1px solid ${C.border}`,
                               borderRadius: 8,
                             }}
                           >

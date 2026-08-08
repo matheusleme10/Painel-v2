@@ -34,6 +34,7 @@ export const ADMIN_TABS = [
 
 export const FRANCHISE_TABS = [
   { id: 'dash',  label: 'Minha Unidade', icon: 'dash' },
+  { id: 'alerts', label: 'Central de Alertas', icon: 'fire' },
   { id: 'revenue', label: 'Potencial', icon: 'money' },
   { id: 'items', label: 'Itens', icon: 'item' },
   { id: 'cats',  label: 'Categorias', icon: 'cat' },

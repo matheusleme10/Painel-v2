@@ -61,6 +61,19 @@ export function DailyItemsMatrix({ rows, title = 'Histórico diário dos itens' 
     return { dates: [...datesAsc].reverse(), items: enriched, isSingleStore: stores.size <= 1 };
   }, [rows]);
 
+  const { avgActive, avgPaused } = useMemo(() => {
+    if (!dates.length || !items.length) return { avgActive: 0, avgPaused: 0 };
+    let totalActive = 0;
+    let totalPaused = 0;
+    dates.forEach((date) => {
+      items.forEach((item) => {
+        const cell = item.byDate.get(date);
+        if (cell) { totalActive += cell.active; totalPaused += cell.paused; }
+      });
+    });
+    return { avgActive: totalActive / dates.length, avgPaused: totalPaused / dates.length };
+  }, [dates, items]);
+
   const visible = useMemo(() => {
     const term = normalize(query);
     const filtered = items.filter((item) => {
@@ -89,14 +102,20 @@ export function DailyItemsMatrix({ rows, title = 'Histórico diário dos itens' 
           <span className="eyebrow">STATUS E PREÇO POR DATA</span>
           <h2>{title}</h2>
           <p>{isSingleStore
-            ? 'P = pausado, A = ativo. O preço em vermelho mudou em relação ao registro anterior.'
-            : 'Na visão da rede, P indica quantas unidades tiveram o item pausado naquele dia.'}</p>
+            ? 'Acompanhe, dia a dia, se cada item esteve ativo (A) ou pausado (P) e qual preço estava cadastrado. Preços em vermelho mudaram em relação ao dia anterior.'
+            : 'Na visão da rede, o número ao lado do P mostra quantas unidades tinham o item pausado naquele dia. Preços em vermelho mudaram em relação ao dia anterior.'}</p>
         </div>
         <div className="daily-matrix-controls">
           <input type="search" value={query} placeholder="Buscar item ou categoria..." onChange={(event) => setQuery(event.target.value)} />
           <label><input type="checkbox" checked={onlyLongPauses} onChange={(event) => setOnlyLongPauses(event.target.checked)} /> Pausado há 2+ dias</label>
         </div>
       </div>
+
+      {dates.length > 1 && <div className="daily-matrix-stats">
+        <div className="is-active"><small>Média de itens ativos por dia</small><strong>{Math.round(avgActive)}</strong></div>
+        <div className="is-paused"><small>Média de itens pausados por dia</small><strong>{Math.round(avgPaused)}</strong></div>
+        <div><small>Período analisado</small><strong>{dates.length} dia(s)</strong></div>
+      </div>}
 
       <div className="daily-matrix-wrap">
         <table className="daily-matrix">

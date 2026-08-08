@@ -37,8 +37,9 @@ function StatusColumn({ title, rows, status, query }) {
       <div>
         {visible.map((row, index) => (
           <article key={`${row.item}-${index}`}>
-            <span><strong>{row.item}</strong><small>{row.categoria} · {row.occurrences}× no período</small></span>
-            {row.precoNum > 0 && <b style={{ color }}>{brl(row.precoNum)}</b>}
+            <span><strong>{row.item}</strong><small>{row.categoria || 'Sem categoria'}</small></span>
+            <b className="status-occurrences">{row.occurrences}×</b>
+            <b className="status-price" style={row.precoNum > 0 ? { color } : undefined}>{row.precoNum > 0 ? brl(row.precoNum) : '—'}</b>
           </article>
         ))}
         {!visible.length && <p>Nenhum item encontrado neste status.</p>}

@@ -22,6 +22,7 @@ import { FranchiseIdentityGate } from './components/FranchiseIdentityGate.jsx';
 import { ManagementPage } from './pages/ManagementPage.jsx';
 import { FranchiseFeedbackPage } from './pages/FranchiseFeedbackPage.jsx';
 import { AlertsPage } from './pages/AlertsPage.jsx';
+import { FranchiseAlertsPage } from './pages/FranchiseAlertsPage.jsx';
 import { brandById, identifyBrand } from './utils/brands.js';
 import { decodeCatalogCube } from './utils/pivot-cache.js';
 import { isSameStore, resolveStoreSelection } from './utils/stores.js';
@@ -317,6 +318,7 @@ export function App() {
             ? <PotentialPageV2 rows={detailRows} isAdmin />
             : <PotentialAccessGate><PotentialPageV2 rows={detailRows} /></PotentialAccessGate>)}
           {tab === 'alerts' && isAdmin && <AlertsPage today={exactSnapshotDates.length ? detailRows : productRows} />}
+          {tab === 'alerts' && !isAdmin && <FranchiseAlertsPage all={detailRows} today={pageRows} />}
           {tab === 'notify' && isAdmin && <AutomatedNotificationPage />}
           {tab === 'access' && isAdmin && <ManagementPage />}
           {tab === 'feedback' && !isAdmin && <FranchiseFeedbackPage />}
