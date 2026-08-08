@@ -24,7 +24,7 @@ export function PortalHeader({ tab, onTabChange, all, lastDate, shift, syncing, 
     <aside className="portal-sidebar">
       <button className="brand-lockup" onClick={() => onTabChange(role === 'admin' ? 'network' : 'dash')} aria-label="Ir ao dashboard">
         <span className="brand-mark"><IHMonogram /></span>
-        <span className="brand-context"><strong>Operação</strong><small>{role === 'admin' ? 'Inteligência da Rede' : 'Portal do Franqueado'}</small></span>
+        <span className="brand-context"><strong>Operação</strong><small>Portal de Itens Pausados x Ativos</small></span>
       </button>
 
       <nav className="sidebar-nav" aria-label="Navegação principal">
