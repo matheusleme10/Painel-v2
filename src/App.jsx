@@ -125,16 +125,22 @@ export function App() {
   // o rótulo do último arquivo importado — senão a tela abre "vazia" mesmo
   // com dados completos já salvos na nuvem.
   const latestFullLoad = useMemo(() => {
-    if (!networkHistoryList.length) return null;
-    return [...networkHistoryList].sort((a, b) => {
+    // No perfil franqueado o backend remove o consolidado da rede por
+    // segurança. Nesse caso, a unitHistory da própria loja passa a ser a
+    // fonte para descobrir a última data/turno disponível.
+    const availableLoads = networkHistoryList.length ? networkHistoryList : unitHistory;
+    if (!availableLoads.length) return null;
+    return [...availableLoads].sort((a, b) => {
       if (a.date !== b.date) return a.date < b.date ? -1 : 1;
       if (a.shift === metadata.dataShift) return 1;
       if (b.shift === metadata.dataShift) return -1;
       return 0;
     }).at(-1);
-  }, [networkHistoryList, metadata.dataShift]);
+  }, [networkHistoryList, unitHistory, metadata.dataShift]);
   const defaultDate = latestFullLoad?.date || lastDate;
-  const defaultShift = latestFullLoad?.shift || metadata.dataShift || 'Jantar';
+  const defaultShift = latestFullLoad?.shift
+    || (['Almoço', 'Jantar', 'Ambos'].includes(metadata.dataShift) ? metadata.dataShift : null)
+    || 'Jantar';
   const effectiveFrom = filters.from || defaultDate;
   const effectiveTo = filters.to || defaultDate;
   const effectiveShift = filters.shift || defaultShift;
@@ -244,7 +250,8 @@ export function App() {
   const draftedDetailRows = useMemo(() => applyPriceDrafts(shiftCollapsedDetailRows, priceDrafts), [shiftCollapsedDetailRows, priceDrafts]);
   const draftedProductRows = useMemo(() => applyPriceDrafts(shiftCollapsedProductRows, priceDrafts), [shiftCollapsedProductRows, priceDrafts]);
   const shiftHasNetworkData = effectiveShift === 'Ambos'
-    || (metadata.networkHistory || []).some((entry) => entry.shift === effectiveShift);
+    || (metadata.networkHistory || []).some((entry) => entry.shift === effectiveShift)
+    || unitHistory.some((entry) => entry.shift === effectiveShift);
 
   function authenticated(next) {
     setAuth(next);
