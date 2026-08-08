@@ -103,7 +103,7 @@ export function App() {
         }
       })
       .finally(() => setSyncing(false));
-  }, [auth]);
+  }, [auth, context?.store]);
 
   const metadata = all.find((row) => row.networkSummary || row.catalogRows) || {};
   const unitHistory = metadata.unitHistory || [];

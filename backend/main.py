@@ -207,6 +207,7 @@ def api_error(error: IFoodAPIError) -> HTTPException:
 SESSION_COOKIE = "ital_portal_session"
 POTENTIAL_COOKIE = "ital_potential_access"
 IDENTITY_COOKIE = "ital_franchise_identity"
+FRANCHISE_CONTEXT_COOKIE = "ital_franchise_context"
 SESSION_TTL_SECONDS = 8 * 60 * 60
 LOGIN_WINDOW_SECONDS = 15 * 60
 LOGIN_MAX_ATTEMPTS = 5
@@ -272,6 +273,37 @@ def _get_identity(request: Request) -> dict | None:
         if not identity.get("name") or not EMAIL_PATTERN.match(str(identity.get("email", ""))):
             return None
         return identity
+    except (ValueError, TypeError, UnicodeError, json.JSONDecodeError):
+        return None
+
+
+def _create_franchise_context(brand_id: str, store: str) -> str:
+    context = {
+        "brandId": brand_id,
+        "store": store,
+        "expires": int(time.time()) + SESSION_TTL_SECONDS,
+    }
+    encoded = base64.urlsafe_b64encode(
+        json.dumps(context, ensure_ascii=True, separators=(",", ":")).encode("utf-8")
+    ).decode("ascii").rstrip("=")
+    signature = hmac.new(_session_secret(), encoded.encode("ascii"), hashlib.sha256).hexdigest()
+    return f"{encoded}.{signature}"
+
+
+def _get_franchise_context(request: Request) -> dict | None:
+    token = request.cookies.get(FRANCHISE_CONTEXT_COOKIE, "")
+    try:
+        encoded, signature = token.split(".", 1)
+        expected = hmac.new(_session_secret(), encoded.encode("ascii"), hashlib.sha256).hexdigest()
+        if not hmac.compare_digest(signature, expected):
+            return None
+        padding = "=" * (-len(encoded) % 4)
+        context = json.loads(base64.urlsafe_b64decode(f"{encoded}{padding}").decode("utf-8"))
+        if int(context.get("expires", 0)) <= int(time.time()):
+            return None
+        if not context.get("brandId") or not context.get("store"):
+            return None
+        return context
     except (ValueError, TypeError, UnicodeError, json.JSONDecodeError):
         return None
 
@@ -486,6 +518,74 @@ def redact_paused_revenue(payload: dict) -> dict:
     safe_payload = dict(payload)
     safe_payload["rows"] = [redact_row(row) for row in payload.get("rows", [])]
     return safe_payload
+
+
+def _store_key(value: object) -> str:
+    return " ".join(str(value or "").strip().lower().split())
+
+
+def filter_payload_for_store(payload: dict, selected_store: str) -> dict:
+    """Return only the selected unit's rows while preserving required metadata."""
+    target = _store_key(selected_store)
+    source_rows = payload.get("rows", [])
+    metadata = next((row for row in source_rows if row.get("networkSummary") or row.get("catalogRows")), {})
+    scoped_rows = [dict(row) for row in source_rows if _store_key(row.get("loja")) == target]
+    if not scoped_rows:
+        scoped_rows = [{"loja": selected_store}]
+
+    meta = dict(metadata)
+    meta["networkHistory"] = []
+    meta["networkSummary"] = None
+    meta["unitHistory"] = [
+        entry for entry in metadata.get("unitHistory", [])
+        if _store_key(entry.get("label")) == target
+    ]
+    meta["unitStats"] = [
+        entry for entry in metadata.get("unitStats", [])
+        if _store_key(entry.get("label") or entry.get("loja")) == target
+    ]
+    for field in ("catalogRows", "catalogHistory", "productHistory"):
+        meta[field] = [
+            entry for entry in metadata.get(field, [])
+            if _store_key(entry.get("loja")) == target
+        ]
+    meta["forneriaSummaryHistory"] = []
+
+    cube = metadata.get("catalogCube")
+    if isinstance(cube, dict):
+        stores = cube.get("stores", [])
+        allowed_indexes = {index for index, store in enumerate(stores) if _store_key(store) == target}
+        selected_records = [
+            record for record in cube.get("records", [])
+            if isinstance(record, list) and len(record) >= 7 and record[0] in allowed_indexes
+        ]
+        dimensions = ["stores", "items", "categories", "dates", "shifts"]
+        used_indexes = [{record[position] for record in selected_records} for position in range(5)]
+        index_maps = [
+            {old_index: new_index for new_index, old_index in enumerate(sorted(indexes))}
+            for indexes in used_indexes
+        ]
+        meta["catalogCube"] = {
+            **cube,
+            **{
+                dimension: [cube.get(dimension, [])[old_index] for old_index in sorted(indexes)]
+                for dimension, indexes in zip(dimensions, used_indexes)
+            },
+            "records": [
+                [*(index_maps[position][record[position]] for position in range(5)), *record[5:]]
+                for record in selected_records
+            ],
+        }
+
+    metadata_fields = {
+        "networkSummary", "networkHistory", "unitStats", "unitHistory", "dataShift",
+        "catalogRows", "catalogHistory", "productHistory", "forneriaSummaryHistory", "catalogCube",
+    }
+    for row in scoped_rows:
+        for field in metadata_fields:
+            row.pop(field, None)
+    scoped_rows[0].update({field: meta.get(field) for field in metadata_fields if field in meta})
+    return {**payload, "rows": scoped_rows, "totalRows": len(scoped_rows)}
 
 
 async def read_current_payload() -> dict | None:
@@ -914,6 +1014,7 @@ async def login_session(credentials: LoginRequest, request: Request, response: R
         raise HTTPException(status_code=401, detail="Senha incorreta.")
     LOGIN_ATTEMPTS.pop(attempt_key, None)
     response.delete_cookie(IDENTITY_COOKIE, path="/", samesite="strict")
+    response.delete_cookie(FRANCHISE_CONTEXT_COOKIE, path="/", samesite="strict")
     response.set_cookie(
         SESSION_COOKIE,
         _create_session(role),
@@ -943,6 +1044,7 @@ async def logout_session(response: Response) -> dict:
     response.delete_cookie(SESSION_COOKIE, path="/", samesite="strict")
     response.delete_cookie(POTENTIAL_COOKIE, path="/", samesite="strict")
     response.delete_cookie(IDENTITY_COOKIE, path="/", samesite="strict")
+    response.delete_cookie(FRANCHISE_CONTEXT_COOKIE, path="/", samesite="strict")
     return {"authenticated": False}
 
 
@@ -976,19 +1078,30 @@ async def identify_franchise(action: FranchiseIdentityRequest, request: Request,
 
 
 @app.post("/api/access/context")
-async def register_franchise_context(action: FranchiseContextRequest, request: Request) -> dict:
+async def register_franchise_context(action: FranchiseContextRequest, request: Request, response: Response) -> dict:
     if require_session(request) != "franchise":
         raise HTTPException(status_code=403, detail="Registro disponível somente para franqueados.")
     identity = _get_identity(request)
     if identity is None:
         raise HTTPException(status_code=401, detail="Identifique-se antes de selecionar a unidade.")
+    brand_id = action.brandId.strip()
+    store = " ".join(action.store.strip().split())
     audit_recorded = await _record_access_event(_access_event(
         request,
         identity,
         "unit_selected",
-        brandId=action.brandId.strip(),
-        store=" ".join(action.store.strip().split()),
+        brandId=brand_id,
+        store=store,
     ))
+    response.set_cookie(
+        FRANCHISE_CONTEXT_COOKIE,
+        _create_franchise_context(brand_id, store),
+        max_age=SESSION_TTL_SECONDS,
+        httponly=True,
+        secure=os.getenv("NODE_ENV") == "production" or bool(os.getenv("VERCEL")),
+        samesite="strict",
+        path="/",
+    )
     return {"recorded": audit_recorded}
 
 
@@ -1145,7 +1258,12 @@ async def load_saved_data(request: Request) -> dict:
     if payload is None:
         return {"hasData": False, "rows": []}
     response = {"hasData": True, **payload}
-    return redact_paused_revenue(response) if role == "franchise" else response
+    if role != "franchise":
+        return response
+    context = _get_franchise_context(request)
+    if context is None:
+        return redact_paused_revenue(response)
+    return filter_payload_for_store(response, context["store"])
 
 
 @app.post("/api/data/upload")

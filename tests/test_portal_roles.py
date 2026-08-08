@@ -2,7 +2,7 @@ from fastapi.testclient import TestClient
 import hashlib
 
 import backend.main as main_module
-from backend.main import LOGIN_ATTEMPTS, app, redact_paused_revenue
+from backend.main import LOGIN_ATTEMPTS, app, filter_payload_for_store, redact_paused_revenue
 
 
 def test_franchise_payload_keeps_active_prices_and_redacts_paused_prices():
@@ -46,6 +46,52 @@ def test_franchise_payload_keeps_active_prices_and_redacts_paused_prices():
     assert safe["rows"][0]["catalogCube"]["records"][0][6] == 30
     assert safe["rows"][0]["catalogCube"]["records"][1][6] == 0
     assert payload["rows"][0]["precoNum"] == 25
+
+
+def test_store_scoped_payload_keeps_paused_prices_and_removes_other_units():
+    payload = {
+        "rows": [
+            {
+                "loja": "Loja A",
+                "status": "Pausado",
+                "precoNum": 25,
+                "networkSummary": {"pausedRevenue": 999},
+                "networkHistory": [{"date": "2026-08-08", "pausedRevenue": 999}],
+                "unitHistory": [
+                    {"label": "Loja A", "date": "2026-08-08"},
+                    {"label": "Loja B", "date": "2026-08-08"},
+                ],
+                "catalogRows": [
+                    {"loja": "Loja A", "status": "Pausado", "precoNum": 25},
+                    {"loja": "Loja B", "status": "Pausado", "precoNum": 70},
+                ],
+                "catalogCube": {
+                    "stores": ["Loja A", "Loja B"],
+                    "items": ["Tiramisu"],
+                    "categories": ["Sobremesas"],
+                    "dates": ["2026-08-08"],
+                    "shifts": ["Jantar"],
+                    "records": [
+                        [0, 0, 0, 0, 0, 1, 25],
+                        [1, 0, 0, 0, 0, 1, 70],
+                    ],
+                },
+            },
+            {"loja": "Loja B", "status": "Pausado", "precoNum": 70},
+        ]
+    }
+
+    scoped = filter_payload_for_store(payload, "Loja A")
+
+    assert len(scoped["rows"]) == 1
+    assert scoped["rows"][0]["precoNum"] == 25
+    assert scoped["rows"][0]["networkHistory"] == []
+    assert scoped["rows"][0]["networkSummary"] is None
+    assert scoped["rows"][0]["unitHistory"] == [{"label": "Loja A", "date": "2026-08-08"}]
+    assert scoped["rows"][0]["catalogRows"] == [
+        {"loja": "Loja A", "status": "Pausado", "precoNum": 25}
+    ]
+    assert scoped["rows"][0]["catalogCube"]["records"] == [[0, 0, 0, 0, 0, 1, 25]]
 
 
 def test_session_cookie_authenticates_without_exposing_hash_to_frontend(monkeypatch):
