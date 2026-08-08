@@ -6,7 +6,7 @@ import { Pill } from '../components/ui/Pill.jsx';
 import { Ic } from '../components/ui/Icon.jsx';
 import { pct, brl, shortName } from '../utils/format.js';
 
-export function AlertsPage({ today, all }) {
+export function AlertsPage({ today }) {
   const alerts = useMemo(() => {
     // Group alerts by priority
     const alerts = {
@@ -20,23 +20,15 @@ export function AlertsPage({ today, all }) {
     const itemMap = {};
     const catMap = {};
 
+    // `today` é o catálogo completo (ativos + pausados) do período selecionado —
+    // cada loja aparece uma vez por item, então dá pra somar ativo/pausado
+    // direto das linhas, sem depender de um total pré-calculado à parte.
     today.forEach((r) => {
-      if (!lojaMap[r.loja]) {
-        lojaMap[r.loja] = {
-          t: r.unitTotal || 0,
-          p: r.unitPaused || 0,
-          a: r.unitActive || 0,
-          hasSummary: Boolean(r.unitTotal),
-        };
-      }
-      if (!lojaMap[r.loja].hasSummary) {
-        lojaMap[r.loja].t++;
-        if (r.status === 'Pausado') {
-          lojaMap[r.loja].p++;
-        } else {
-          lojaMap[r.loja].a++;
-        }
-      }
+      if (!r.loja) return;
+      if (!lojaMap[r.loja]) lojaMap[r.loja] = { t: 0, p: 0, a: 0 };
+      lojaMap[r.loja].t++;
+      if (r.status === 'Pausado') lojaMap[r.loja].p++;
+      else lojaMap[r.loja].a++;
 
       if (r.status === 'Pausado') {
         if (!itemMap[r.item]) {

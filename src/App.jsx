@@ -21,6 +21,7 @@ import { PotentialAccessGate } from './components/PotentialAccessGate.jsx';
 import { FranchiseIdentityGate } from './components/FranchiseIdentityGate.jsx';
 import { ManagementPage } from './pages/ManagementPage.jsx';
 import { FranchiseFeedbackPage } from './pages/FranchiseFeedbackPage.jsx';
+import { AlertsPage } from './pages/AlertsPage.jsx';
 import { brandById, identifyBrand } from './utils/brands.js';
 import { decodeCatalogCube } from './utils/pivot-cache.js';
 import { isSameStore, resolveStoreSelection } from './utils/stores.js';
@@ -102,16 +103,33 @@ export function App() {
     ? metadata.catalogHistory
     : (metadata.catalogRows || []);
   const productHistory = metadata.productHistory || [];
+  const networkHistoryList = metadata.networkHistory || [];
   const sortedDates = useMemo(() => [...new Set([
-    ...(metadata.networkHistory || []).map((entry) => entry.date),
+    ...networkHistoryList.map((entry) => entry.date),
     ...unitHistory.map((entry) => entry.date),
     ...catalogHistory.map((entry) => entry.dia),
     ...productHistory.map((entry) => entry.dia),
   ].filter(Boolean))].sort(), [metadata, unitHistory, catalogHistory, productHistory]);
   const lastDate = sortedDates.at(-1) || null;
-  const effectiveFrom = filters.from || lastDate;
-  const effectiveTo = filters.to || lastDate;
-  const effectiveShift = filters.shift || metadata.dataShift || 'Jantar';
+  // Nem toda carga enviada traz o catálogo completo (a de Jantar às vezes só
+  // tem o consolidado da Forneria). Por isso a data/turno padrão seguem a
+  // última carga que realmente tem catálogo completo (networkHistory), e não
+  // o rótulo do último arquivo importado — senão a tela abre "vazia" mesmo
+  // com dados completos já salvos na nuvem.
+  const latestFullLoad = useMemo(() => {
+    if (!networkHistoryList.length) return null;
+    return [...networkHistoryList].sort((a, b) => {
+      if (a.date !== b.date) return a.date < b.date ? -1 : 1;
+      if (a.shift === metadata.dataShift) return 1;
+      if (b.shift === metadata.dataShift) return -1;
+      return 0;
+    }).at(-1);
+  }, [networkHistoryList, metadata.dataShift]);
+  const defaultDate = latestFullLoad?.date || lastDate;
+  const defaultShift = latestFullLoad?.shift || metadata.dataShift || 'Jantar';
+  const effectiveFrom = filters.from || defaultDate;
+  const effectiveTo = filters.to || defaultDate;
+  const effectiveShift = filters.shift || defaultShift;
   const selectedDate = effectiveTo;
   const isAdmin = auth?.role === 'admin';
   const scopeBrand = isAdmin ? filters.brandId : (context?.brandId || 'all');
@@ -292,6 +310,7 @@ export function App() {
         {tab === 'revenue' && (isAdmin
           ? <PotentialPageV2 rows={detailRows} isAdmin />
           : <PotentialAccessGate><PotentialPageV2 rows={detailRows} /></PotentialAccessGate>)}
+        {tab === 'alerts' && isAdmin && <AlertsPage today={exactSnapshotDates.length ? detailRows : productRows} />}
         {tab === 'notify' && isAdmin && <AutomatedNotificationPage />}
         {tab === 'access' && isAdmin && <ManagementPage />}
         {tab === 'feedback' && !isAdmin && <FranchiseFeedbackPage />}

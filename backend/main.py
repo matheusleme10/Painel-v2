@@ -649,6 +649,58 @@ async def write_feedback_settings(settings: dict) -> None:
     temporary.replace(FEEDBACK_SETTINGS_PATH)
 
 
+def _build_critical_summary(rows: list[dict], date: str) -> str:
+    """Resume os alertas mais críticos do dia (mesma lógica da página
+    "Central de Alertas" do portal) para deixar o aviso automático acionável,
+    em vez de só avisar que "os dados foram atualizados". Usa apenas dados que
+    já vêm no upload — nenhuma informação nova precisa ser cadastrada."""
+    day_rows = [row for row in rows if str(row.get("dia", ""))[:10] == date and row.get("loja")]
+    if not day_rows:
+        return ""
+
+    store_totals: dict[str, dict[str, int]] = {}
+    item_stores: dict[str, set[str]] = {}
+    item_risk: dict[str, float] = {}
+    total_risk = 0.0
+    for row in day_rows:
+        store = row.get("loja")
+        stats = store_totals.setdefault(store, {"total": 0, "paused": 0})
+        stats["total"] += 1
+        if row.get("status") == "Pausado":
+            stats["paused"] += 1
+            item = row.get("item") or "Item sem nome"
+            item_stores.setdefault(item, set()).add(store)
+            price = float(row.get("precoNum") or 0)
+            item_risk[item] = item_risk.get(item, 0.0) + price
+            total_risk += price
+
+    critical_stores = sorted(
+        (
+            (store, stats["paused"], round(100 * (stats["total"] - stats["paused"]) / stats["total"]))
+            for store, stats in store_totals.items()
+            if stats["total"] and (stats["total"] - stats["paused"]) / stats["total"] < 0.6
+        ),
+        key=lambda entry: entry[2],
+    )[:3]
+    systemic_items = sorted(
+        ((item, len(stores)) for item, stores in item_stores.items() if len(stores) >= 3),
+        key=lambda entry: -entry[1],
+    )[:3]
+
+    lines = []
+    if critical_stores:
+        lines.append("Lojas com disponibilidade crítica (abaixo de 60%):")
+        lines.extend(f"- {store}: {score}% disponível, {paused} itens pausados" for store, paused, score in critical_stores)
+    if systemic_items:
+        lines.append("Itens pausados em várias lojas ao mesmo tempo:")
+        lines.extend(f"- {item}: pausado em {count} lojas" for item, count in systemic_items)
+    if total_risk > 0:
+        lines.append(f"Receita pausada estimada no dia: R$ {total_risk:,.2f}".replace(",", "_").replace(".", ",").replace("_", "."))
+    if not lines:
+        return ""
+    return "\n\n" + "\n".join(lines) + "\n\nDetalhes em Central de Alertas, no portal."
+
+
 def _notification_context(payload: dict) -> dict[str, str]:
     rows = payload.get("rows") or []
     metadata = next((row for row in rows if row.get("networkHistory") or row.get("networkSummary")), {})
@@ -664,8 +716,11 @@ def _notification_context(payload: dict) -> dict[str, str]:
     dashboard_url = os.getenv("DASHBOARD_PUBLIC_URL", "").strip()
     default_message = (
         f"{greeting}! O Dashboard de Itens Pausados foi atualizado com os dados de "
-        f"{shift}, {formatted_date}.\n\n"
-        "Acesse o portal para consultar itens ativos, pausados e o ranking da rede."
+        f"{shift}, {formatted_date}."
+    )
+    default_message += _build_critical_summary(rows, date)
+    default_message += (
+        "\n\nAcesse o portal para consultar itens ativos, pausados e o ranking da rede."
     )
     if dashboard_url:
         default_message += f"\n\n{dashboard_url}"

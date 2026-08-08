@@ -1,0 +1,1226 @@
+{
+  "schema": "openai.presentation.layout/v4",
+  "unit": "px",
+  "slide": {
+    "aid": "sl/7fu9qy",
+    "id": "7fu9qy",
+    "slide": 4,
+    "layoutId": "51bb64ba-23f9-433a-8c54-7b70db5fb834",
+    "layoutName": "Title Slide",
+    "layoutType": "title",
+    "masterLayoutId": "c173c47f-f4ff-42fb-93ad-af9bbfbfbc6a",
+    "masterLayoutName": "Master",
+    "backgroundColor": "#FAFAFB",
+    "frame": {
+      "left": 0,
+      "top": 0,
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "theme": {
+    "colorSchemeName": "ChatGPT",
+    "colors": {
+      "accent1": "#156082",
+      "accent2": "#E97132",
+      "accent3": "#196B24",
+      "accent4": "#0F9ED5",
+      "accent5": "#A02B93",
+      "accent6": "#4EA72E",
+      "bg1": "#FFFFFF",
+      "bg2": "#000000",
+      "tx1": "#1F1F1F",
+      "tx2": "#FFFFFF",
+      "dk1": "#000000",
+      "lt1": "#FFFFFF",
+      "dk2": "#0E2841",
+      "lt2": "#E8E8E8",
+      "hlink": "#467886",
+      "folHlink": "#96607D"
+    },
+    "typefaces": [
+      "+mn-lt"
+    ]
+  },
+  "inheritedLayers": [
+    {
+      "scope": "layout",
+      "id": "51bb64ba-23f9-433a-8c54-7b70db5fb834",
+      "name": "Title Slide",
+      "type": "title",
+      "parentLayoutId": "c173c47f-f4ff-42fb-93ad-af9bbfbfbc6a",
+      "elements": []
+    },
+    {
+      "scope": "master",
+      "id": "c173c47f-f4ff-42fb-93ad-af9bbfbfbc6a",
+      "name": "Master",
+      "type": "master",
+      "elements": []
+    }
+  ],
+  "elements": [
+    {
+      "order": 1,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/5cz25cra",
+      "id": "1",
+      "bbox": [
+        0,
+        0,
+        1280,
+        14
+      ],
+      "geometry": "rect",
+      "fillColor": "#C8102E",
+      "lineColor": "#C8102E",
+      "lineWidth": 0
+    },
+    {
+      "order": 2,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/i98jaxsj",
+      "id": "2",
+      "bbox": [
+        58,
+        23,
+        102,
+        66
+      ],
+      "geometry": "roundRect",
+      "fillColor": "#C8102E",
+      "lineColor": "#C8102E",
+      "lineWidth": 1
+    },
+    {
+      "order": 3,
+      "kind": "image",
+      "scope": "slide",
+      "aid": "im/alwr2h0z",
+      "id": "3",
+      "bbox": [
+        68,
+        29,
+        82,
+        52
+      ],
+      "alt": "Logo Ital in House",
+      "contentType": "image/png",
+      "imageFit": "contain",
+      "asset": {
+        "assetId": "2daf68ad-9357-40df-971b-045e0e8876f4",
+        "contentType": "image/png",
+        "byteLength": 57570
+      }
+    },
+    {
+      "order": 4,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/g7q187ad",
+      "id": "4",
+      "bbox": [
+        182,
+        31,
+        880,
+        52
+      ],
+      "geometry": "rect",
+      "text": "Minha Unidade mostra a situação atual",
+      "textPreview": "Minha Unidade mostra a situação atual",
+      "resolvedFontSize": 35,
+      "resolvedTextStyle": {
+        "fontSize": 35,
+        "typeface": "+mn-lt",
+        "color": "#101828",
+        "bold": true,
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Minha Unidade mostra a situação atual"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Minha Unidade mostra a situação atual",
+          "resolvedTextStyle": {
+            "fontSize": 35,
+            "color": "#101828",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Minha Unidade mostra a situação atual",
+              "fontSize": 35,
+              "color": "#101828",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 5,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/h8zi1sry",
+      "id": "5",
+      "bbox": [
+        182,
+        76,
+        600,
+        24
+      ],
+      "geometry": "rect",
+      "text": "MANUAL DO FRANQUEADO",
+      "textPreview": "MANUAL DO FRANQUEADO",
+      "resolvedFontSize": 13,
+      "resolvedTextStyle": {
+        "fontSize": 13,
+        "typeface": "+mn-lt",
+        "color": "#667085",
+        "bold": true,
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "MANUAL DO FRANQUEADO"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "MANUAL DO FRANQUEADO",
+          "resolvedTextStyle": {
+            "fontSize": 13,
+            "color": "#667085",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "MANUAL DO FRANQUEADO",
+              "fontSize": 13,
+              "color": "#667085",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 6,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/u5oj6xsn",
+      "id": "6",
+      "bbox": [
+        1155,
+        40,
+        60,
+        30
+      ],
+      "geometry": "rect",
+      "text": "04",
+      "textPreview": "04",
+      "resolvedFontSize": 16,
+      "resolvedTextStyle": {
+        "fontSize": 16,
+        "typeface": "+mn-lt",
+        "color": "#C8102E",
+        "bold": true,
+        "alignment": "right",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "04"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "04",
+          "resolvedTextStyle": {
+            "fontSize": 16,
+            "color": "#C8102E",
+            "bold": true,
+            "alignment": "right"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "04",
+              "fontSize": 16,
+              "color": "#C8102E",
+              "bold": true,
+              "alignment": "right"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 7,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/v6x0z298",
+      "id": "7",
+      "bbox": [
+        64,
+        108,
+        1152,
+        1
+      ],
+      "geometry": "rect",
+      "fillColor": "#E4E7EC",
+      "lineColor": "#E4E7EC",
+      "lineWidth": 0
+    },
+    {
+      "order": 8,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/83614nah",
+      "id": "8",
+      "bbox": [
+        75,
+        165,
+        345,
+        145
+      ],
+      "geometry": "roundRect",
+      "fillColor": "#ECFDF5",
+      "lineColor": "#ECFDF5",
+      "lineWidth": 1
+    },
+    {
+      "order": 9,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/t4fixsr2",
+      "id": "9",
+      "bbox": [
+        75,
+        165,
+        8,
+        145
+      ],
+      "geometry": "rect",
+      "fillColor": "#059669",
+      "lineColor": "#059669",
+      "lineWidth": 0
+    },
+    {
+      "order": 10,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/54julkjy",
+      "id": "10",
+      "bbox": [
+        101,
+        183,
+        299,
+        30
+      ],
+      "geometry": "rect",
+      "text": "Disponibilidade",
+      "textPreview": "Disponibilidade",
+      "resolvedFontSize": 21,
+      "resolvedTextStyle": {
+        "fontSize": 21,
+        "typeface": "+mn-lt",
+        "color": "#059669",
+        "bold": true,
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Disponibilidade"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Disponibilidade",
+          "resolvedTextStyle": {
+            "fontSize": 21,
+            "color": "#059669",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Disponibilidade",
+              "fontSize": 21,
+              "color": "#059669",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 11,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/43adsf2d",
+      "id": "11",
+      "bbox": [
+        101,
+        219,
+        299,
+        77
+      ],
+      "geometry": "rect",
+      "text": "Percentual do cardápio ativo no recorte selecionado.",
+      "textPreview": "Percentual do cardápio ativo no recorte selecionado.",
+      "resolvedFontSize": 16,
+      "resolvedTextStyle": {
+        "fontSize": 16,
+        "typeface": "+mn-lt",
+        "color": "#475467",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 2,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Percentual do cardápio ativo no recorte"
+          },
+          {
+            "index": 2,
+            "text": "selecionado."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Percentual do cardápio ativo no recorte selecionado.",
+          "resolvedTextStyle": {
+            "fontSize": 16,
+            "color": "#475467",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Percentual do cardápio ativo no recorte selecionado.",
+              "fontSize": 16,
+              "color": "#475467",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 12,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/321cza18",
+      "id": "12",
+      "bbox": [
+        468,
+        165,
+        345,
+        145
+      ],
+      "geometry": "roundRect",
+      "fillColor": "#FFF1F3",
+      "lineColor": "#FFF1F3",
+      "lineWidth": 1
+    },
+    {
+      "order": 13,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/i1svq5kn",
+      "id": "13",
+      "bbox": [
+        468,
+        165,
+        8,
+        145
+      ],
+      "geometry": "rect",
+      "fillColor": "#C8102E",
+      "lineColor": "#C8102E",
+      "lineWidth": 0
+    },
+    {
+      "order": 14,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/h0zux0j2",
+      "id": "14",
+      "bbox": [
+        494,
+        183,
+        299,
+        30
+      ],
+      "geometry": "rect",
+      "text": "Itens pausados",
+      "textPreview": "Itens pausados",
+      "resolvedFontSize": 21,
+      "resolvedTextStyle": {
+        "fontSize": 21,
+        "typeface": "+mn-lt",
+        "color": "#C8102E",
+        "bold": true,
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Itens pausados"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Itens pausados",
+          "resolvedTextStyle": {
+            "fontSize": 21,
+            "color": "#C8102E",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Itens pausados",
+              "fontSize": 21,
+              "color": "#C8102E",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 15,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/gzqdov2h",
+      "id": "15",
+      "bbox": [
+        494,
+        219,
+        299,
+        77
+      ],
+      "geometry": "rect",
+      "text": "Produtos indisponíveis que exigem atenção da operação.",
+      "textPreview": "Produtos indisponíveis que exigem atenção da operação.",
+      "resolvedFontSize": 16,
+      "resolvedTextStyle": {
+        "fontSize": 16,
+        "typeface": "+mn-lt",
+        "color": "#475467",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 2,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Produtos indisponíveis que exigem"
+          },
+          {
+            "index": 2,
+            "text": "atenção da operação."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Produtos indisponíveis que exigem atenção da operação.",
+          "resolvedTextStyle": {
+            "fontSize": 16,
+            "color": "#475467",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Produtos indisponíveis que exigem atenção da operação.",
+              "fontSize": 16,
+              "color": "#475467",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 16,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/vyhcva1w",
+      "id": "16",
+      "bbox": [
+        860,
+        165,
+        345,
+        145
+      ],
+      "geometry": "roundRect",
+      "fillColor": "#EFF6FF",
+      "lineColor": "#EFF6FF",
+      "lineWidth": 1
+    },
+    {
+      "order": 17,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/ux8vm5kb",
+      "id": "17",
+      "bbox": [
+        860,
+        165,
+        8,
+        145
+      ],
+      "geometry": "rect",
+      "fillColor": "#2563EB",
+      "lineColor": "#2563EB",
+      "lineWidth": 0
+    },
+    {
+      "order": 18,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/twzut0jq",
+      "id": "18",
+      "bbox": [
+        886,
+        183,
+        299,
+        30
+      ],
+      "geometry": "rect",
+      "text": "Itens ativos",
+      "textPreview": "Itens ativos",
+      "resolvedFontSize": 21,
+      "resolvedTextStyle": {
+        "fontSize": 21,
+        "typeface": "+mn-lt",
+        "color": "#2563EB",
+        "bold": true,
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Itens ativos"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Itens ativos",
+          "resolvedTextStyle": {
+            "fontSize": 21,
+            "color": "#2563EB",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Itens ativos",
+              "fontSize": 21,
+              "color": "#2563EB",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 19,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/8vqtkv2l",
+      "id": "19",
+      "bbox": [
+        886,
+        219,
+        299,
+        77
+      ],
+      "geometry": "rect",
+      "text": "Produtos disponíveis para venda na unidade.",
+      "textPreview": "Produtos disponíveis para venda na unidade.",
+      "resolvedFontSize": 16,
+      "resolvedTextStyle": {
+        "fontSize": 16,
+        "typeface": "+mn-lt",
+        "color": "#475467",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 2,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Produtos disponíveis para venda na"
+          },
+          {
+            "index": 2,
+            "text": "unidade."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Produtos disponíveis para venda na unidade.",
+          "resolvedTextStyle": {
+            "fontSize": 16,
+            "color": "#475467",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Produtos disponíveis para venda na unidade.",
+              "fontSize": 16,
+              "color": "#475467",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 20,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/kfud0va1",
+      "id": "20",
+      "bbox": [
+        75,
+        365,
+        500,
+        32
+      ],
+      "geometry": "rect",
+      "text": "Na mesma página você pode:",
+      "textPreview": "Na mesma página você pode:",
+      "resolvedFontSize": 24,
+      "resolvedTextStyle": {
+        "fontSize": 24,
+        "typeface": "+mn-lt",
+        "color": "#101828",
+        "bold": true,
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Na mesma página você pode:"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Na mesma página você pode:",
+          "resolvedTextStyle": {
+            "fontSize": 24,
+            "color": "#101828",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Na mesma página você pode:",
+              "fontSize": 24,
+              "color": "#101828",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 21,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/lg3u90rm",
+      "id": "21",
+      "bbox": [
+        82,
+        427,
+        14,
+        14
+      ],
+      "geometry": "ellipse",
+      "fillColor": "#C8102E",
+      "lineColor": "#C8102E",
+      "lineWidth": 0
+    },
+    {
+      "order": 22,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/ydsvylsb",
+      "id": "22",
+      "bbox": [
+        110,
+        420,
+        1022,
+        42
+      ],
+      "geometry": "rect",
+      "text": "Pesquisar produto ou categoria",
+      "textPreview": "Pesquisar produto ou categoria",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "fontSize": 18,
+        "typeface": "+mn-lt",
+        "color": "#101828",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Pesquisar produto ou categoria"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Pesquisar produto ou categoria",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "color": "#101828",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Pesquisar produto ou categoria",
+              "fontSize": 18,
+              "color": "#101828",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 23,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/ze1c7qtw",
+      "id": "23",
+      "bbox": [
+        82,
+        491,
+        14,
+        14
+      ],
+      "geometry": "ellipse",
+      "fillColor": "#C8102E",
+      "lineColor": "#C8102E",
+      "lineWidth": 0
+    },
+    {
+      "order": 24,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/cbadwva5",
+      "id": "24",
+      "bbox": [
+        110,
+        484,
+        1022,
+        42
+      ],
+      "geometry": "rect",
+      "text": "Alternar entre listas de ativos e pausados",
+      "textPreview": "Alternar entre listas de ativos e pausados",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "fontSize": 18,
+        "typeface": "+mn-lt",
+        "color": "#101828",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Alternar entre listas de ativos e pausados"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Alternar entre listas de ativos e pausados",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "color": "#101828",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Alternar entre listas de ativos e pausados",
+              "fontSize": 18,
+              "color": "#101828",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 25,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/xcju5gbq",
+      "id": "25",
+      "bbox": [
+        82,
+        555,
+        14,
+        14
+      ],
+      "geometry": "ellipse",
+      "fillColor": "#C8102E",
+      "lineColor": "#C8102E",
+      "lineWidth": 0
+    },
+    {
+      "order": 26,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/apsvulsz",
+      "id": "26",
+      "bbox": [
+        110,
+        548,
+        1022,
+        42
+      ],
+      "geometry": "rect",
+      "text": "Ver quantas vezes cada produto pausou no período",
+      "textPreview": "Ver quantas vezes cada produto pausou no período",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "fontSize": 18,
+        "typeface": "+mn-lt",
+        "color": "#101828",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Ver quantas vezes cada produto pausou no período"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Ver quantas vezes cada produto pausou no período",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "color": "#101828",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Ver quantas vezes cada produto pausou no período",
+              "fontSize": 18,
+              "color": "#101828",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 27,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/ba1c3qtk",
+      "id": "27",
+      "bbox": [
+        64,
+        680,
+        900,
+        20
+      ],
+      "geometry": "rect",
+      "text": "Use a pesquisa para localizar itens além da primeira página.",
+      "textPreview": "Use a pesquisa para localizar itens além da primeira página.",
+      "resolvedFontSize": 11,
+      "resolvedTextStyle": {
+        "fontSize": 11,
+        "typeface": "+mn-lt",
+        "color": "#667085",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Use a pesquisa para localizar itens além da primeira página."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Use a pesquisa para localizar itens além da primeira página.",
+          "resolvedTextStyle": {
+            "fontSize": 11,
+            "color": "#667085",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Use a pesquisa para localizar itens além da primeira página.",
+              "fontSize": 11,
+              "color": "#667085",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 28,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/w7ed8fa9",
+      "id": "28",
+      "bbox": [
+        950,
+        680,
+        266,
+        20
+      ],
+      "geometry": "rect",
+      "text": "Portal de Itens Pausados × Ativos",
+      "textPreview": "Portal de Itens Pausados × Ativos",
+      "resolvedFontSize": 11,
+      "resolvedTextStyle": {
+        "fontSize": 11,
+        "typeface": "+mn-lt",
+        "color": "#C8102E",
+        "bold": true,
+        "alignment": "right",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Portal de Itens Pausados × Ativos"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Portal de Itens Pausados × Ativos",
+          "resolvedTextStyle": {
+            "fontSize": 11,
+            "color": "#C8102E",
+            "bold": true,
+            "alignment": "right"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Portal de Itens Pausados × Ativos",
+              "fontSize": 11,
+              "color": "#C8102E",
+              "bold": true,
+              "alignment": "right"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    }
+  ],
+  "composeRuns": []
+}

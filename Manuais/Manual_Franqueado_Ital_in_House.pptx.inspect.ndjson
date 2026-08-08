@@ -1,0 +1,219 @@
+{"kind":"deck","id":"pr/eo9m7p","name":"Deck"}
+{"kind":"layout","layoutId":"c173c47f-f4ff-42fb-93ad-af9bbfbfbc6a","name":"Master","type":"master"}
+{"kind":"layout","layoutId":"51bb64ba-23f9-433a-8c54-7b70db5fb834","name":"Title Slide","type":"title"}
+{"kind":"slide","id":"sl/a30p82","slide":1,"title":"MANUAL DE USO","textShapes":5}
+{"kind":"shape","id":"sh/o3e9kvup","slide":1,"bbox":[0,0,410,720]}
+{"kind":"textbox","id":"sh/2hcrilcj","slide":1,"text":"MANUAL DE USO","textPreview":"MANUAL DE USO","textChars":13,"textLines":1,"bbox":[480,105,650,34]}
+{"kind":"textbox","id":"sh/x8naxkb6","slide":1,"text":"Portal do Franqueado","textPreview":"Portal do Franqueado","textChars":20,"textLines":1,"bbox":[480,165,690,105]}
+{"kind":"textbox","id":"sh/c7e9oful","slide":1,"text":"Consulte sua unidade, entenda o cardápio e priorize ações em poucos minutos.","textPreview":"Consulte sua unidade, entenda o cardápio e priorize ações em poucos minutos.","textChars":76,"textLines":1,"bbox":[480,305,670,92]}
+{"kind":"shape","id":"sh/b65svatg","slide":1,"bbox":[480,430,120,6]}
+{"kind":"textbox","id":"sh/a5wrm5cv","slide":1,"text":"Ital in House · Operação","textPreview":"Ital in House · Operação","textChars":24,"textLines":1,"bbox":[480,465,500,30]}
+{"kind":"textbox","id":"sh/lc7a1kbi","slide":1,"text":"Versão de treinamento","textPreview":"Versão de treinamento","textChars":21,"textLines":1,"bbox":[480,502,400,24]}
+{"kind":"image","id":"im/6lsfu18j","slide":1,"name":"","alt":"Logo Ital in House","bbox":[86,78,230,140]}
+{"kind":"notes","id":"nt/a30p82","slide":1,"text":""}
+{"kind":"slide","id":"sl/pgdzp3","slide":2,"title":"Seu caminho até o painel","textShapes":16}
+{"kind":"shape","id":"sh/0zqlofmp","slide":2,"bbox":[0,0,1280,14]}
+{"kind":"shape","id":"sh/zyh4fal4","slide":2,"bbox":[58,23,102,66]}
+{"kind":"textbox","id":"sh/9ojmlk36","slide":2,"text":"Seu caminho até o painel","textPreview":"Seu caminho até o painel","textChars":24,"textLines":1,"bbox":[182,31,880,52]}
+{"kind":"textbox","id":"sh/ona5szml","slide":2,"text":"MANUAL DO FRANQUEADO","textPreview":"MANUAL DO FRANQUEADO","textChars":20,"textLines":1,"bbox":[182,76,600,24]}
+{"kind":"textbox","id":"sh/n2h4jul0","slide":2,"text":"02","textPreview":"02","textChars":2,"textLines":1,"bbox":[1155,40,60,30]}
+{"kind":"shape","id":"sh/m183qp4v","slide":2,"bbox":[64,108,1152,1]}
+{"kind":"shape","id":"sh/5sfm9032","slide":2,"bbox":[78,175,52,52]}
+{"kind":"textbox","id":"sh/476lgvmh","slide":2,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[78,184,52,30]}
+{"kind":"textbox","id":"sh/q94bylsb","slide":2,"text":"Entre com a senha","textPreview":"Entre com a senha","textChars":17,"textLines":1,"bbox":[148,173,280,34]}
+{"kind":"textbox","id":"sh/rads7qtw","slide":2,"text":"Use a senha compartilhada do perfil de franqueado.","textPreview":"Use a senha compartilhada do perfil de franqueado.","textChars":50,"textLines":1,"bbox":[148,209,280,78]}
+{"kind":"shape","id":"sh/sbmt0bah","slide":2,"bbox":[465,175,52,52]}
+{"kind":"textbox","id":"sh/dcva9gbm","slide":2,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[465,184,52,30]}
+{"kind":"textbox","id":"sh/ed4b2ls7","slide":2,"text":"Identifique-se","textPreview":"Identifique-se","textChars":14,"textLines":1,"bbox":[535,173,280,34]}
+{"kind":"textbox","id":"sh/fedsbqts","slide":2,"text":"Informe nome completo e e-mail autorizado.","textPreview":"Informe nome completo e e-mail autorizado.","textChars":42,"textLines":1,"bbox":[535,209,280,78]}
+{"kind":"shape","id":"sh/0fmt4vad","slide":2,"bbox":[852,175,52,52]}
+{"kind":"textbox","id":"sh/1gvad0by","slide":2,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[852,184,52,30]}
+{"kind":"textbox","id":"sh/2hob65sj","slide":2,"text":"Escolha a unidade","textPreview":"Escolha a unidade","textChars":17,"textLines":1,"bbox":[922,173,280,34]}
+{"kind":"textbox","id":"sh/nixcfat4","slide":2,"text":"Selecione a marca e pesquise sua loja pelo nome ou cidade.","textPreview":"Selecione a marca e pesquise sua loja pelo nome ou cidade.","textChars":58,"textLines":1,"bbox":[922,209,280,78]}
+{"kind":"shape","id":"sh/z6xsnapw","slide":2,"bbox":[160,430,960,140]}
+{"kind":"shape","id":"sh/y5oru58r","slide":2,"bbox":[160,430,8,140]}
+{"kind":"textbox","id":"sh/l8zapk72","slide":2,"text":"Quer trocar de perfil?","textPreview":"Quer trocar de perfil?","textChars":22,"textLines":1,"bbox":[186,448,914,30]}
+{"kind":"textbox","id":"sh/k769wfqh","slide":2,"text":"Na identificação, use “Voltar e trocar perfil”. Dentro do portal, use “Trocar unidade” ou “Sair”.","textPreview":"Na identificação, use “Voltar e trocar perfil”. Dentro do portal, use “Trocar unidade” ou “Sair”.","textChars":97,"textLines":1,"bbox":[186,484,914,72]}
+{"kind":"textbox","id":"sh/bixsjqp0","slide":2,"text":"A identificação registra nome, e-mail, data e unidade acessada.","textPreview":"A identificação registra nome, e-mail, data e unidade acessada.","textChars":63,"textLines":1,"bbox":[64,680,900,20]}
+{"kind":"textbox","id":"sh/ahorql8f","slide":2,"text":"Portal de Itens Pausados × Ativos","textPreview":"Portal de Itens Pausados × Ativos","textChars":33,"textLines":1,"bbox":[950,680,266,20]}
+{"kind":"image","id":"im/b6d47mhg","slide":2,"name":"","alt":"Logo Ital in House","bbox":[68,29,82,52]}
+{"kind":"notes","id":"nt/pgdzp3","slide":2,"text":""}
+{"kind":"slide","id":"sl/q8ikd7","slide":3,"title":"Os filtros controlam todas as páginas","textShapes":16}
+{"kind":"shape","id":"sh/6h83ad4b","slide":3,"bbox":[0,0,1280,14]}
+{"kind":"shape","id":"sh/tkz2l83m","slide":3,"bbox":[58,23,102,66]}
+{"kind":"textbox","id":"sh/fmhknils","slide":3,"text":"Os filtros controlam todas as páginas","textPreview":"Os filtros controlam todas as páginas","textChars":37,"textLines":1,"bbox":[182,31,880,52]}
+{"kind":"textbox","id":"sh/ul83ed47","slide":3,"text":"MANUAL DO FRANQUEADO","textPreview":"MANUAL DO FRANQUEADO","textChars":20,"textLines":1,"bbox":[182,76,600,24]}
+{"kind":"textbox","id":"sh/hojmps3y","slide":3,"text":"03","textPreview":"03","textChars":2,"textLines":1,"bbox":[1155,40,60,30]}
+{"kind":"shape","id":"sh/gnqlgnmd","slide":3,"bbox":[64,108,1152,1]}
+{"kind":"shape","id":"sh/vqxkbelo","slide":3,"bbox":[90,165,52,52]}
+{"kind":"textbox","id":"sh/apo32t43","slide":3,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[90,174,52,30]}
+{"kind":"textbox","id":"sh/8jedw7y9","slide":3,"text":"Escolha o período","textPreview":"Escolha o período","textChars":17,"textLines":1,"bbox":[160,163,430,34]}
+{"kind":"textbox","id":"sh/9knupczu","slide":3,"text":"Use Última carga, Últimas 7 cargas ou datas específicas.","textPreview":"Use Última carga, Últimas 7 cargas ou datas específicas.","textChars":56,"textLines":1,"bbox":[160,199,430,78]}
+{"kind":"shape","id":"sh/mhwbuxg3","slide":3,"bbox":[90,310,52,52]}
+{"kind":"textbox","id":"sh/7i5cn2ho","slide":3,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[90,319,52,30]}
+{"kind":"textbox","id":"sh/wned07y5","slide":3,"text":"Escolha o turno","textPreview":"Escolha o turno","textChars":15,"textLines":1,"bbox":[160,308,430,34]}
+{"kind":"textbox","id":"sh/ho7utczq","slide":3,"text":"Almoço e Jantar mostram recortes diferentes do relatório.","textPreview":"Almoço e Jantar mostram recortes diferentes do relatório.","textChars":57,"textLines":1,"bbox":[160,344,430,78]}
+{"kind":"shape","id":"sh/ulwvyxgf","slide":3,"bbox":[90,455,52,52]}
+{"kind":"textbox","id":"sh/vm5cr2h0","slide":3,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[90,464,52,30]}
+{"kind":"textbox","id":"sh/crutony1","slide":3,"text":"Confirme a análise","textPreview":"Confirme a análise","textChars":18,"textLines":1,"bbox":[160,453,430,34]}
+{"kind":"textbox","id":"sh/xs3uh8zm","slide":3,"text":"Clique em Aplicar para recalcular todos os indicadores.","textPreview":"Clique em Aplicar para recalcular todos os indicadores.","textChars":55,"textLines":1,"bbox":[160,489,430,78]}
+{"kind":"shape","id":"sh/dcbi5kne","slide":3,"bbox":[690,205,450,285]}
+{"kind":"shape","id":"sh/sb21wfmt","slide":3,"bbox":[690,205,8,285]}
+{"kind":"textbox","id":"sh/rat03a58","slide":3,"text":"Regra principal","textPreview":"Regra principal","textChars":15,"textLines":1,"bbox":[716,223,404,30]}
+{"kind":"textbox","id":"sh/q9kju54n","slide":3,"text":"Ativos e pausados sempre representam o período e o turno aplicados. Ao entrar, o portal abre na última carga disponível.","textPreview":"Ativos e pausados sempre representam o período e o turno aplicados. Ao entrar, o portal abre na última carga disponível.","textChars":120,"textLines":1,"bbox":[716,259,404,217]}
+{"kind":"textbox","id":"sh/10v29kna","slide":3,"text":"Se uma tela parecer antiga, confira período e turno antes de comparar.","textPreview":"Se uma tela parecer antiga, confira período e turno antes de comparar.","textChars":70,"textLines":1,"bbox":[64,680,900,20]}
+{"kind":"textbox","id":"sh/0z210fmp","slide":3,"text":"Portal de Itens Pausados × Ativos","textPreview":"Portal de Itens Pausados × Ativos","textChars":33,"textLines":1,"bbox":[950,680,266,20]}
+{"kind":"image","id":"im/94b2pw72","slide":3,"name":"","alt":"Logo Ital in House","bbox":[68,29,82,52]}
+{"kind":"notes","id":"nt/q8ikd7","slide":3,"text":""}
+{"kind":"slide","id":"sl/7fu9qy","slide":4,"title":"Minha Unidade mostra a situação atual","textShapes":15}
+{"kind":"shape","id":"sh/5cz25cra","slide":4,"bbox":[0,0,1280,14]}
+{"kind":"shape","id":"sh/i98jaxsj","slide":4,"bbox":[58,23,102,66]}
+{"kind":"textbox","id":"sh/g7q187ad","slide":4,"text":"Minha Unidade mostra a situação atual","textPreview":"Minha Unidade mostra a situação atual","textChars":37,"textLines":1,"bbox":[182,31,880,52]}
+{"kind":"textbox","id":"sh/h8zi1sry","slide":4,"text":"MANUAL DO FRANQUEADO","textPreview":"MANUAL DO FRANQUEADO","textChars":20,"textLines":1,"bbox":[182,76,600,24]}
+{"kind":"textbox","id":"sh/u5oj6xsn","slide":4,"text":"04","textPreview":"04","textChars":2,"textLines":1,"bbox":[1155,40,60,30]}
+{"kind":"shape","id":"sh/v6x0z298","slide":4,"bbox":[64,108,1152,1]}
+{"kind":"shape","id":"sh/83614nah","slide":4,"bbox":[75,165,345,145]}
+{"kind":"shape","id":"sh/t4fixsr2","slide":4,"bbox":[75,165,8,145]}
+{"kind":"textbox","id":"sh/54julkjy","slide":4,"text":"Disponibilidade","textPreview":"Disponibilidade","textChars":15,"textLines":1,"bbox":[101,183,299,30]}
+{"kind":"textbox","id":"sh/43adsf2d","slide":4,"text":"Percentual do cardápio ativo no recorte selecionado.","textPreview":"Percentual do cardápio ativo no recorte selecionado.","textChars":52,"textLines":1,"bbox":[101,219,299,77]}
+{"kind":"shape","id":"sh/321cza18","slide":4,"bbox":[468,165,345,145]}
+{"kind":"shape","id":"sh/i1svq5kn","slide":4,"bbox":[468,165,8,145]}
+{"kind":"textbox","id":"sh/h0zux0j2","slide":4,"text":"Itens pausados","textPreview":"Itens pausados","textChars":14,"textLines":1,"bbox":[494,183,299,30]}
+{"kind":"textbox","id":"sh/gzqdov2h","slide":4,"text":"Produtos indisponíveis que exigem atenção da operação.","textPreview":"Produtos indisponíveis que exigem atenção da operação.","textChars":54,"textLines":1,"bbox":[494,219,299,77]}
+{"kind":"shape","id":"sh/vyhcva1w","slide":4,"bbox":[860,165,345,145]}
+{"kind":"shape","id":"sh/ux8vm5kb","slide":4,"bbox":[860,165,8,145]}
+{"kind":"textbox","id":"sh/twzut0jq","slide":4,"text":"Itens ativos","textPreview":"Itens ativos","textChars":12,"textLines":1,"bbox":[886,183,299,30]}
+{"kind":"textbox","id":"sh/8vqtkv2l","slide":4,"text":"Produtos disponíveis para venda na unidade.","textPreview":"Produtos disponíveis para venda na unidade.","textChars":43,"textLines":1,"bbox":[886,219,299,77]}
+{"kind":"textbox","id":"sh/kfud0va1","slide":4,"text":"Na mesma página você pode:","textPreview":"Na mesma página você pode:","textChars":26,"textLines":1,"bbox":[75,365,500,32]}
+{"kind":"shape","id":"sh/lg3u90rm","slide":4,"bbox":[82,427,14,14]}
+{"kind":"textbox","id":"sh/ydsvylsb","slide":4,"text":"Pesquisar produto ou categoria","textPreview":"Pesquisar produto ou categoria","textChars":30,"textLines":1,"bbox":[110,420,1022,42]}
+{"kind":"shape","id":"sh/ze1c7qtw","slide":4,"bbox":[82,491,14,14]}
+{"kind":"textbox","id":"sh/cbadwva5","slide":4,"text":"Alternar entre listas de ativos e pausados","textPreview":"Alternar entre listas de ativos e pausados","textChars":42,"textLines":1,"bbox":[110,484,1022,42]}
+{"kind":"shape","id":"sh/xcju5gbq","slide":4,"bbox":[82,555,14,14]}
+{"kind":"textbox","id":"sh/apsvulsz","slide":4,"text":"Ver quantas vezes cada produto pausou no período","textPreview":"Ver quantas vezes cada produto pausou no período","textChars":48,"textLines":1,"bbox":[110,548,1022,42]}
+{"kind":"textbox","id":"sh/ba1c3qtk","slide":4,"text":"Use a pesquisa para localizar itens além da primeira página.","textPreview":"Use a pesquisa para localizar itens além da primeira página.","textChars":60,"textLines":1,"bbox":[64,680,900,20]}
+{"kind":"textbox","id":"sh/w7ed8fa9","slide":4,"text":"Portal de Itens Pausados × Ativos","textPreview":"Portal de Itens Pausados × Ativos","textChars":33,"textLines":1,"bbox":[950,680,266,20]}
+{"kind":"image","id":"im/alwr2h0z","slide":4,"name":"","alt":"Logo Ital in House","bbox":[68,29,82,52]}
+{"kind":"notes","id":"nt/7fu9qy","slide":4,"text":""}
+{"kind":"slide","id":"sl/sjbvto","slide":5,"title":"Itens e Categorias explicam onde agir","textShapes":11}
+{"kind":"shape","id":"sh/e5ozy9cb","slide":5,"bbox":[0,0,1280,14]}
+{"kind":"shape","id":"sh/18fy94b2","slide":5,"bbox":[58,23,102,66]}
+{"kind":"textbox","id":"sh/r2xg3utk","slide":5,"text":"Itens e Categorias explicam onde agir","textPreview":"Itens e Categorias explicam onde agir","textChars":37,"textLines":1,"bbox":[182,31,880,52]}
+{"kind":"textbox","id":"sh/q1ozupcf","slide":5,"text":"MANUAL DO FRANQUEADO","textPreview":"MANUAL DO FRANQUEADO","textChars":20,"textLines":1,"bbox":[182,76,600,24]}
+{"kind":"textbox","id":"sh/d4fy54bq","slide":5,"text":"05","textPreview":"05","textChars":2,"textLines":1,"bbox":[1155,40,60,30]}
+{"kind":"shape","id":"sh/s36hwzu5","slide":5,"bbox":[64,108,1152,1]}
+{"kind":"shape","id":"sh/3edgzuto","slide":5,"bbox":[75,165,520,190]}
+{"kind":"shape","id":"sh/id4f6pc3","slide":5,"bbox":[75,165,8,190]}
+{"kind":"textbox","id":"sh/07axs3ip","slide":5,"text":"Itens","textPreview":"Itens","textChars":5,"textLines":1,"bbox":[101,183,474,30]}
+{"kind":"textbox","id":"sh/l8jy18za","slide":5,"text":"Lista o catálogo da unidade. Pesquise pelo nome e navegue entre ativos e pausados.","textPreview":"Lista o catálogo da unidade. Pesquise pelo nome e navegue entre ativos e pausados.","textChars":82,"textLines":1,"bbox":[101,219,474,122]}
+{"kind":"shape","id":"sh/y58fqt0z","slide":5,"bbox":[685,165,520,190]}
+{"kind":"shape","id":"sh/z6hgzyh4","slide":5,"bbox":[685,165,8,190]}
+{"kind":"textbox","id":"sh/c3qxojit","slide":5,"text":"Categorias","textPreview":"Categorias","textChars":10,"textLines":1,"bbox":[711,183,474,30]}
+{"kind":"textbox","id":"sh/d4zyxoze","slide":5,"text":"Resume quantos estão pausados, ativos e o percentual de disponibilidade de cada grupo.","textPreview":"Resume quantos estão pausados, ativos e o percentual de disponibilidade de cada grupo.","textChars":86,"textLines":1,"bbox":[711,219,474,122]}
+{"kind":"shape","id":"sh/q18fmt0n","slide":5,"bbox":[160,410,960,115]}
+{"kind":"textbox","id":"sh/b2hgveh8","slide":5,"text":"Exemplo de leitura","textPreview":"Exemplo de leitura","textChars":18,"textLines":1,"bbox":[190,430,250,26]}
+{"kind":"textbox","id":"sh/wzuh0nix","slide":5,"text":"36 pausados · 27 ativos · 63 no total · 43% ativos","textPreview":"36 pausados · 27 ativos · 63 no total · 43% ativos","textChars":50,"textLines":1,"bbox":[190,468,830,34]}
+{"kind":"textbox","id":"sh/x03y9szi","slide":5,"text":"Clique em uma categoria para abrir os produtos pausados daquele grupo.","textPreview":"Clique em uma categoria para abrir os produtos pausados daquele grupo.","textChars":70,"textLines":1,"bbox":[64,680,900,20]}
+{"kind":"textbox","id":"sh/5kf6xona","slide":5,"text":"Portal de Itens Pausados × Ativos","textPreview":"Portal de Itens Pausados × Ativos","textChars":33,"textLines":1,"bbox":[950,680,266,20]}
+{"kind":"image","id":"im/xcjqhoja","slide":5,"name":"","alt":"Logo Ital in House","bbox":[68,29,82,52]}
+{"kind":"notes","id":"nt/sjbvto","slide":5,"text":""}
+{"kind":"slide","id":"sl/t6e811","slide":6,"title":"Ranking compara lojas da mesma marca","textShapes":17}
+{"kind":"shape","id":"sh/5kbi947i","slide":6,"bbox":[0,0,1280,14]}
+{"kind":"shape","id":"sh/ihkjypor","slide":6,"bbox":[58,23,102,66]}
+{"kind":"textbox","id":"sh/snm14z6t","slide":6,"text":"Ranking compara lojas da mesma marca","textPreview":"Ranking compara lojas da mesma marca","textChars":36,"textLines":1,"bbox":[182,31,880,52]}
+{"kind":"textbox","id":"sh/tov2d47e","slide":6,"text":"MANUAL DO FRANQUEADO","textPreview":"MANUAL DO FRANQUEADO","textChars":20,"textLines":1,"bbox":[182,76,600,24]}
+{"kind":"textbox","id":"sh/6lkj29o3","slide":6,"text":"06","textPreview":"06","textChars":2,"textLines":1,"bbox":[1155,40,60,30]}
+{"kind":"shape","id":"sh/7mdkbupo","slide":6,"bbox":[64,108,1152,1]}
+{"kind":"textbox","id":"sh/gbm18j65","slide":6,"text":"O ranking ajuda a entender a posição da sua unidade sem misturar operações diferentes.","textPreview":"O ranking ajuda a entender a posição da sua unidade sem misturar operações diferentes.","textChars":86,"textLines":1,"bbox":[75,150,1080,50]}
+{"kind":"shape","id":"sh/hcv2honq","slide":6,"bbox":[90,245,52,52]}
+{"kind":"textbox","id":"sh/xo7y14ji","slide":6,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[90,254,52,30]}
+{"kind":"textbox","id":"sh/wnyxsz2x","slide":6,"text":"Veja os líderes","textPreview":"Veja os líderes","textChars":15,"textLines":1,"bbox":[160,243,280,34]}
+{"kind":"textbox","id":"sh/v2pgzu1s","slide":6,"text":"As primeiras posições aparecem no topo.","textPreview":"As primeiras posições aparecem no topo.","textChars":39,"textLines":1,"bbox":[160,279,280,78]}
+{"kind":"shape","id":"sh/a1wfq9k7","slide":6,"bbox":[465,245,52,52]}
+{"kind":"textbox","id":"sh/5s7y5oju","slide":6,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[465,254,52,30]}
+{"kind":"textbox","id":"sh/kryxwj29","slide":6,"text":"Encontre sua unidade","textPreview":"Encontre sua unidade","textChars":20,"textLines":1,"bbox":[535,243,280,34]}
+{"kind":"textbox","id":"sh/jqpg3e1o","slide":6,"text":"Sua loja fica destacada mesmo quando está fora das primeiras posições.","textPreview":"Sua loja fica destacada mesmo quando está fora das primeiras posições.","textChars":70,"textLines":1,"bbox":[535,279,280,78]}
+{"kind":"shape","id":"sh/ipgfu9k3","slide":6,"bbox":[840,245,52,52]}
+{"kind":"textbox","id":"sh/lwnytk3a","slide":6,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[840,254,52,30]}
+{"kind":"textbox","id":"sh/0vexkf25","slide":6,"text":"Compare com a média","textPreview":"Compare com a média","textChars":19,"textLines":1,"bbox":[910,243,280,34]}
+{"kind":"textbox","id":"sh/cfyx0zal","slide":6,"text":"Use disponibilidade, ativos e pausados para orientar ações.","textPreview":"Use disponibilidade, ativos e pausados para orientar ações.","textChars":59,"textLines":1,"bbox":[910,279,280,78]}
+{"kind":"shape","id":"sh/dgry9kb6","slide":6,"bbox":[230,485,820,110]}
+{"kind":"shape","id":"sh/qdgfypsv","slide":6,"bbox":[230,485,8,110]}
+{"kind":"textbox","id":"sh/repg7utg","slide":6,"text":"Importante","textPreview":"Importante","textChars":10,"textLines":1,"bbox":[256,503,774,30]}
+{"kind":"textbox","id":"sh/03ih4zax","slide":6,"text":"Franqueados não visualizam receita pausada nem valores financeiros de outras lojas.","textPreview":"Franqueados não visualizam receita pausada nem valores financeiros de outras lojas.","textChars":83,"textLines":1,"bbox":[256,539,774,42]}
+{"kind":"textbox","id":"sh/14ryd4bi","slide":6,"text":"City compara com City; Green com Green; Ital in House com Ital in House.","textPreview":"City compara com City; Green com Green; Ital in House com Ital in House.","textChars":72,"textLines":1,"bbox":[64,680,900,20]}
+{"kind":"textbox","id":"sh/eh0f2psr","slide":6,"text":"Portal de Itens Pausados × Ativos","textPreview":"Portal de Itens Pausados × Ativos","textChars":33,"textLines":1,"bbox":[950,680,266,20]}
+{"kind":"image","id":"im/etsr6poz","slide":6,"name":"","alt":"Logo Ital in House","bbox":[68,29,82,52]}
+{"kind":"notes","id":"nt/t6e811","slide":6,"text":""}
+{"kind":"slide","id":"sl/9v07mt","slide":7,"title":"Forneria acompanha os produtos fornecidos","textShapes":13}
+{"kind":"shape","id":"sh/3m9sv69c","slide":7,"bbox":[0,0,1280,14]}
+{"kind":"shape","id":"sh/4nitorax","slide":7,"bbox":[58,23,102,66]}
+{"kind":"textbox","id":"sh/qp0bq1sn","slide":7,"text":"Forneria acompanha os produtos fornecidos","textPreview":"Forneria acompanha os produtos fornecidos","textChars":41,"textLines":1,"bbox":[182,31,880,52]}
+{"kind":"textbox","id":"sh/rq9sz698","slide":7,"text":"MANUAL DO FRANQUEADO","textPreview":"MANUAL DO FRANQUEADO","textChars":20,"textLines":1,"bbox":[182,76,600,24]}
+{"kind":"textbox","id":"sh/cbitsbat","slide":7,"text":"07","textPreview":"07","textChars":2,"textLines":1,"bbox":[1155,40,60,30]}
+{"kind":"shape","id":"sh/dcba1gre","slide":7,"bbox":[64,108,1152,1]}
+{"kind":"textbox","id":"sh/edkbulsz","slide":7,"text":"Use os filtros para acompanhar um tipo por vez ou todos juntos.","textPreview":"Use os filtros para acompanhar um tipo por vez ou todos juntos.","textChars":63,"textLines":1,"bbox":[75,150,900,36]}
+{"kind":"shape","id":"sh/zetc3q9k","slide":7,"bbox":[75,230,200,90]}
+{"kind":"textbox","id":"sh/v298japs","slide":7,"text":"Cannoli","textPreview":"Cannoli","textChars":7,"textLines":1,"bbox":[88,257,174,32]}
+{"kind":"shape","id":"sh/u10ra5o7","slide":7,"bbox":[301,230,200,90]}
+{"kind":"textbox","id":"sh/h4rqlk7i","slide":7,"text":"Crostini","textPreview":"Crostini","textChars":8,"textLines":1,"bbox":[314,257,174,32]}
+{"kind":"shape","id":"sh/w3i9cf6x","slide":7,"bbox":[527,230,200,90]}
+{"kind":"textbox","id":"sh/7e98fapg","slide":7,"text":"Palha Italiana","textPreview":"Palha Italiana","textChars":14,"textLines":1,"bbox":[540,257,174,32]}
+{"kind":"shape","id":"sh/mdgr65ov","slide":7,"bbox":[753,230,200,90]}
+{"kind":"textbox","id":"sh/9grqh07m","slide":7,"text":"Brownie","textPreview":"Brownie","textChars":7,"textLines":1,"bbox":[766,257,174,32]}
+{"kind":"shape","id":"sh/8fi98f61","slide":7,"bbox":[979,230,200,90]}
+{"kind":"textbox","id":"sh/ratsrupk","slide":7,"text":"Tiramisu","textPreview":"Tiramisu","textChars":8,"textLines":1,"bbox":[992,257,174,32]}
+{"kind":"shape","id":"sh/69kripof","slide":7,"bbox":[185,390,910,150]}
+{"kind":"shape","id":"sh/25obqt8n","slide":7,"bbox":[185,390,8,150]}
+{"kind":"textbox","id":"sh/36xcjy9s","slide":7,"text":"A porcentagem muda com o filtro","textPreview":"A porcentagem muda com o filtro","textChars":31,"textLines":1,"bbox":[211,408,864,30]}
+{"kind":"textbox","id":"sh/or6tc3qd","slide":7,"text":"Ao retirar um tipo, os cards de disponibilidade, ativos, pausados e unidades encontradas são recalculados.","textPreview":"Ao retirar um tipo, os cards de disponibilidade, ativos, pausados e unidades encontradas são recalculados.","textChars":106,"textLines":1,"bbox":[211,444,864,82]}
+{"kind":"textbox","id":"sh/psful8ry","slide":7,"text":"Tiramisu é monitorado, mas não é fornecido pela mesma operação dos demais itens.","textPreview":"Tiramisu é monitorado, mas não é fornecido pela mesma operação dos demais itens.","textChars":80,"textLines":1,"bbox":[64,680,900,20]}
+{"kind":"textbox","id":"sh/qtobed8j","slide":7,"text":"Portal de Itens Pausados × Ativos","textPreview":"Portal de Itens Pausados × Ativos","textChars":33,"textLines":1,"bbox":[950,680,266,20]}
+{"kind":"image","id":"im/4jq1sfa9","slide":7,"name":"","alt":"Logo Ital in House","bbox":[68,29,82,52]}
+{"kind":"notes","id":"nt/9v07mt","slide":7,"text":""}
+{"kind":"slide","id":"sl/uygplq","slide":8,"title":"Potencial exige uma segunda autorização","textShapes":11}
+{"kind":"shape","id":"sh/0za9oz6d","slide":8,"bbox":[0,0,1280,14]}
+{"kind":"shape","id":"sh/fy1sveps","slide":8,"bbox":[58,23,102,66]}
+{"kind":"textbox","id":"sh/p43a1o7u","slide":8,"text":"Potencial exige uma segunda autorização","textPreview":"Potencial exige uma segunda autorização","textChars":39,"textLines":1,"bbox":[182,31,880,52]}
+{"kind":"textbox","id":"sh/o3utsj69","slide":8,"text":"MANUAL DO FRANQUEADO","textPreview":"MANUAL DO FRANQUEADO","textChars":20,"textLines":1,"bbox":[182,76,600,24]}
+{"kind":"textbox","id":"sh/n2lszepo","slide":8,"text":"08","textPreview":"08","textChars":2,"textLines":1,"bbox":[1155,40,60,30]}
+{"kind":"shape","id":"sh/21sbq9o3","slide":8,"bbox":[64,108,1152,1]}
+{"kind":"shape","id":"sh/x83a5o7q","slide":8,"bbox":[90,170,520,235]}
+{"kind":"shape","id":"sh/c7utwj6l","slide":8,"bbox":[90,170,8,235]}
+{"kind":"textbox","id":"sh/i9o329sz","slide":8,"text":"O que a página estima","textPreview":"O que a página estima","textChars":21,"textLines":1,"bbox":[116,188,474,30]}
+{"kind":"textbox","id":"sh/jax4betk","slide":8,"text":"Preço médio dos itens ativos, potencial diário e potencial do período conforme as premissas informadas.","textPreview":"Preço médio dos itens ativos, potencial diário e potencial do período conforme as premissas informadas.","textChars":103,"textLines":1,"bbox":[116,224,474,167]}
+{"kind":"shape","id":"sh/4b6l4jap","slide":8,"bbox":[670,170,520,235]}
+{"kind":"shape","id":"sh/5cfmdoba","slide":8,"bbox":[670,170,8,235]}
+{"kind":"textbox","id":"sh/6d836tsv","slide":8,"text":"Como acessar","textPreview":"Como acessar","textChars":12,"textLines":1,"bbox":[696,188,474,30]}
+{"kind":"textbox","id":"sh/reh4fy9g","slide":8,"text":"Abra Potencial e informe a senha adicional disponibilizada pela gestão. Não compartilhe essa senha fora da operação.","textPreview":"Abra Potencial e informe a senha adicional disponibilizada pela gestão. Não compartilhe essa senha fora da operação.","textChars":116,"textLines":1,"bbox":[696,224,474,167]}
+{"kind":"textbox","id":"sh/sfql83a1","slide":8,"text":"A estimativa não representa faturamento realizado.","textPreview":"A estimativa não representa faturamento realizado.","textChars":50,"textLines":1,"bbox":[170,480,940,42]}
+{"kind":"textbox","id":"sh/tgzmh8rm","slide":8,"text":"É um cenário calculado a partir de preços ativos e premissas de volume.","textPreview":"É um cenário calculado a partir de preços ativos e premissas de volume.","textChars":71,"textLines":1,"bbox":[220,535,840,32]}
+{"kind":"textbox","id":"sh/mh43upsr","slide":8,"text":"Em caso de dúvida, valide os números com a gestão antes de tomar decisões financeiras.","textPreview":"Em caso de dúvida, valide os números com a gestão antes de tomar decisões financeiras.","textChars":86,"textLines":1,"bbox":[64,680,900,20]}
+{"kind":"textbox","id":"sh/nidk3utc","slide":8,"text":"Portal de Itens Pausados × Ativos","textPreview":"Portal de Itens Pausados × Ativos","textChars":33,"textLines":1,"bbox":[950,680,266,20]}
+{"kind":"image","id":"im/rytwva5k","slide":8,"name":"","alt":"Logo Ital in House","bbox":[68,29,82,52]}
+{"kind":"notes","id":"nt/uygplq","slide":8,"text":""}
+{"kind":"slide","id":"sl/jlr8pf","slide":9,"title":"Rotina recomendada em 3 minutos","textShapes":12}
+{"kind":"shape","id":"sh/g7qhovip","slide":9,"bbox":[0,0,1280,14]}
+{"kind":"shape","id":"sh/f6hgfq14","slide":9,"bbox":[58,23,102,66]}
+{"kind":"textbox","id":"sh/pczyl0z6","slide":9,"text":"Rotina recomendada em 3 minutos","textPreview":"Rotina recomendada em 3 minutos","textChars":31,"textLines":1,"bbox":[182,31,880,52]}
+{"kind":"textbox","id":"sh/obqhsfil","slide":9,"text":"MANUAL DO FRANQUEADO","textPreview":"MANUAL DO FRANQUEADO","textChars":20,"textLines":1,"bbox":[182,76,600,24]}
+{"kind":"textbox","id":"sh/3ahgja1g","slide":9,"text":"09","textPreview":"09","textChars":2,"textLines":1,"bbox":[1155,40,60,30]}
+{"kind":"shape","id":"sh/298zq50v","slide":9,"bbox":[64,108,1152,1]}
+{"kind":"shape","id":"sh/5gfy9gj2","slide":9,"bbox":[125,162,14,14]}
+{"kind":"textbox","id":"sh/4f6xgbih","slide":9,"text":"Confirme se o portal está atualizado até Almoço ou Jantar.","textPreview":"Confirme se o portal está atualizado até Almoço ou Jantar.","textChars":58,"textLines":1,"bbox":[153,155,1002,42]}
+{"kind":"shape","id":"sh/ul4juxkj","slide":9,"bbox":[125,250,14,14]}
+{"kind":"textbox","id":"sh/vmdk32lo","slide":9,"text":"Verifique disponibilidade, ativos e pausados da sua unidade.","textPreview":"Verifique disponibilidade, ativos e pausados da sua unidade.","textChars":60,"textLines":1,"bbox":[153,243,1002,42]}
+{"kind":"shape","id":"sh/gnm1w729","slide":9,"bbox":[125,338,14,14]}
+{"kind":"textbox","id":"sh/hov25c3u","slide":9,"text":"Pesquise os itens pausados e confira as categorias mais afetadas.","textPreview":"Pesquise os itens pausados e confira as categorias mais afetadas.","textChars":65,"textLines":1,"bbox":[153,331,1002,42]}
+{"kind":"shape","id":"sh/ip4jyhkf","slide":9,"bbox":[125,426,14,14]}
+{"kind":"textbox","id":"sh/3qdk7ml0","slide":9,"text":"Consulte sua posição no ranking da marca.","textPreview":"Consulte sua posição no ranking da marca.","textChars":41,"textLines":1,"bbox":[153,419,1002,42]}
+{"kind":"shape","id":"sh/4r610r2l","slide":9,"bbox":[125,514,14,14]}
+{"kind":"textbox","id":"sh/5cf29w36","slide":9,"text":"Acione a operação responsável e volte após a próxima atualização.","textPreview":"Acione a operação responsável e volte após a próxima atualização.","textChars":65,"textLines":1,"bbox":[153,507,1002,42]}
+{"kind":"shape","id":"sh/qdoj2hkr","slide":9,"bbox":[190,585,900,74]}
+{"kind":"shape","id":"sh/rexkbmlw","slide":9,"bbox":[190,585,8,74]}
+{"kind":"textbox","id":"sh/nih0zmh4","slide":9,"text":"Precisa de ajuda?","textPreview":"Precisa de ajuda?","textChars":17,"textLines":1,"bbox":[216,603,854,30]}
+{"kind":"textbox","id":"sh/2hojq10j","slide":9,"text":"Anote unidade, período, turno e página. Envie essas quatro informações ao suporte para acelerar a análise.","textPreview":"Anote unidade, período, turno e página. Envie essas quatro informações ao suporte para acelerar a análise.","textChars":106,"textLines":1,"bbox":[216,639,854,6]}
+{"kind":"textbox","id":"sh/pkzi1wza","slide":9,"text":"Nunca envie senhas ou capturas com credenciais.","textPreview":"Nunca envie senhas ou capturas com credenciais.","textChars":47,"textLines":1,"bbox":[64,680,900,20]}
+{"kind":"textbox","id":"sh/ojq1srip","slide":9,"text":"Portal de Itens Pausados × Ativos","textPreview":"Portal de Itens Pausados × Ativos","textChars":33,"textLines":1,"bbox":[950,680,266,20]}
+{"kind":"image","id":"im/jqh0zqho","slide":9,"name":"","alt":"Logo Ital in House","bbox":[68,29,82,52]}
+{"kind":"notes","id":"nt/jlr8pf","slide":9,"text":""}

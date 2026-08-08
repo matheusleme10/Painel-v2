@@ -1,9 +1,13 @@
 from __future__ import annotations
 
 import asyncio
+import base64
+import json
+import mimetypes
 import os
 import time
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 import httpx
@@ -57,7 +61,7 @@ class IFoodClient:
                 "O aplicativo iFood não possui permissões habilitadas. "
                 "Libere os módulos Merchant e Catalog no Portal do Desenvolvedor."
             )
-        return safe[:300]
+        return safe[:1500]
 
     @staticmethod
     def _message(payload: Any, fallback: str) -> str:
@@ -71,9 +75,20 @@ class IFoodClient:
                 or payload.get("error")
             )
             if isinstance(value, dict):
-                return str(value.get("message") or value.get("description") or value)
-            if value:
-                return str(value)
+                value = value.get("message") or value.get("description") or value
+            text = str(value) if value else fallback
+            # A validação de bean do iFood (ex.: "FullItemDto is not valid") costuma
+            # vir com uma lista de campos específicos que falharam — sem isso é
+            # impossível saber qual campo corrigir. Anexa se existir.
+            details = (
+                payload.get("details")
+                or payload.get("violations")
+                or payload.get("errors")
+                or payload.get("fieldErrors")
+            )
+            if details:
+                text = f"{text} | detalhes: {json.dumps(details, ensure_ascii=False)[:1000]}"
+            return text
         return fallback
 
     async def _request_raw(self, method: str, path: str, **kwargs: Any) -> httpx.Response:
@@ -167,8 +182,173 @@ class IFoodClient:
             if merchant.get("id")
         ]
 
-    async def list_categories(self, merchant_id: str) -> list[dict[str, Any]]:
+    async def list_categories(
+        self, merchant_id: str, catalog_id: str | None = None
+    ) -> list[dict[str, Any]]:
+        """`GET /categories` sem catalogId no path deu "no Route matched with
+        those values" em teste real (mesmo problema do create_category) — a
+        rota exige o catalogId. Busca automaticamente via list_catalogs se não
+        for informado, pra não quebrar quem já chama list_categories(merchant_id)
+        sem esse argumento."""
+        if not catalog_id:
+            catalogs = await self.list_catalogs(merchant_id)
+            if not catalogs:
+                return []
+            catalog_id = catalogs[0]["catalogId"]
         payload = await self.request(
-            "GET", f"/catalog/v2.0/merchants/{merchant_id}/categories?include_items=true"
+            "GET",
+            f"/catalog/v2.0/merchants/{merchant_id}/catalogs/{catalog_id}/categories?include_items=true",
         )
         return payload if isinstance(payload, list) else payload.get("categories", [])
+
+    # ------------------------------------------------------------------
+    # Escrita — usada só nos cenários de homologação (Merchant + Catalog)
+    # pedidos pelo suporte do iFood, gravados em vídeo. Não faz parte do
+    # fluxo normal do dashboard, que é somente leitura (métodos acima).
+    #
+    # ATENÇÃO: os nomes de campo abaixo foram levantados na documentação
+    # pública do iFood, mas a Catalog API é sensível a versão. Antes de
+    # gravar de verdade, confira cada payload no "API Reference" do
+    # Developer Portal (aba com Swagger/"Try it out") e ajuste se algum
+    # nome de campo tiver mudado. Use --dry-run no script de homologação
+    # pra ver o JSON exato antes de qualquer chamada real ser enviada.
+    # ------------------------------------------------------------------
+
+    async def get_merchant_details(self, merchant_id: str) -> dict[str, Any]:
+        return await self.request("GET", f"/merchant/v1.0/merchants/{merchant_id}")
+
+    async def get_merchant_status(self, merchant_id: str) -> Any:
+        return await self.request("GET", f"/merchant/v1.0/merchants/{merchant_id}/status")
+
+    async def list_interruptions(self, merchant_id: str) -> list[dict[str, Any]]:
+        payload = await self.request("GET", f"/merchant/v1.0/merchants/{merchant_id}/interruptions")
+        return payload if isinstance(payload, list) else payload.get("interruptions", [])
+
+    async def create_interruption(
+        self, merchant_id: str, *, description: str, start: str, end: str
+    ) -> dict[str, Any]:
+        """`start`/`end` em ISO 8601 (horário local da loja). O iFood ignora
+        qualquer timezone enviado no payload e usa sempre o fuso da loja."""
+        return await self.request(
+            "POST",
+            f"/merchant/v1.0/merchants/{merchant_id}/interruptions",
+            json={"description": description, "start": start, "end": end},
+        )
+
+    async def delete_interruption(self, merchant_id: str, interruption_id: str) -> None:
+        await self.request(
+            "DELETE", f"/merchant/v1.0/merchants/{merchant_id}/interruptions/{interruption_id}"
+        )
+
+    async def get_opening_hours(self, merchant_id: str) -> Any:
+        return await self.request("GET", f"/merchant/v1.0/merchants/{merchant_id}/opening-hours")
+
+    async def set_opening_hours(self, merchant_id: str, shifts: list[dict[str, Any]]) -> Any:
+        """`shifts`: lista de {"dayOfWeek": "SATURDAY", "start": "10:00:00", "duration": <minutos>}.
+        O payload precisa do "storeId" (= merchantId) no nível raiz, e o "start"
+        precisa vir com segundos (HH:MM:SS) — sem isso o iFood recusa com 400."""
+        return await self.request(
+            "PUT",
+            f"/merchant/v1.0/merchants/{merchant_id}/opening-hours",
+            json={"storeId": merchant_id, "shifts": shifts},
+        )
+
+    # -- Catalog (escrita) ----------------------------------------------
+
+    async def list_catalogs(self, merchant_id: str) -> list[dict[str, Any]]:
+        """Passo 1 do guia oficial: GET /catalogs devolve o(s) catalogId(s)
+        da loja. Toda loja já tem pelo menos um catálogo padrão."""
+        payload = await self.request("GET", f"/catalog/v2.0/merchants/{merchant_id}/catalogs")
+        return payload if isinstance(payload, list) else payload.get("catalogs", [])
+
+    async def list_category_items(self, merchant_id: str, category_id: str) -> Any:
+        """Passo 5 do guia oficial: confirma que o item (com complementos,
+        se houver) foi salvo dentro da categoria."""
+        return await self.request(
+            "GET", f"/catalog/v2.0/merchants/{merchant_id}/categories/{category_id}/items"
+        )
+
+    async def delete_item(self, merchant_id: str, category_id: str, product_id: str) -> None:
+        """DELETE /categories/{categoryId}/products/{productId} — remove o
+        item da categoria (a rota usa o productId, não o itemId)."""
+        await self.request(
+            "DELETE",
+            f"/catalog/v2.0/merchants/{merchant_id}/categories/{category_id}/products/{product_id}",
+        )
+
+    async def delete_category(self, merchant_id: str, category_id: str) -> None:
+        await self.request(
+            "DELETE", f"/catalog/v2.0/merchants/{merchant_id}/categories/{category_id}"
+        )
+
+    async def upload_image(self, merchant_id: str, image_path: Path) -> str:
+        """O endpoint espera JSON com a imagem em base64 (data URI), não
+        multipart/form-data — mandar como multipart deu "Something went wrong,
+        please try again later" em teste real."""
+        mime_type = mimetypes.guess_type(str(image_path))[0] or "image/jpeg"
+        encoded = base64.b64encode(image_path.read_bytes()).decode("ascii")
+        payload = await self.request(
+            "POST",
+            f"/catalog/v2.0/merchants/{merchant_id}/image/upload/",
+            json={"image": f"data:{mime_type};base64,{encoded}"},
+        )
+        return payload.get("imagePath") or payload.get("path") or ""
+
+    async def create_category(
+        self, merchant_id: str, *, name: str, status: str = "AVAILABLE", catalog_id: str | None = None
+    ) -> dict[str, Any]:
+        """POST direto em /categories (sem catalogId no path) deu
+        "no Route matched with those values" em teste real — a rota exige o
+        catalogId no path. Se não vier, busca automaticamente via list_catalogs
+        (Passo 1) e usa o primeiro catálogo disponível."""
+        if not catalog_id:
+            catalogs = await self.list_catalogs(merchant_id)
+            if not catalogs:
+                raise IFoodAPIError("Loja sem nenhum catálogo (GET /catalogs vazio).", 502)
+            catalog_id = catalogs[0]["catalogId"]
+        return await self.request(
+            "POST",
+            f"/catalog/v2.0/merchants/{merchant_id}/catalogs/{catalog_id}/categories",
+            json={"name": name, "status": status, "template": "DEFAULT"},
+        )
+
+    async def put_item(self, merchant_id: str, payload: dict[str, Any]) -> Any:
+        """Cria/edita item, products, optionGroups e options em uma única
+        chamada. O PUT substitui o estado inteiro do item: sempre reenvie
+        os 4 campos (item, products, optionGroups, options) completos,
+        mesmo quando algum estiver vazio."""
+        return await self.request("PUT", f"/catalog/v2.0/merchants/{merchant_id}/items", json=payload)
+
+    async def patch_items_price(self, merchant_id: str, payload: dict[str, Any]) -> Any:
+        """Confirmado no Swagger: esse endpoint em lote está deprecado
+        ("Use the PATCH '/{merchantId}/items/{itemId}' endpoint instead"),
+        e dá erro real "PatchItemPriceDto is not valid". Mantido só por
+        compatibilidade; use patch_item() para itens individuais."""
+        return await self.request(
+            "PATCH", f"/catalog/v2.0/merchants/{merchant_id}/items/price", json=payload
+        )
+
+    async def patch_items_status(self, merchant_id: str, payload: dict[str, Any]) -> Any:
+        """Também deprecado no Swagger — use patch_item()."""
+        return await self.request(
+            "PATCH", f"/catalog/v2.0/merchants/{merchant_id}/items/status", json=payload
+        )
+
+    async def patch_item(self, merchant_id: str, item_id: str, payload: dict[str, Any]) -> Any:
+        """Endpoint atual (não deprecado) pra alterar um item individual via
+        JSON Merge Patch — substitui os antigos patch_items_price/status em
+        lote. payload é só os campos que devem mudar, ex.: {"price": {"value": 27.5}}
+        ou {"status": "PAUSED"}."""
+        return await self.request(
+            "PATCH", f"/catalog/v2.0/merchants/{merchant_id}/items/{item_id}", json=payload
+        )
+
+    async def patch_options_price(self, merchant_id: str, payload: dict[str, Any]) -> Any:
+        return await self.request(
+            "PATCH", f"/catalog/v2.0/merchants/{merchant_id}/options/price", json=payload
+        )
+
+    async def patch_options_status(self, merchant_id: str, payload: dict[str, Any]) -> Any:
+        return await self.request(
+            "PATCH", f"/catalog/v2.0/merchants/{merchant_id}/options/status", json=payload
+        )

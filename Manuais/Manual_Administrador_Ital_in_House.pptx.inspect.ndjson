@@ -1,0 +1,213 @@
+{"kind":"deck","id":"pr/720cm6","name":"Deck"}
+{"kind":"layout","layoutId":"0db12faa-23d3-4bc6-9b03-d9449dbc4405","name":"Master","type":"master"}
+{"kind":"layout","layoutId":"11e118da-9a63-4a4d-8bde-5e23dc1da517","name":"Title Slide","type":"title"}
+{"kind":"slide","id":"sl/hwwzw9","slide":1,"title":"MANUAL DE USO","textShapes":5}
+{"kind":"shape","id":"sh/qho329cj","slide":1,"bbox":[0,0,410,720]}
+{"kind":"textbox","id":"sh/c3q54jup","slide":1,"text":"MANUAL DE USO","textPreview":"MANUAL DE USO","textChars":13,"textLines":1,"bbox":[480,105,650,34]}
+{"kind":"textbox","id":"sh/z6h4fet0","slide":1,"text":"Portal do Administrador","textPreview":"Portal do Administrador","textChars":23,"textLines":1,"bbox":[480,165,690,105]}
+{"kind":"textbox","id":"sh/e58n6tcf","slide":1,"text":"Atualize a base, acompanhe a rede, controle acessos e comunique novas cargas.","textPreview":"Atualize a base, acompanhe a rede, controle acessos e comunique novas cargas.","textChars":77,"textLines":1,"bbox":[480,305,670,92]}
+{"kind":"shape","id":"sh/18zmhob6","slide":1,"bbox":[480,430,120,6]}
+{"kind":"textbox","id":"sh/07q58jul","slide":1,"text":"Ital in House · Operação","textPreview":"Ital in House · Operação","textChars":24,"textLines":1,"bbox":[480,465,500,30]}
+{"kind":"textbox","id":"sh/fad43udw","slide":1,"text":"Versão de treinamento","textPreview":"Versão de treinamento","textChars":21,"textLines":1,"bbox":[480,502,400,24]}
+{"kind":"image","id":"im/wjm9kbi1","slide":1,"name":"","alt":"Logo Ital in House","bbox":[86,78,230,140]}
+{"kind":"notes","id":"nt/hwwzw9","slide":1,"text":""}
+{"kind":"slide","id":"sl/lqp4yf","slide":2,"title":"O Admin enxerga a operação inteira","textShapes":10}
+{"kind":"shape","id":"sh/6tsvud4n","slide":2,"bbox":[0,0,1280,14]}
+{"kind":"shape","id":"sh/tw3ups3e","slide":2,"bbox":[58,23,102,66]}
+{"kind":"textbox","id":"sh/fylwrilk","slide":2,"text":"O Admin enxerga a operação inteira","textPreview":"O Admin enxerga a operação inteira","textChars":34,"textLines":1,"bbox":[182,31,880,52]}
+{"kind":"textbox","id":"sh/excvyx4z","slide":2,"text":"MANUAL DO ADMINISTRADOR","textPreview":"MANUAL DO ADMINISTRADOR","textChars":23,"textLines":1,"bbox":[182,76,600,24]}
+{"kind":"textbox","id":"sh/103ets3a","slide":2,"text":"02","textPreview":"02","textChars":2,"textLines":1,"bbox":[1155,40,60,30]}
+{"kind":"shape","id":"sh/gzud0nm5","slide":2,"bbox":[64,108,1152,1]}
+{"kind":"shape","id":"sh/3mlwv2lg","slide":2,"bbox":[75,160,520,205]}
+{"kind":"shape","id":"sh/21cv2xkv","slide":2,"bbox":[75,160,8,205]}
+{"kind":"textbox","id":"sh/g7ilsrat","slide":2,"text":"Visão consolidada","textPreview":"Visão consolidada","textChars":17,"textLines":1,"bbox":[101,178,474,30]}
+{"kind":"textbox","id":"sh/18r2lwre","slide":2,"text":"Rede, marcas, unidades, categorias, produtos, ranking, Forneria e potencial.","textPreview":"Rede, marcas, unidades, categorias, produtos, ranking, Forneria e potencial.","textChars":76,"textLines":1,"bbox":[101,214,474,137]}
+{"kind":"shape","id":"sh/e5g3qhsn","slide":2,"bbox":[685,160,520,205]}
+{"kind":"shape","id":"sh/f69kjm98","slide":2,"bbox":[685,160,8,205]}
+{"kind":"textbox","id":"sh/ovilwrap","slide":2,"text":"Governança","textPreview":"Governança","textChars":10,"textLines":1,"bbox":[711,178,474,30]}
+{"kind":"textbox","id":"sh/pwrmpwra","slide":2,"text":"Atualização da base, domínios autorizados, registros de acesso e avisos.","textPreview":"Atualização da base, domínios autorizados, registros de acesso e avisos.","textChars":72,"textLines":1,"bbox":[711,214,474,137]}
+{"kind":"textbox","id":"sh/2903uhsz","slide":2,"text":"O perfil Admin pode ver métricas financeiras que não são entregues ao franqueado.","textPreview":"O perfil Admin pode ver métricas financeiras que não são entregues ao franqueado.","textChars":81,"textLines":1,"bbox":[125,440,1030,70]}
+{"kind":"textbox","id":"sh/3u9knm9k","slide":2,"text":"Use o Admin somente em dispositivos confiáveis.","textPreview":"Use o Admin somente em dispositivos confiáveis.","textChars":47,"textLines":1,"bbox":[64,680,900,20]}
+{"kind":"textbox","id":"sh/cz2l0ba1","slide":2,"text":"Portal de Itens Pausados × Ativos","textPreview":"Portal de Itens Pausados × Ativos","textChars":33,"textLines":1,"bbox":[950,680,266,20]}
+{"kind":"image","id":"im/dgv25g3a","slide":2,"name":"","alt":"Logo Ital in House","bbox":[68,29,82,52]}
+{"kind":"notes","id":"nt/lqp4yf","slide":2,"text":""}
+{"kind":"slide","id":"sl/49hlv1","slide":3,"title":"Atualize os dados com o arquivo oficial","textShapes":16}
+{"kind":"shape","id":"sh/kfml4zm5","slide":3,"bbox":[0,0,1280,14]}
+{"kind":"shape","id":"sh/zedkbulk","slide":3,"bbox":[58,23,102,66]}
+{"kind":"textbox","id":"sh/xcv29k3e","slide":3,"text":"Atualize os dados com o arquivo oficial","textPreview":"Atualize os dados com o arquivo oficial","textChars":39,"textLines":1,"bbox":[182,31,880,52]}
+{"kind":"textbox","id":"sh/cb2l0zmt","slide":3,"text":"MANUAL DO ADMINISTRADOR","textPreview":"MANUAL DO ADMINISTRADOR","textChars":23,"textLines":1,"bbox":[182,76,600,24]}
+{"kind":"textbox","id":"sh/batk7ul8","slide":3,"text":"03","textPreview":"03","textChars":2,"textLines":1,"bbox":[1155,40,60,30]}
+{"kind":"shape","id":"sh/a9kjyp43","slide":3,"bbox":[64,108,1152,1]}
+{"kind":"shape","id":"sh/h8fmlo3i","slide":3,"bbox":[80,165,52,52]}
+{"kind":"textbox","id":"sh/w76lcjmd","slide":3,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[80,174,52,30]}
+{"kind":"textbox","id":"sh/qp8vmdcf","slide":3,"text":"Abra Atualizar Dados","textPreview":"Abra Atualizar Dados","textChars":20,"textLines":1,"bbox":[150,163,285,34]}
+{"kind":"textbox","id":"sh/rqhwvid0","slide":3,"text":"Selecione o relatório XLSX mais recente.","textPreview":"Selecione o relatório XLSX mais recente.","textChars":40,"textLines":1,"bbox":[150,199,285,78]}
+{"kind":"shape","id":"sh/cbqdonul","slide":3,"bbox":[465,165,52,52]}
+{"kind":"textbox","id":"sh/dczexsb6","slide":3,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[465,174,52,30]}
+{"kind":"textbox","id":"sh/2lovidcj","slide":3,"text":"Confira a prévia","textPreview":"Confira a prévia","textChars":16,"textLines":1,"bbox":[535,163,285,34]}
+{"kind":"textbox","id":"sh/3mxcrid4","slide":3,"text":"Valide registros, última data, unidades e valores.","textPreview":"Valide registros, última data, unidades e valores.","textChars":50,"textLines":1,"bbox":[535,199,285,78]}
+{"kind":"shape","id":"sh/4nqdknu9","slide":3,"bbox":[850,165,52,52]}
+{"kind":"textbox","id":"sh/pozut8vu","slide":3,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[850,174,52,30]}
+{"kind":"textbox","id":"sh/mhsvuxcn","slide":3,"text":"Salve na nuvem","textPreview":"Salve na nuvem","textChars":14,"textLines":1,"bbox":[920,163,285,34]}
+{"kind":"textbox","id":"sh/ni1wn2t8","slide":3,"text":"Use Aplicar e Salvar na Nuvem e aguarde a confirmação.","textPreview":"Use Aplicar e Salvar na Nuvem e aguarde a confirmação.","textChars":54,"textLines":1,"bbox":[920,199,285,78]}
+{"kind":"shape","id":"sh/jmtsfutk","slide":3,"bbox":[180,405,920,150]}
+{"kind":"shape","id":"sh/ilkrmpsz","slide":3,"bbox":[180,405,8,150]}
+{"kind":"textbox","id":"sh/5ovah4bq","slide":3,"text":"Antes de publicar","textPreview":"Antes de publicar","textChars":17,"textLines":1,"bbox":[206,423,874,30]}
+{"kind":"textbox","id":"sh/kn2toza5","slide":3,"text":"Confirme se a carga corresponde a Almoço ou Jantar e se a última data do relatório está correta.","textPreview":"Confirme se a carga corresponde a Almoço ou Jantar e se a última data do relatório está correta.","textChars":96,"textLines":1,"bbox":[206,459,874,82]}
+{"kind":"textbox","id":"sh/7qdsjetw","slide":3,"text":"A última versão salva permanece disponível após F5 e para todos os usuários.","textPreview":"A última versão salva permanece disponível após F5 e para todos os usuários.","textChars":76,"textLines":1,"bbox":[64,680,900,20]}
+{"kind":"textbox","id":"sh/6p4bq9sb","slide":3,"text":"Portal de Itens Pausados × Ativos","textPreview":"Portal de Itens Pausados × Ativos","textChars":33,"textLines":1,"bbox":[950,680,266,20]}
+{"kind":"image","id":"im/3qtcrix0","slide":3,"name":"","alt":"Logo Ital in House","bbox":[68,29,82,52]}
+{"kind":"notes","id":"nt/49hlv1","slide":3,"text":""}
+{"kind":"slide","id":"sl/lec7q6","slide":4,"title":"Período, turno e marca recalculam a rede","textShapes":16}
+{"kind":"shape","id":"sh/0ve9kva1","slide":4,"bbox":[0,0,1280,14]}
+{"kind":"shape","id":"sh/fu5srq9g","slide":4,"bbox":[58,23,102,66]}
+{"kind":"textbox","id":"sh/pk7axkri","slide":4,"text":"Período, turno e marca recalculam a rede","textPreview":"Período, turno e marca recalculam a rede","textChars":40,"textLines":1,"bbox":[182,31,880,52]}
+{"kind":"textbox","id":"sh/ojytofax","slide":4,"text":"MANUAL DO ADMINISTRADOR","textPreview":"MANUAL DO ADMINISTRADOR","textChars":23,"textLines":1,"bbox":[182,76,600,24]}
+{"kind":"textbox","id":"sh/nipsva9c","slide":4,"text":"04","textPreview":"04","textChars":2,"textLines":1,"bbox":[1155,40,60,30]}
+{"kind":"shape","id":"sh/2hgbm5s7","slide":4,"bbox":[64,108,1152,1]}
+{"kind":"shape","id":"sh/xora1kru","slide":4,"bbox":[85,170,52,52]}
+{"kind":"textbox","id":"sh/cnytsfq9","slide":4,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[85,179,52,30]}
+{"kind":"textbox","id":"sh/qlwvetk7","slide":4,"text":"Defina o período","textPreview":"Defina o período","textChars":16,"textLines":1,"bbox":[155,168,430,34]}
+{"kind":"textbox","id":"sh/rm5w7y1c","slide":4,"text":"Última carga, sete cargas, todas ou datas específicas.","textPreview":"Última carga, sete cargas, todas ou datas específicas.","textChars":54,"textLines":1,"bbox":[155,204,430,78]}
+{"kind":"shape","id":"sh/c7exg32x","slide":4,"bbox":[85,315,52,52]}
+{"kind":"textbox","id":"sh/d8ne98ji","slide":4,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[85,324,52,30]}
+{"kind":"textbox","id":"sh/e9wfid03","slide":4,"text":"Escolha o turno","textPreview":"Escolha o turno","textChars":15,"textLines":1,"bbox":[155,313,430,34]}
+{"kind":"textbox","id":"sh/za5wbi1o","slide":4,"text":"Almoço e Jantar devem refletir a carga desejada.","textPreview":"Almoço e Jantar devem refletir a carga desejada.","textChars":48,"textLines":1,"bbox":[155,349,430,78]}
+{"kind":"shape","id":"sh/0byxk3i9","slide":4,"bbox":[85,460,52,52]}
+{"kind":"textbox","id":"sh/1c7ed8ju","slide":4,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[85,469,52,30]}
+{"kind":"textbox","id":"sh/udcv69kz","slide":4,"text":"Escolha a marca","textPreview":"Escolha a marca","textChars":15,"textLines":1,"bbox":[155,458,430,34]}
+{"kind":"textbox","id":"sh/felwze1k","slide":4,"text":"Todas, Ital in House, Fast Food Caipira, City Burger ou Green.","textPreview":"Todas, Ital in House, Fast Food Caipira, City Burger ou Green.","textChars":62,"textLines":1,"bbox":[155,494,430,78]}
+{"kind":"shape","id":"sh/jihs7ahc","slide":4,"bbox":[680,230,470,260]}
+{"kind":"shape","id":"sh/ix8be50r","slide":4,"bbox":[680,230,8,260]}
+{"kind":"textbox","id":"sh/5kju9kz2","slide":4,"text":"Escopo global","textPreview":"Escopo global","textChars":13,"textLines":1,"bbox":[706,248,424,30]}
+{"kind":"textbox","id":"sh/kjqtgfih","slide":4,"text":"Depois de clicar em Aplicar, todas as páginas usam o mesmo período e turno. O filtro de marca acompanha a análise administrativa.","textPreview":"Depois de clicar em Aplicar, todas as páginas usam o mesmo período e turno. O filtro de marca acompanha a análise administrativa.","textChars":129,"textLines":1,"bbox":[706,284,424,192]}
+{"kind":"textbox","id":"sh/vuhs3ah0","slide":4,"text":"Evite comparar telas com filtros diferentes.","textPreview":"Evite comparar telas com filtros diferentes.","textChars":44,"textLines":1,"bbox":[64,680,900,20]}
+{"kind":"textbox","id":"sh/at8ba50f","slide":4,"text":"Portal de Itens Pausados × Ativos","textPreview":"Portal de Itens Pausados × Ativos","textChars":33,"textLines":1,"bbox":[950,680,266,20]}
+{"kind":"image","id":"im/jelcnmdk","slide":4,"name":"","alt":"Logo Ital in House","bbox":[68,29,82,52]}
+{"kind":"notes","id":"nt/lec7q6","slide":4,"text":""}
+{"kind":"slide","id":"sl/me21f1","slide":5,"title":"Use cada página para uma decisão","textShapes":19}
+{"kind":"shape","id":"sh/wfmt8ze5","slide":5,"bbox":[0,0,1280,14]}
+{"kind":"shape","id":"sh/bedszuxk","slide":5,"bbox":[58,23,102,66]}
+{"kind":"textbox","id":"sh/l4fu5ofm","slide":5,"text":"Use cada página para uma decisão","textPreview":"Use cada página para uma decisão","textChars":32,"textLines":1,"bbox":[182,31,880,52]}
+{"kind":"textbox","id":"sh/k36tcje1","slide":5,"text":"MANUAL DO ADMINISTRADOR","textPreview":"MANUAL DO ADMINISTRADOR","textChars":23,"textLines":1,"bbox":[182,76,600,24]}
+{"kind":"textbox","id":"sh/j2xs3exg","slide":5,"text":"05","textPreview":"05","textChars":2,"textLines":1,"bbox":[1155,40,60,30]}
+{"kind":"shape","id":"sh/yh4ba9wv","slide":5,"bbox":[64,108,1152,1]}
+{"kind":"textbox","id":"sh/t8fu9ofi","slide":5,"text":"Geral da Rede","textPreview":"Geral da Rede","textChars":13,"textLines":1,"bbox":[95,145,220,26]}
+{"kind":"textbox","id":"sh/876tgjed","slide":5,"text":"Saúde consolidada e unidades mais afetadas","textPreview":"Saúde consolidada e unidades mais afetadas","textChars":42,"textLines":1,"bbox":[315,145,320,58]}
+{"kind":"shape","id":"sh/mdojql07","slide":5,"bbox":[95,205,500,1]}
+{"kind":"textbox","id":"sh/nexkz6hs","slide":5,"text":"Franquias","textPreview":"Franquias","textChars":9,"textLines":1,"bbox":[665,145,220,26]}
+{"kind":"textbox","id":"sh/8f6lsbix","slide":5,"text":"Busca por loja e comparação operacional","textPreview":"Busca por loja e comparação operacional","textChars":39,"textLines":1,"bbox":[885,145,320,58]}
+{"kind":"shape","id":"sh/90z21gzi","slide":5,"bbox":[665,205,500,1]}
+{"kind":"textbox","id":"sh/a183ul03","slide":5,"text":"Itens","textPreview":"Itens","textChars":5,"textLines":1,"bbox":[95,265,220,26]}
+{"kind":"textbox","id":"sh/v2hk3qho","slide":5,"text":"Ocorrências, sistêmicos e receita em risco","textPreview":"Ocorrências, sistêmicos e receita em risco","textChars":42,"textLines":1,"bbox":[315,265,320,58]}
+{"kind":"shape","id":"sh/w3qlwvi9","slide":5,"bbox":[95,325,500,1]}
+{"kind":"textbox","id":"sh/x4z250zu","slide":5,"text":"Categorias","textPreview":"Categorias","textChars":10,"textLines":1,"bbox":[665,265,220,26]}
+{"kind":"textbox","id":"sh/q54ji10z","slide":5,"text":"Grupos com maior concentração de pausas","textPreview":"Grupos com maior concentração de pausas","textChars":39,"textLines":1,"bbox":[885,265,320,58]}
+{"kind":"shape","id":"sh/r6dkrmhk","slide":5,"bbox":[665,325,500,1]}
+{"kind":"textbox","id":"sh/fatgz2xc","slide":5,"text":"Ranking","textPreview":"Ranking","textChars":7,"textLines":1,"bbox":[95,385,220,26]}
+{"kind":"textbox","id":"sh/upkzqxgr","slide":5,"text":"Desempenho relativo por disponibilidade","textPreview":"Desempenho relativo por disponibilidade","textChars":39,"textLines":1,"bbox":[315,385,320,58]}
+{"kind":"shape","id":"sh/hcbi1sf2","slide":5,"bbox":[95,445,500,1]}
+{"kind":"textbox","id":"sh/gb2hsnyx","slide":5,"text":"Forneria","textPreview":"Forneria","textChars":8,"textLines":1,"bbox":[665,385,220,26]}
+{"kind":"textbox","id":"sh/7m9gvih0","slide":5,"text":"Disponibilidade dos produtos acompanhados","textPreview":"Disponibilidade dos produtos acompanhados","textChars":41,"textLines":1,"bbox":[885,385,320,58]}
+{"kind":"shape","id":"sh/6l0zmdgf","slide":5,"bbox":[665,445,500,1]}
+{"kind":"textbox","id":"sh/toryxsf6","slide":5,"text":"Potencial","textPreview":"Potencial","textChars":9,"textLines":1,"bbox":[95,505,220,26]}
+{"kind":"textbox","id":"sh/snihonyl","slide":5,"text":"Cenários gerais ou por unidade","textPreview":"Cenários gerais ou por unidade","textChars":30,"textLines":1,"bbox":[315,505,320,58]}
+{"kind":"shape","id":"sh/rid07mxk","slide":5,"bbox":[95,565,500,1]}
+{"kind":"textbox","id":"sh/qh4zyhgz","slide":5,"text":"A antiga página Alertas foi removida por repetir informações dessas páginas.","textPreview":"A antiga página Alertas foi removida por repetir informações dessas páginas.","textChars":76,"textLines":1,"bbox":[64,680,900,20]}
+{"kind":"textbox","id":"sh/8nedszeh","slide":5,"text":"Portal de Itens Pausados × Ativos","textPreview":"Portal de Itens Pausados × Ativos","textChars":33,"textLines":1,"bbox":[950,680,266,20]}
+{"kind":"image","id":"im/vylgn6xs","slide":5,"name":"","alt":"Logo Ital in House","bbox":[68,29,82,52]}
+{"kind":"notes","id":"nt/me21f1","slide":5,"text":""}
+{"kind":"slide","id":"sl/2q81r7","slide":6,"title":"Acessos controla identidade e permissões","textShapes":11}
+{"kind":"shape","id":"sh/h87ut0jq","slide":6,"bbox":[0,0,1280,14]}
+{"kind":"shape","id":"sh/u5gbyl0f","slide":6,"bbox":[58,23,102,66]}
+{"kind":"textbox","id":"sh/4bit4fih","slide":6,"text":"Acessos controla identidade e permissões","textPreview":"Acessos controla identidade e permissões","textChars":40,"textLines":1,"bbox":[182,31,880,52]}
+{"kind":"textbox","id":"sh/5crux0j2","slide":6,"text":"MANUAL DO ADMINISTRADOR","textPreview":"MANUAL DO ADMINISTRADOR","textChars":23,"textLines":1,"bbox":[182,76,600,24]}
+{"kind":"textbox","id":"sh/i90b250b","slide":6,"text":"06","textPreview":"06","textChars":2,"textLines":1,"bbox":[1155,40,60,30]}
+{"kind":"shape","id":"sh/3a9cva1w","slide":6,"bbox":[64,108,1152,1]}
+{"kind":"shape","id":"sh/kfetsbix","slide":6,"bbox":[75,165,520,190]}
+{"kind":"shape","id":"sh/lgnulgji","slide":6,"bbox":[75,165,8,190]}
+{"kind":"textbox","id":"sh/1wf29szu","slide":6,"text":"Domínios permitidos","textPreview":"Domínios permitidos","textChars":19,"textLines":1,"bbox":[101,183,474,30]}
+{"kind":"textbox","id":"sh/0vmlgny9","slide":6,"text":"Cadastre italinhouse.com, gmail.com ou outros domínios autorizados. Salve antes de testar.","textPreview":"Cadastre italinhouse.com, gmail.com ou outros domínios autorizados. Salve antes de testar.","textChars":90,"textLines":1,"bbox":[101,219,474,122]}
+{"kind":"shape","id":"sh/zudk7iho","slide":6,"bbox":[685,165,520,190]}
+{"kind":"shape","id":"sh/et43edg3","slide":6,"bbox":[685,165,8,190]}
+{"kind":"textbox","id":"sh/90f2dcfq","slide":6,"text":"Histórico de acesso","textPreview":"Histórico de acesso","textChars":19,"textLines":1,"bbox":[711,183,474,30]}
+{"kind":"textbox","id":"sh/oz6lk7yl","slide":6,"text":"Consulte nome, e-mail, data, evento, marca e unidade selecionada.","textPreview":"Consulte nome, e-mail, data, evento, marca e unidade selecionada.","textChars":65,"textLines":1,"bbox":[711,219,474,122]}
+{"kind":"shape","id":"sh/nyxkb2x0","slide":6,"bbox":[225,420,830,135]}
+{"kind":"shape","id":"sh/mxo3ixgf","slide":6,"bbox":[225,420,8,135]}
+{"kind":"textbox","id":"sh/xoz2hcf2","slide":6,"text":"Limpeza dos logs","textPreview":"Limpeza dos logs","textChars":16,"textLines":1,"bbox":[251,438,784,30]}
+{"kind":"textbox","id":"sh/wnqlo7yh","slide":6,"text":"Use Apagar logs somente após confirmar a política de retenção. A ação é definitiva e não apaga a base.","textPreview":"Use Apagar logs somente após confirmar a política de retenção. A ação é definitiva e não apaga a base.","textChars":102,"textLines":1,"bbox":[251,474,784,67]}
+{"kind":"textbox","id":"sh/gjyd0fap","slide":6,"text":"Nome e e-mail são declaratórios; contas individuais são a evolução recomendada.","textPreview":"Nome e e-mail são declaratórios; contas individuais são a evolução recomendada.","textChars":79,"textLines":1,"bbox":[64,680,900,20]}
+{"kind":"textbox","id":"sh/h4re9kra","slide":6,"text":"Portal de Itens Pausados × Ativos","textPreview":"Portal de Itens Pausados × Ativos","textChars":33,"textLines":1,"bbox":[950,680,266,20]}
+{"kind":"image","id":"im/ytcvmxsv","slide":6,"name":"","alt":"Logo Ital in House","bbox":[68,29,82,52]}
+{"kind":"notes","id":"nt/2q81r7","slide":6,"text":""}
+{"kind":"slide","id":"sl/l3ityv","slide":7,"title":"Avisos comunica cada nova atualização","textShapes":16}
+{"kind":"shape","id":"sh/7ypgbu1c","slide":7,"bbox":[0,0,1280,14]}
+{"kind":"shape","id":"sh/szyh4zix","slide":7,"bbox":[58,23,102,66]}
+{"kind":"textbox","id":"sh/u1gz6p03","slide":7,"text":"Avisos comunica cada nova atualização","textPreview":"Avisos comunica cada nova atualização","textChars":37,"textLines":1,"bbox":[182,31,880,52]}
+{"kind":"textbox","id":"sh/f2pgfu1o","slide":7,"text":"MANUAL DO ADMINISTRADOR","textPreview":"MANUAL DO ADMINISTRADOR","textChars":23,"textLines":1,"bbox":[182,76,600,24]}
+{"kind":"textbox","id":"sh/g3yh8zi9","slide":7,"text":"07","textPreview":"07","textChars":2,"textLines":1,"bbox":[1155,40,60,30]}
+{"kind":"shape","id":"sh/h4rih4ju","slide":7,"bbox":[64,108,1152,1]}
+{"kind":"shape","id":"sh/2p0za90f","slide":7,"bbox":[80,155,52,52]}
+{"kind":"textbox","id":"sh/3q90je1k","slide":7,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[80,164,52,30]}
+{"kind":"textbox","id":"sh/7q1g36hs","slide":7,"text":"Cadastre destinatários","textPreview":"Cadastre destinatários","textChars":22,"textLines":1,"bbox":[150,153,285,34]}
+{"kind":"textbox","id":"sh/mpszu1g7","slide":7,"text":"Informe um e-mail por linha ou separe por vírgula.","textPreview":"Informe um e-mail por linha ou separe por vírgula.","textChars":50,"textLines":1,"bbox":[150,189,285,78]}
+{"kind":"shape","id":"sh/9cjy5gzi","slide":7,"bbox":[465,155,52,52]}
+{"kind":"textbox","id":"sh/8bahwbyd","slide":7,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[465,164,52,30]}
+{"kind":"textbox","id":"sh/zm1gz6hg","slide":7,"text":"Revise assunto e mensagem","textPreview":"Revise assunto e mensagem","textChars":25,"textLines":1,"bbox":[535,153,285,34]}
+{"kind":"textbox","id":"sh/yl8zq1gv","slide":7,"text":"Data e turno podem ser preenchidos automaticamente.","textPreview":"Data e turno podem ser preenchidos automaticamente.","textChars":51,"textLines":1,"bbox":[535,189,285,78]}
+{"kind":"shape","id":"sh/lojy1wzm","slide":7,"bbox":[850,155,52,52]}
+{"kind":"textbox","id":"sh/knahsry1","slide":7,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[850,164,52,30]}
+{"kind":"textbox","id":"sh/jilgbqh0","slide":7,"text":"Teste antes de ativar","textPreview":"Teste antes de ativar","textChars":21,"textLines":1,"bbox":[920,153,285,34]}
+{"kind":"textbox","id":"sh/ihcz2lgf","slide":7,"text":"Envie para um endereço controlado e confirme o recebimento.","textPreview":"Envie para um endereço controlado e confirme o recebimento.","textChars":59,"textLines":1,"bbox":[920,189,285,78]}
+{"kind":"shape","id":"sh/edgjup0n","slide":7,"bbox":[210,410,860,135]}
+{"kind":"shape","id":"sh/fepk3u18","slide":7,"bbox":[210,410,8,135]}
+{"kind":"textbox","id":"sh/gfy1wzid","slide":7,"text":"Automação após upload","textPreview":"Automação após upload","textChars":21,"textLines":1,"bbox":[236,428,814,30]}
+{"kind":"textbox","id":"sh/1g7254jy","slide":7,"text":"Ative em verde para enviar após novas cargas. Deixe vermelho durante testes ou manutenção.","textPreview":"Ative em verde para enviar após novas cargas. Deixe vermelho durante testes ou manutenção.","textChars":90,"textLines":1,"bbox":[236,464,814,67]}
+{"kind":"textbox","id":"sh/21gjy90j","slide":7,"text":"WhatsApp depende de configuração própria; e-mail depende do servidor SMTP.","textPreview":"WhatsApp depende de configuração própria; e-mail depende do servidor SMTP.","textChars":74,"textLines":1,"bbox":[64,680,900,20]}
+{"kind":"textbox","id":"sh/32pk7uh4","slide":7,"text":"Portal de Itens Pausados × Ativos","textPreview":"Portal de Itens Pausados × Ativos","textChars":33,"textLines":1,"bbox":[950,680,266,20]}
+{"kind":"image","id":"im/w7u9cb6x","slide":7,"name":"","alt":"Logo Ital in House","bbox":[68,29,82,52]}
+{"kind":"notes","id":"nt/l3ityv","slide":7,"text":""}
+{"kind":"slide","id":"sl/dn0o15","slide":8,"title":"E-mail corporativo exige credencial própria","textShapes":11}
+{"kind":"shape","id":"sh/lwve98zm","slide":8,"bbox":[0,0,1280,14]}
+{"kind":"shape","id":"sh/y9kvedgb","slide":8,"bbox":[58,23,102,66]}
+{"kind":"textbox","id":"sh/8zmdknyd","slide":8,"text":"E-mail corporativo exige credencial própria","textPreview":"E-mail corporativo exige credencial própria","textChars":43,"textLines":1,"bbox":[182,31,880,52]}
+{"kind":"textbox","id":"sh/t0vedszy","slide":8,"text":"MANUAL DO ADMINISTRADOR","textPreview":"MANUAL DO ADMINISTRADOR","textChars":23,"textLines":1,"bbox":[182,76,600,24]}
+{"kind":"textbox","id":"sh/6x4vidg7","slide":8,"text":"08","textPreview":"08","textChars":2,"textLines":1,"bbox":[1155,40,60,30]}
+{"kind":"shape","id":"sh/7ydwbihs","slide":8,"bbox":[64,108,1152,1]}
+{"kind":"shape","id":"sh/g3mdony9","slide":8,"bbox":[75,165,520,210]}
+{"kind":"shape","id":"sh/h4fehsfu","slide":8,"bbox":[75,165,8,210]}
+{"kind":"textbox","id":"sh/dwfudg7a","slide":8,"text":"Gmail / Google Workspace","textPreview":"Gmail / Google Workspace","textChars":24,"textLines":1,"bbox":[101,183,474,30]}
+{"kind":"textbox","id":"sh/cv6d4b6p","slide":8,"text":"Use verificação em duas etapas e Senha de app. A senha normal da conta não deve ser usada no sistema.","textPreview":"Use verificação em duas etapas e Senha de app. A senha normal da conta não deve ser usada no sistema.","textChars":101,"textLines":1,"bbox":[101,219,474,142]}
+{"kind":"shape","id":"sh/ruxcb6pk","slide":8,"bbox":[685,165,520,210]}
+{"kind":"shape","id":"sh/qtov21oz","slide":8,"bbox":[685,165,8,210]}
+{"kind":"textbox","id":"sh/lkzehgnm","slide":8,"text":"Conta recomendada","textPreview":"Conta recomendada","textChars":17,"textLines":1,"bbox":[711,183,474,30]}
+{"kind":"textbox","id":"sh/0zqd8b61","slide":8,"text":"Crie uma caixa exclusiva, como avisos@italinhouse.com, aprovada e administrada pela empresa.","textPreview":"Crie uma caixa exclusiva, como avisos@italinhouse.com, aprovada e administrada pela empresa.","textChars":92,"textLines":1,"bbox":[711,219,474,142]}
+{"kind":"textbox","id":"sh/zyhwfqpg","slide":8,"text":"Variáveis sensíveis ficam apenas na Vercel.","textPreview":"Variáveis sensíveis ficam apenas na Vercel.","textChars":43,"textLines":1,"bbox":[180,445,920,38]}
+{"kind":"textbox","id":"sh/yxov6lov","slide":8,"text":"Nunca coloque senha, token ou credencial no GitHub ou no navegador.","textPreview":"Nunca coloque senha, token ou credencial no GitHub ou no navegador.","textChars":67,"textLines":1,"bbox":[210,505,860,32]}
+{"kind":"textbox","id":"sh/h4vu5w72","slide":8,"text":"Após alterar variáveis, faça um novo deploy sem cache.","textPreview":"Após alterar variáveis, faça um novo deploy sem cache.","textChars":54,"textLines":1,"bbox":[64,680,900,20]}
+{"kind":"textbox","id":"sh/g3mdwr6x","slide":8,"text":"Portal de Itens Pausados × Ativos","textPreview":"Portal de Itens Pausados × Ativos","textChars":33,"textLines":1,"bbox":[950,680,266,20]}
+{"kind":"image","id":"im/u50r2x8n","slide":8,"name":"","alt":"Logo Ital in House","bbox":[68,29,82,52]}
+{"kind":"notes","id":"nt/dn0o15","slide":8,"text":""}
+{"kind":"slide","id":"sl/7sh67o","slide":9,"title":"Checklist de publicação e operação","textShapes":11}
+{"kind":"shape","id":"sh/0vyx4ni9","slide":9,"bbox":[0,0,1280,14]}
+{"kind":"shape","id":"sh/fupwbiho","slide":9,"bbox":[58,23,102,66]}
+{"kind":"textbox","id":"sh/p0rehszq","slide":9,"text":"Checklist de publicação e operação","textPreview":"Checklist de publicação e operação","textChars":34,"textLines":1,"bbox":[182,31,880,52]}
+{"kind":"textbox","id":"sh/ozix8nil","slide":9,"text":"MANUAL DO ADMINISTRADOR","textPreview":"MANUAL DO ADMINISTRADOR","textChars":23,"textLines":1,"bbox":[182,76,600,24]}
+{"kind":"textbox","id":"sh/nypwfih0","slide":9,"text":"09","textPreview":"09","textChars":2,"textLines":1,"bbox":[1155,40,60,30]}
+{"kind":"shape","id":"sh/2xgf6x0f","slide":9,"bbox":[64,108,1152,1]}
+{"kind":"shape","id":"sh/54ne58zm","slide":9,"bbox":[105,152,14,14]}
+{"kind":"textbox","id":"sh/43edw3i1","slide":9,"text":"Validar data, turno e quantidade de unidades da nova carga.","textPreview":"Validar data, turno e quantidade de unidades da nova carga.","textChars":59,"textLines":1,"bbox":[133,145,1032,42]}
+{"kind":"shape","id":"sh/a98zulsz","slide":9,"bbox":[105,230,14,14]}
+{"kind":"textbox","id":"sh/ba10nqtk","slide":9,"text":"Confirmar que a base foi salva na nuvem.","textPreview":"Confirmar que a base foi salva na nuvem.","textChars":40,"textLines":1,"bbox":[133,223,1032,42]}
+{"kind":"shape","id":"sh/cbahwva5","slide":9,"bbox":[105,308,14,14]}
+{"kind":"textbox","id":"sh/xcjip0bq","slide":9,"text":"Testar Geral, Itens, Categorias, Ranking e uma unidade franqueada.","textPreview":"Testar Geral, Itens, Categorias, Ranking e uma unidade franqueada.","textChars":66,"textLines":1,"bbox":[133,301,1032,42]}
+{"kind":"shape","id":"sh/ydszy5sb","slide":9,"bbox":[105,386,14,14]}
+{"kind":"textbox","id":"sh/ze10ratg","slide":9,"text":"Verificar destinatários e enviar um e-mail de teste.","textPreview":"Verificar destinatários e enviar um e-mail de teste.","textChars":52,"textLines":1,"bbox":[133,379,1032,42]}
+{"kind":"shape","id":"sh/kfah0va1","slide":9,"bbox":[105,464,14,14]}
+{"kind":"textbox","id":"sh/lgjit0bm","slide":9,"text":"Acompanhar os primeiros acessos e registrar feedback do piloto.","textPreview":"Acompanhar os primeiros acessos e registrar feedback do piloto.","textChars":63,"textLines":1,"bbox":[133,457,1032,42]}
+{"kind":"shape","id":"sh/m1cz25s7","slide":9,"bbox":[105,542,14,14]}
+{"kind":"textbox","id":"sh/72l0vats","slide":9,"text":"Nunca publicar .env.local, senhas, tokens ou planilhas reais no GitHub.","textPreview":"Nunca publicar .env.local, senhas, tokens ou planilhas reais no GitHub.","textChars":71,"textLines":1,"bbox":[133,535,1032,42]}
+{"kind":"textbox","id":"sh/j6lgjap0","slide":9,"text":"Em caso de erro, registre página, horário, ação executada e mensagem exibida.","textPreview":"Em caso de erro, registre página, horário, ação executada e mensagem exibida.","textChars":77,"textLines":1,"bbox":[64,680,900,20]}
+{"kind":"textbox","id":"sh/i5czq58f","slide":9,"text":"Portal de Itens Pausados × Ativos","textPreview":"Portal de Itens Pausados × Ativos","textChars":33,"textLines":1,"bbox":[950,680,266,20]}
+{"kind":"image","id":"im/fipk7ud8","slide":9,"name":"","alt":"Logo Ital in House","bbox":[68,29,82,52]}
+{"kind":"notes","id":"nt/7sh67o","slide":9,"text":""}

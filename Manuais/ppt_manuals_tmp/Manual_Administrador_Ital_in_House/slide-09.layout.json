@@ -1,0 +1,911 @@
+{
+  "schema": "openai.presentation.layout/v4",
+  "unit": "px",
+  "slide": {
+    "aid": "sl/7sh67o",
+    "id": "7sh67o",
+    "slide": 9,
+    "layoutId": "11e118da-9a63-4a4d-8bde-5e23dc1da517",
+    "layoutName": "Title Slide",
+    "layoutType": "title",
+    "masterLayoutId": "0db12faa-23d3-4bc6-9b03-d9449dbc4405",
+    "masterLayoutName": "Master",
+    "backgroundColor": "#FAFAFB",
+    "frame": {
+      "left": 0,
+      "top": 0,
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "theme": {
+    "colorSchemeName": "ChatGPT",
+    "colors": {
+      "accent1": "#156082",
+      "accent2": "#E97132",
+      "accent3": "#196B24",
+      "accent4": "#0F9ED5",
+      "accent5": "#A02B93",
+      "accent6": "#4EA72E",
+      "bg1": "#FFFFFF",
+      "bg2": "#000000",
+      "tx1": "#1F1F1F",
+      "tx2": "#FFFFFF",
+      "dk1": "#000000",
+      "lt1": "#FFFFFF",
+      "dk2": "#0E2841",
+      "lt2": "#E8E8E8",
+      "hlink": "#467886",
+      "folHlink": "#96607D"
+    },
+    "typefaces": [
+      "+mn-lt"
+    ]
+  },
+  "inheritedLayers": [
+    {
+      "scope": "layout",
+      "id": "11e118da-9a63-4a4d-8bde-5e23dc1da517",
+      "name": "Title Slide",
+      "type": "title",
+      "parentLayoutId": "0db12faa-23d3-4bc6-9b03-d9449dbc4405",
+      "elements": []
+    },
+    {
+      "scope": "master",
+      "id": "0db12faa-23d3-4bc6-9b03-d9449dbc4405",
+      "name": "Master",
+      "type": "master",
+      "elements": []
+    }
+  ],
+  "elements": [
+    {
+      "order": 1,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/0vyx4ni9",
+      "id": "1",
+      "bbox": [
+        0,
+        0,
+        1280,
+        14
+      ],
+      "geometry": "rect",
+      "fillColor": "#C8102E",
+      "lineColor": "#C8102E",
+      "lineWidth": 0
+    },
+    {
+      "order": 2,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/fupwbiho",
+      "id": "2",
+      "bbox": [
+        58,
+        23,
+        102,
+        66
+      ],
+      "geometry": "roundRect",
+      "fillColor": "#C8102E",
+      "lineColor": "#C8102E",
+      "lineWidth": 1
+    },
+    {
+      "order": 3,
+      "kind": "image",
+      "scope": "slide",
+      "aid": "im/fipk7ud8",
+      "id": "3",
+      "bbox": [
+        68,
+        29,
+        82,
+        52
+      ],
+      "alt": "Logo Ital in House",
+      "contentType": "image/png",
+      "imageFit": "contain",
+      "asset": {
+        "assetId": "8853ea8c-4653-4960-a3f6-bc5f11ff4b42",
+        "contentType": "image/png",
+        "byteLength": 57570
+      }
+    },
+    {
+      "order": 4,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/p0rehszq",
+      "id": "4",
+      "bbox": [
+        182,
+        31,
+        880,
+        52
+      ],
+      "geometry": "rect",
+      "text": "Checklist de publicação e operação",
+      "textPreview": "Checklist de publicação e operação",
+      "resolvedFontSize": 35,
+      "resolvedTextStyle": {
+        "fontSize": 35,
+        "typeface": "+mn-lt",
+        "color": "#101828",
+        "bold": true,
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Checklist de publicação e operação"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Checklist de publicação e operação",
+          "resolvedTextStyle": {
+            "fontSize": 35,
+            "color": "#101828",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Checklist de publicação e operação",
+              "fontSize": 35,
+              "color": "#101828",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 5,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/ozix8nil",
+      "id": "5",
+      "bbox": [
+        182,
+        76,
+        600,
+        24
+      ],
+      "geometry": "rect",
+      "text": "MANUAL DO ADMINISTRADOR",
+      "textPreview": "MANUAL DO ADMINISTRADOR",
+      "resolvedFontSize": 13,
+      "resolvedTextStyle": {
+        "fontSize": 13,
+        "typeface": "+mn-lt",
+        "color": "#667085",
+        "bold": true,
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "MANUAL DO ADMINISTRADOR"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "MANUAL DO ADMINISTRADOR",
+          "resolvedTextStyle": {
+            "fontSize": 13,
+            "color": "#667085",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "MANUAL DO ADMINISTRADOR",
+              "fontSize": 13,
+              "color": "#667085",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 6,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/nypwfih0",
+      "id": "6",
+      "bbox": [
+        1155,
+        40,
+        60,
+        30
+      ],
+      "geometry": "rect",
+      "text": "09",
+      "textPreview": "09",
+      "resolvedFontSize": 16,
+      "resolvedTextStyle": {
+        "fontSize": 16,
+        "typeface": "+mn-lt",
+        "color": "#C8102E",
+        "bold": true,
+        "alignment": "right",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "09"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "09",
+          "resolvedTextStyle": {
+            "fontSize": 16,
+            "color": "#C8102E",
+            "bold": true,
+            "alignment": "right"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "09",
+              "fontSize": 16,
+              "color": "#C8102E",
+              "bold": true,
+              "alignment": "right"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 7,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/2xgf6x0f",
+      "id": "7",
+      "bbox": [
+        64,
+        108,
+        1152,
+        1
+      ],
+      "geometry": "rect",
+      "fillColor": "#E4E7EC",
+      "lineColor": "#E4E7EC",
+      "lineWidth": 0
+    },
+    {
+      "order": 8,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/54ne58zm",
+      "id": "8",
+      "bbox": [
+        105,
+        152,
+        14,
+        14
+      ],
+      "geometry": "ellipse",
+      "fillColor": "#C8102E",
+      "lineColor": "#C8102E",
+      "lineWidth": 0
+    },
+    {
+      "order": 9,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/43edw3i1",
+      "id": "9",
+      "bbox": [
+        133,
+        145,
+        1032,
+        42
+      ],
+      "geometry": "rect",
+      "text": "Validar data, turno e quantidade de unidades da nova carga.",
+      "textPreview": "Validar data, turno e quantidade de unidades da nova carga.",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "fontSize": 18,
+        "typeface": "+mn-lt",
+        "color": "#101828",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Validar data, turno e quantidade de unidades da nova carga."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Validar data, turno e quantidade de unidades da nova carga.",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "color": "#101828",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Validar data, turno e quantidade de unidades da nova carga.",
+              "fontSize": 18,
+              "color": "#101828",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 10,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/a98zulsz",
+      "id": "10",
+      "bbox": [
+        105,
+        230,
+        14,
+        14
+      ],
+      "geometry": "ellipse",
+      "fillColor": "#C8102E",
+      "lineColor": "#C8102E",
+      "lineWidth": 0
+    },
+    {
+      "order": 11,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/ba10nqtk",
+      "id": "11",
+      "bbox": [
+        133,
+        223,
+        1032,
+        42
+      ],
+      "geometry": "rect",
+      "text": "Confirmar que a base foi salva na nuvem.",
+      "textPreview": "Confirmar que a base foi salva na nuvem.",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "fontSize": 18,
+        "typeface": "+mn-lt",
+        "color": "#101828",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Confirmar que a base foi salva na nuvem."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Confirmar que a base foi salva na nuvem.",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "color": "#101828",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Confirmar que a base foi salva na nuvem.",
+              "fontSize": 18,
+              "color": "#101828",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 12,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/cbahwva5",
+      "id": "12",
+      "bbox": [
+        105,
+        308,
+        14,
+        14
+      ],
+      "geometry": "ellipse",
+      "fillColor": "#C8102E",
+      "lineColor": "#C8102E",
+      "lineWidth": 0
+    },
+    {
+      "order": 13,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/xcjip0bq",
+      "id": "13",
+      "bbox": [
+        133,
+        301,
+        1032,
+        42
+      ],
+      "geometry": "rect",
+      "text": "Testar Geral, Itens, Categorias, Ranking e uma unidade franqueada.",
+      "textPreview": "Testar Geral, Itens, Categorias, Ranking e uma unidade franqueada.",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "fontSize": 18,
+        "typeface": "+mn-lt",
+        "color": "#101828",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Testar Geral, Itens, Categorias, Ranking e uma unidade franqueada."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Testar Geral, Itens, Categorias, Ranking e uma unidade franqueada.",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "color": "#101828",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Testar Geral, Itens, Categorias, Ranking e uma unidade franqueada.",
+              "fontSize": 18,
+              "color": "#101828",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 14,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/ydszy5sb",
+      "id": "14",
+      "bbox": [
+        105,
+        386,
+        14,
+        14
+      ],
+      "geometry": "ellipse",
+      "fillColor": "#C8102E",
+      "lineColor": "#C8102E",
+      "lineWidth": 0
+    },
+    {
+      "order": 15,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/ze10ratg",
+      "id": "15",
+      "bbox": [
+        133,
+        379,
+        1032,
+        42
+      ],
+      "geometry": "rect",
+      "text": "Verificar destinatários e enviar um e-mail de teste.",
+      "textPreview": "Verificar destinatários e enviar um e-mail de teste.",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "fontSize": 18,
+        "typeface": "+mn-lt",
+        "color": "#101828",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Verificar destinatários e enviar um e-mail de teste."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Verificar destinatários e enviar um e-mail de teste.",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "color": "#101828",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Verificar destinatários e enviar um e-mail de teste.",
+              "fontSize": 18,
+              "color": "#101828",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 16,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/kfah0va1",
+      "id": "16",
+      "bbox": [
+        105,
+        464,
+        14,
+        14
+      ],
+      "geometry": "ellipse",
+      "fillColor": "#C8102E",
+      "lineColor": "#C8102E",
+      "lineWidth": 0
+    },
+    {
+      "order": 17,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/lgjit0bm",
+      "id": "17",
+      "bbox": [
+        133,
+        457,
+        1032,
+        42
+      ],
+      "geometry": "rect",
+      "text": "Acompanhar os primeiros acessos e registrar feedback do piloto.",
+      "textPreview": "Acompanhar os primeiros acessos e registrar feedback do piloto.",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "fontSize": 18,
+        "typeface": "+mn-lt",
+        "color": "#101828",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Acompanhar os primeiros acessos e registrar feedback do piloto."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Acompanhar os primeiros acessos e registrar feedback do piloto.",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "color": "#101828",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Acompanhar os primeiros acessos e registrar feedback do piloto.",
+              "fontSize": 18,
+              "color": "#101828",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 18,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/m1cz25s7",
+      "id": "18",
+      "bbox": [
+        105,
+        542,
+        14,
+        14
+      ],
+      "geometry": "ellipse",
+      "fillColor": "#C8102E",
+      "lineColor": "#C8102E",
+      "lineWidth": 0
+    },
+    {
+      "order": 19,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/72l0vats",
+      "id": "19",
+      "bbox": [
+        133,
+        535,
+        1032,
+        42
+      ],
+      "geometry": "rect",
+      "text": "Nunca publicar .env.local, senhas, tokens ou planilhas reais no GitHub.",
+      "textPreview": "Nunca publicar .env.local, senhas, tokens ou planilhas reais no GitHub.",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "fontSize": 18,
+        "typeface": "+mn-lt",
+        "color": "#101828",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Nunca publicar .env.local, senhas, tokens ou planilhas reais no GitHub."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Nunca publicar .env.local, senhas, tokens ou planilhas reais no GitHub.",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "color": "#101828",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Nunca publicar .env.local, senhas, tokens ou planilhas reais no GitHub.",
+              "fontSize": 18,
+              "color": "#101828",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 20,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/j6lgjap0",
+      "id": "20",
+      "bbox": [
+        64,
+        680,
+        900,
+        20
+      ],
+      "geometry": "rect",
+      "text": "Em caso de erro, registre página, horário, ação executada e mensagem exibida.",
+      "textPreview": "Em caso de erro, registre página, horário, ação executada e mensagem exibida.",
+      "resolvedFontSize": 11,
+      "resolvedTextStyle": {
+        "fontSize": 11,
+        "typeface": "+mn-lt",
+        "color": "#667085",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Em caso de erro, registre página, horário, ação executada e mensagem exibida."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Em caso de erro, registre página, horário, ação executada e mensagem exibida.",
+          "resolvedTextStyle": {
+            "fontSize": 11,
+            "color": "#667085",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Em caso de erro, registre página, horário, ação executada e mensagem exibida.",
+              "fontSize": 11,
+              "color": "#667085",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 21,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/i5czq58f",
+      "id": "21",
+      "bbox": [
+        950,
+        680,
+        266,
+        20
+      ],
+      "geometry": "rect",
+      "text": "Portal de Itens Pausados × Ativos",
+      "textPreview": "Portal de Itens Pausados × Ativos",
+      "resolvedFontSize": 11,
+      "resolvedTextStyle": {
+        "fontSize": 11,
+        "typeface": "+mn-lt",
+        "color": "#C8102E",
+        "bold": true,
+        "alignment": "right",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Portal de Itens Pausados × Ativos"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Portal de Itens Pausados × Ativos",
+          "resolvedTextStyle": {
+            "fontSize": 11,
+            "color": "#C8102E",
+            "bold": true,
+            "alignment": "right"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Portal de Itens Pausados × Ativos",
+              "fontSize": 11,
+              "color": "#C8102E",
+              "bold": true,
+              "alignment": "right"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    }
+  ],
+  "composeRuns": []
+}

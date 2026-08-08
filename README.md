@@ -148,6 +148,37 @@ Catalog homologados. Não salve Bearer Token manual no código ou no Git. Quando
 forem liberados, configure as credenciais exclusivamente no backend e nas variáveis
 sensíveis da plataforma.
 
+Preencha `IFOOD_CLIENT_ID` e `IFOOD_CLIENT_SECRET` no `.env.local` (app do tipo
+**Centralizado**, com `grantType=client_credentials`) para testar. Dois scripts prontos,
+sem nenhuma credencial escrita no código:
+
+```powershell
+# Testa a autenticação (token) e diagnostica erro de permissão/loja vinculada.
+python scripts/extrair_ifood.py --test-token
+
+# Extração completa: autentica, lista as lojas (Merchant) e os itens ativos/pausados
+# por categoria (Catalog) de todas elas, salvando um CSV em data/staging/.
+python scripts/extrair_ifood.py
+
+# Testa loja a loja de forma interativa (já existente).
+python scripts/testar_loja_ifood.py --all
+```
+
+Importante (confirmado em teste real, inclusive na tela do Developer Portal): o
+`/oauth/token` da iFood só emite `access_token` se o app tiver **pelo menos uma loja
+autorizada**, e nenhuma loja consegue autorizar o app — nem a loja de teste — antes dele
+estar **homologado**. A própria aba **Permissões** do app mostra "O aplicativo precisa
+estar homologado para receber autorização" enquanto isso não acontece. Ou seja, `403 no
+permissions granted to client` nesse estágio é esperado, não é erro de configuração.
+Próximo passo: abrir um chamado de homologação no Developer Portal (Central de Ajuda /
+Suporte) pedindo os módulos **Merchant** e **Catalog** para este app centralizado. Depois
+de homologado, rode `python scripts/extrair_ifood.py --test-token` de novo para confirmar
+o token e a lista de lojas. `--test-token` mostra o status HTTP e essas instruções
+automaticamente quando a autenticação falha. O CSV gerado por `extrair_ifood.py` usa o
+mesmo layout (`CSV_HEADERS`) já consumido pelo portal, servindo de base para uma futura
+automação (n8n, cron, etc.) sem substituir o upload manual do XLSX, que continua
+funcionando.
+
 ## 8. Testes
 
 ```powershell

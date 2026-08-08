@@ -22,6 +22,7 @@ export const ADMIN_TABS = [
   { id: 'rank',   label: 'Ranking',    icon: 'trophy' },
   { id: 'forneria', label: 'Forneria', icon: 'bakery' },
   { id: 'revenue', label: 'Potencial', icon: 'money' },
+  { id: 'alerts', label: 'Central de Alertas', icon: 'fire' },
   { id: 'access', label: 'Gestão', icon: 'access' },
   { id: 'notify', label: 'Avisos',     icon: 'alert'  },
   { id: 'update', label: 'Atualizar Dados', icon: 'upload' },

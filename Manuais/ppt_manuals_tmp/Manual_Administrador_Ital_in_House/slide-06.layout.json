@@ -1,0 +1,924 @@
+{
+  "schema": "openai.presentation.layout/v4",
+  "unit": "px",
+  "slide": {
+    "aid": "sl/2q81r7",
+    "id": "2q81r7",
+    "slide": 6,
+    "layoutId": "11e118da-9a63-4a4d-8bde-5e23dc1da517",
+    "layoutName": "Title Slide",
+    "layoutType": "title",
+    "masterLayoutId": "0db12faa-23d3-4bc6-9b03-d9449dbc4405",
+    "masterLayoutName": "Master",
+    "backgroundColor": "#FAFAFB",
+    "frame": {
+      "left": 0,
+      "top": 0,
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "theme": {
+    "colorSchemeName": "ChatGPT",
+    "colors": {
+      "accent1": "#156082",
+      "accent2": "#E97132",
+      "accent3": "#196B24",
+      "accent4": "#0F9ED5",
+      "accent5": "#A02B93",
+      "accent6": "#4EA72E",
+      "bg1": "#FFFFFF",
+      "bg2": "#000000",
+      "tx1": "#1F1F1F",
+      "tx2": "#FFFFFF",
+      "dk1": "#000000",
+      "lt1": "#FFFFFF",
+      "dk2": "#0E2841",
+      "lt2": "#E8E8E8",
+      "hlink": "#467886",
+      "folHlink": "#96607D"
+    },
+    "typefaces": [
+      "+mn-lt"
+    ]
+  },
+  "inheritedLayers": [
+    {
+      "scope": "layout",
+      "id": "11e118da-9a63-4a4d-8bde-5e23dc1da517",
+      "name": "Title Slide",
+      "type": "title",
+      "parentLayoutId": "0db12faa-23d3-4bc6-9b03-d9449dbc4405",
+      "elements": []
+    },
+    {
+      "scope": "master",
+      "id": "0db12faa-23d3-4bc6-9b03-d9449dbc4405",
+      "name": "Master",
+      "type": "master",
+      "elements": []
+    }
+  ],
+  "elements": [
+    {
+      "order": 1,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/h87ut0jq",
+      "id": "1",
+      "bbox": [
+        0,
+        0,
+        1280,
+        14
+      ],
+      "geometry": "rect",
+      "fillColor": "#C8102E",
+      "lineColor": "#C8102E",
+      "lineWidth": 0
+    },
+    {
+      "order": 2,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/u5gbyl0f",
+      "id": "2",
+      "bbox": [
+        58,
+        23,
+        102,
+        66
+      ],
+      "geometry": "roundRect",
+      "fillColor": "#C8102E",
+      "lineColor": "#C8102E",
+      "lineWidth": 1
+    },
+    {
+      "order": 3,
+      "kind": "image",
+      "scope": "slide",
+      "aid": "im/ytcvmxsv",
+      "id": "3",
+      "bbox": [
+        68,
+        29,
+        82,
+        52
+      ],
+      "alt": "Logo Ital in House",
+      "contentType": "image/png",
+      "imageFit": "contain",
+      "asset": {
+        "assetId": "b6149b11-60c7-47f4-92b7-0d57f963f680",
+        "contentType": "image/png",
+        "byteLength": 57570
+      }
+    },
+    {
+      "order": 4,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/4bit4fih",
+      "id": "4",
+      "bbox": [
+        182,
+        31,
+        880,
+        52
+      ],
+      "geometry": "rect",
+      "text": "Acessos controla identidade e permissões",
+      "textPreview": "Acessos controla identidade e permissões",
+      "resolvedFontSize": 35,
+      "resolvedTextStyle": {
+        "fontSize": 35,
+        "typeface": "+mn-lt",
+        "color": "#101828",
+        "bold": true,
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Acessos controla identidade e permissões"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Acessos controla identidade e permissões",
+          "resolvedTextStyle": {
+            "fontSize": 35,
+            "color": "#101828",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Acessos controla identidade e permissões",
+              "fontSize": 35,
+              "color": "#101828",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 5,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/5crux0j2",
+      "id": "5",
+      "bbox": [
+        182,
+        76,
+        600,
+        24
+      ],
+      "geometry": "rect",
+      "text": "MANUAL DO ADMINISTRADOR",
+      "textPreview": "MANUAL DO ADMINISTRADOR",
+      "resolvedFontSize": 13,
+      "resolvedTextStyle": {
+        "fontSize": 13,
+        "typeface": "+mn-lt",
+        "color": "#667085",
+        "bold": true,
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "MANUAL DO ADMINISTRADOR"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "MANUAL DO ADMINISTRADOR",
+          "resolvedTextStyle": {
+            "fontSize": 13,
+            "color": "#667085",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "MANUAL DO ADMINISTRADOR",
+              "fontSize": 13,
+              "color": "#667085",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 6,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/i90b250b",
+      "id": "6",
+      "bbox": [
+        1155,
+        40,
+        60,
+        30
+      ],
+      "geometry": "rect",
+      "text": "06",
+      "textPreview": "06",
+      "resolvedFontSize": 16,
+      "resolvedTextStyle": {
+        "fontSize": 16,
+        "typeface": "+mn-lt",
+        "color": "#C8102E",
+        "bold": true,
+        "alignment": "right",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "06"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "06",
+          "resolvedTextStyle": {
+            "fontSize": 16,
+            "color": "#C8102E",
+            "bold": true,
+            "alignment": "right"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "06",
+              "fontSize": 16,
+              "color": "#C8102E",
+              "bold": true,
+              "alignment": "right"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 7,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/3a9cva1w",
+      "id": "7",
+      "bbox": [
+        64,
+        108,
+        1152,
+        1
+      ],
+      "geometry": "rect",
+      "fillColor": "#E4E7EC",
+      "lineColor": "#E4E7EC",
+      "lineWidth": 0
+    },
+    {
+      "order": 8,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/kfetsbix",
+      "id": "8",
+      "bbox": [
+        75,
+        165,
+        520,
+        190
+      ],
+      "geometry": "roundRect",
+      "fillColor": "#EFF6FF",
+      "lineColor": "#EFF6FF",
+      "lineWidth": 1
+    },
+    {
+      "order": 9,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/lgnulgji",
+      "id": "9",
+      "bbox": [
+        75,
+        165,
+        8,
+        190
+      ],
+      "geometry": "rect",
+      "fillColor": "#2563EB",
+      "lineColor": "#2563EB",
+      "lineWidth": 0
+    },
+    {
+      "order": 10,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/1wf29szu",
+      "id": "10",
+      "bbox": [
+        101,
+        183,
+        474,
+        30
+      ],
+      "geometry": "rect",
+      "text": "Domínios permitidos",
+      "textPreview": "Domínios permitidos",
+      "resolvedFontSize": 21,
+      "resolvedTextStyle": {
+        "fontSize": 21,
+        "typeface": "+mn-lt",
+        "color": "#2563EB",
+        "bold": true,
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Domínios permitidos"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Domínios permitidos",
+          "resolvedTextStyle": {
+            "fontSize": 21,
+            "color": "#2563EB",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Domínios permitidos",
+              "fontSize": 21,
+              "color": "#2563EB",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 11,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/0vmlgny9",
+      "id": "11",
+      "bbox": [
+        101,
+        219,
+        474,
+        122
+      ],
+      "geometry": "rect",
+      "text": "Cadastre italinhouse.com, gmail.com ou outros domínios autorizados. Salve antes de testar.",
+      "textPreview": "Cadastre italinhouse.com, gmail.com ou outros domínios autorizados. Salve antes de testar.",
+      "resolvedFontSize": 16,
+      "resolvedTextStyle": {
+        "fontSize": 16,
+        "typeface": "+mn-lt",
+        "color": "#475467",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 2,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Cadastre italinhouse.com, gmail.com ou outros domínios autorizados."
+          },
+          {
+            "index": 2,
+            "text": "Salve antes de testar."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Cadastre italinhouse.com, gmail.com ou outros domínios autorizados. Salve antes de testar.",
+          "resolvedTextStyle": {
+            "fontSize": 16,
+            "color": "#475467",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Cadastre italinhouse.com, gmail.com ou outros domínios autorizados. Salve antes de testar.",
+              "fontSize": 16,
+              "color": "#475467",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 12,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/zudk7iho",
+      "id": "12",
+      "bbox": [
+        685,
+        165,
+        520,
+        190
+      ],
+      "geometry": "roundRect",
+      "fillColor": "#ECFDF5",
+      "lineColor": "#ECFDF5",
+      "lineWidth": 1
+    },
+    {
+      "order": 13,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/et43edg3",
+      "id": "13",
+      "bbox": [
+        685,
+        165,
+        8,
+        190
+      ],
+      "geometry": "rect",
+      "fillColor": "#059669",
+      "lineColor": "#059669",
+      "lineWidth": 0
+    },
+    {
+      "order": 14,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/90f2dcfq",
+      "id": "14",
+      "bbox": [
+        711,
+        183,
+        474,
+        30
+      ],
+      "geometry": "rect",
+      "text": "Histórico de acesso",
+      "textPreview": "Histórico de acesso",
+      "resolvedFontSize": 21,
+      "resolvedTextStyle": {
+        "fontSize": 21,
+        "typeface": "+mn-lt",
+        "color": "#059669",
+        "bold": true,
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Histórico de acesso"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Histórico de acesso",
+          "resolvedTextStyle": {
+            "fontSize": 21,
+            "color": "#059669",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Histórico de acesso",
+              "fontSize": 21,
+              "color": "#059669",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 15,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/oz6lk7yl",
+      "id": "15",
+      "bbox": [
+        711,
+        219,
+        474,
+        122
+      ],
+      "geometry": "rect",
+      "text": "Consulte nome, e-mail, data, evento, marca e unidade selecionada.",
+      "textPreview": "Consulte nome, e-mail, data, evento, marca e unidade selecionada.",
+      "resolvedFontSize": 16,
+      "resolvedTextStyle": {
+        "fontSize": 16,
+        "typeface": "+mn-lt",
+        "color": "#475467",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Consulte nome, e-mail, data, evento, marca e unidade selecionada."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Consulte nome, e-mail, data, evento, marca e unidade selecionada.",
+          "resolvedTextStyle": {
+            "fontSize": 16,
+            "color": "#475467",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Consulte nome, e-mail, data, evento, marca e unidade selecionada.",
+              "fontSize": 16,
+              "color": "#475467",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 16,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/nyxkb2x0",
+      "id": "16",
+      "bbox": [
+        225,
+        420,
+        830,
+        135
+      ],
+      "geometry": "roundRect",
+      "fillColor": "#FFF1F3",
+      "lineColor": "#FFF1F3",
+      "lineWidth": 1
+    },
+    {
+      "order": 17,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/mxo3ixgf",
+      "id": "17",
+      "bbox": [
+        225,
+        420,
+        8,
+        135
+      ],
+      "geometry": "rect",
+      "fillColor": "#C8102E",
+      "lineColor": "#C8102E",
+      "lineWidth": 0
+    },
+    {
+      "order": 18,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/xoz2hcf2",
+      "id": "18",
+      "bbox": [
+        251,
+        438,
+        784,
+        30
+      ],
+      "geometry": "rect",
+      "text": "Limpeza dos logs",
+      "textPreview": "Limpeza dos logs",
+      "resolvedFontSize": 21,
+      "resolvedTextStyle": {
+        "fontSize": 21,
+        "typeface": "+mn-lt",
+        "color": "#C8102E",
+        "bold": true,
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Limpeza dos logs"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Limpeza dos logs",
+          "resolvedTextStyle": {
+            "fontSize": 21,
+            "color": "#C8102E",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Limpeza dos logs",
+              "fontSize": 21,
+              "color": "#C8102E",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 19,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/wnqlo7yh",
+      "id": "19",
+      "bbox": [
+        251,
+        474,
+        784,
+        67
+      ],
+      "geometry": "rect",
+      "text": "Use Apagar logs somente após confirmar a política de retenção. A ação é definitiva e não apaga a base.",
+      "textPreview": "Use Apagar logs somente após confirmar a política de retenção. A ação é definitiva e não apaga a base.",
+      "resolvedFontSize": 16,
+      "resolvedTextStyle": {
+        "fontSize": 16,
+        "typeface": "+mn-lt",
+        "color": "#475467",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Use Apagar logs somente após confirmar a política de retenção. A ação é definitiva e não apaga a base."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Use Apagar logs somente após confirmar a política de retenção. A ação é definitiva e não apaga a base.",
+          "resolvedTextStyle": {
+            "fontSize": 16,
+            "color": "#475467",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Use Apagar logs somente após confirmar a política de retenção. A ação é definitiva e não apaga a base.",
+              "fontSize": 16,
+              "color": "#475467",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 20,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/gjyd0fap",
+      "id": "20",
+      "bbox": [
+        64,
+        680,
+        900,
+        20
+      ],
+      "geometry": "rect",
+      "text": "Nome e e-mail são declaratórios; contas individuais são a evolução recomendada.",
+      "textPreview": "Nome e e-mail são declaratórios; contas individuais são a evolução recomendada.",
+      "resolvedFontSize": 11,
+      "resolvedTextStyle": {
+        "fontSize": 11,
+        "typeface": "+mn-lt",
+        "color": "#667085",
+        "alignment": "left",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Nome e e-mail são declaratórios; contas individuais são a evolução recomendada."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Nome e e-mail são declaratórios; contas individuais são a evolução recomendada.",
+          "resolvedTextStyle": {
+            "fontSize": 11,
+            "color": "#667085",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Nome e e-mail são declaratórios; contas individuais são a evolução recomendada.",
+              "fontSize": 11,
+              "color": "#667085",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 21,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/h4re9kra",
+      "id": "21",
+      "bbox": [
+        950,
+        680,
+        266,
+        20
+      ],
+      "geometry": "rect",
+      "text": "Portal de Itens Pausados × Ativos",
+      "textPreview": "Portal de Itens Pausados × Ativos",
+      "resolvedFontSize": 11,
+      "resolvedTextStyle": {
+        "fontSize": 11,
+        "typeface": "+mn-lt",
+        "color": "#C8102E",
+        "bold": true,
+        "alignment": "right",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Portal de Itens Pausados × Ativos"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Portal de Itens Pausados × Ativos",
+          "resolvedTextStyle": {
+            "fontSize": 11,
+            "color": "#C8102E",
+            "bold": true,
+            "alignment": "right"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Portal de Itens Pausados × Ativos",
+              "fontSize": 11,
+              "color": "#C8102E",
+              "bold": true,
+              "alignment": "right"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    }
+  ],
+  "composeRuns": []
+}
