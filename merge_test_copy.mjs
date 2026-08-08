@@ -114,19 +114,8 @@ export function mergeRows(existing, incoming) {
   for (const r of existing) map.set(rowKey(r), r);
   for (const r of incoming) map.set(rowKey(r), r);
   let rows = Array.from(map.values());
-  const oldMetaRow = existing.find((row) => row.networkSummary || row.catalogRows) || {};
-  const newMetaRow = incoming.find((row) => row.networkSummary || row.catalogRows) || {};
-  // BUG CRÍTICO CORRIGIDO: oldMetaRow/newMetaRow podem ser o mesmo objeto que
-  // já está dentro de `rows` (mesma referência — linhas não são clonadas em
-  // nenhum lugar do app). O laço abaixo apaga os campos de histórico de TODAS
-  // as linhas para depois recolocá-los só na linha [0]; se lermos
-  // oldMetaRow/newMetaRow depois desse laço, os campos já foram apagados e
-  // toda mesclagem "esquecia" o histórico salvo — silenciosamente, sem erro
-  // nenhum. Por isso "mesclar" parecia não salvar nada, e só "substituir todo
-  // o histórico" (que pula esta função) funcionava. Aqui copiamos os valores
-  // ANTES de apagar.
-  const oldMeta = { ...oldMetaRow };
-  const newMeta = { ...newMetaRow };
+  const oldMeta = existing.find((row) => row.networkSummary || row.catalogRows) || {};
+  const newMeta = incoming.find((row) => row.networkSummary || row.catalogRows) || {};
   for (const row of rows) {
     for (const field of META_FIELDS) delete row[field];
   }
