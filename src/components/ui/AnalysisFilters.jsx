@@ -3,7 +3,7 @@ import { C } from '../../constants.js';
 import { formatDateBR } from '../../utils/format.js';
 import { Ic } from './Icon.jsx';
 
-const SHIFTS = ['Almoço', 'Jantar'];
+const SHIFTS = ['Almoço', 'Jantar', 'Ambos'];
 
 export function AnalysisFilters({
   dates,

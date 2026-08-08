@@ -1,13 +1,17 @@
+// Os valores apontam para variáveis CSS (definidas em global.css, com
+// substituições em [data-theme="dark"]) em vez de hex fixo. Assim o modo
+// escuro se propaga automaticamente para todo lugar que usa `C.xxx` em
+// estilos inline, sem precisar tocar em cada componente.
 export const C = {
-  red: '#E11D48', red2: '#9F1239', redL: '#FFF1F2', redM: '#FECDD3',
-  white: '#FFFFFF', bg: '#F5F7FB', card: 'rgba(255,255,255,.9)',
-  border: '#E4E8F0', text: '#101828', sub: '#344054', muted: '#667085',
-  green: '#059669', greenL: '#ECFDF5', greenM: '#6EE7B7',
-  amber: '#D97706', amberL: '#FFFBEB', amberM: '#FCD34D',
-  blue: '#1D4ED8', blueL: '#EFF6FF', blueM: '#93C5FD',
-  purple: '#7C3AED', purpleL: '#F5F3FF', purpleM: '#C4B5FD',
-  orange: '#EA580C', orangeL: '#FFF7ED', orangeM: '#FDBA74',
-  teal: '#0891B2', tealL: '#ECFEFF',
+  red: 'var(--ih-red)', red2: 'var(--ih-red2)', redL: 'var(--ih-redL)', redM: 'var(--ih-redM)',
+  white: 'var(--ih-white)', bg: 'var(--ih-bg)', card: 'var(--ih-card)',
+  border: 'var(--ih-border)', text: 'var(--ih-text)', sub: 'var(--ih-sub)', muted: 'var(--ih-muted)',
+  green: 'var(--ih-green)', greenL: 'var(--ih-greenL)', greenM: 'var(--ih-greenM)',
+  amber: 'var(--ih-amber)', amberL: 'var(--ih-amberL)', amberM: 'var(--ih-amberM)',
+  blue: 'var(--ih-blue)', blueL: 'var(--ih-blueL)', blueM: 'var(--ih-blueM)',
+  purple: 'var(--ih-purple)', purpleL: 'var(--ih-purpleL)', purpleM: 'var(--ih-purpleM)',
+  orange: 'var(--ih-orange)', orangeL: 'var(--ih-orangeL)', orangeM: 'var(--ih-orangeM)',
+  teal: 'var(--ih-teal)', tealL: 'var(--ih-tealL)',
 };
 
 export const PAL = [

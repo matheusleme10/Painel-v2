@@ -144,7 +144,11 @@ export function App() {
     (scopeBrand === 'all' || identifyBrand(store) === scopeBrand)
     && (scopeStore === 'all' || isSameStore(store, scopeStore))
   );
-  const matchesShift = (shift) => !shift || shift === effectiveShift;
+  // 'Ambos' combina Almoço e Jantar em vez de filtrar por um turno só — útil
+  // porque um item pode pausar em turnos diferentes (ou no mesmo) e cada
+  // pausa é uma perda de receita separada; olhando só um turno por vez isso
+  // fica subestimado.
+  const matchesShift = (shift) => effectiveShift === 'Ambos' || !shift || shift === effectiveShift;
   const unitEntries = unitHistory.filter((entry) => (
     entry.date >= effectiveFrom
     && entry.date <= effectiveTo
@@ -183,7 +187,7 @@ export function App() {
   const cubeRows = useMemo(() => decodeCatalogCube(metadata.catalogCube, {
     from: effectiveFrom,
     to: effectiveTo,
-    shift: effectiveShift,
+    shift: effectiveShift === 'Ambos' ? null : effectiveShift,
     brand: scopeBrand,
     store: scopeStore,
   }), [metadata.catalogCube, effectiveFrom, effectiveTo, effectiveShift, scopeBrand, scopeStore]);
@@ -216,7 +220,8 @@ export function App() {
   const brandStores = [...new Set(unitHistory.map((entry) => entry.label).filter(Boolean))];
   const isLatestSingle = effectiveFrom === lastDate && effectiveTo === lastDate;
   const pageRows = networkRows;
-  const shiftHasNetworkData = (metadata.networkHistory || []).some((entry) => entry.shift === effectiveShift);
+  const shiftHasNetworkData = effectiveShift === 'Ambos'
+    || (metadata.networkHistory || []).some((entry) => entry.shift === effectiveShift);
 
   function authenticated(next) {
     setAuth(next);

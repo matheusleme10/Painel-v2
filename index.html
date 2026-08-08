@@ -5,6 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ital In House - Dashboard</title>
   <link rel="stylesheet" href="/src/styles/global.css">
+  <script>
+    try {
+      if (localStorage.getItem('ih-theme') === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    } catch (e) {}
+  </script>
 </head>
 <body>
   <div id="root"></div>
