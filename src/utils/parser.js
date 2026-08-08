@@ -3,6 +3,20 @@ import * as XLSX from 'xlsx';
 import { sanitize } from './security.js';
 import { parsePrice } from './format.js';
 
+const PRICE_KEY_DIACRITICS = new RegExp('[' + String.fromCharCode(0x0300) + '-' + String.fromCharCode(0x036f) + ']', 'g');
+
+// Chave usada para casar o nome de um item entre abas diferentes (cache de
+// pivot, "produtos pausados", abas por marca). Precisa ignorar acento —
+// "Tiramisu" e "Tiramisù" apareciam em abas diferentes com grafia diferente,
+// e uma comparação só com toLocaleLowerCase não casava as duas, fazendo o
+// preço de "produtos pausados" nunca completar esse item.
+export function priceKey(value) {
+  return String(value || '')
+    .normalize('NFD').replace(PRICE_KEY_DIACRITICS, '')
+    .toLocaleLowerCase('pt-BR')
+    .trim();
+}
+
 export function normalizeRow(raw) {
   const clean = {};
   for (const k in raw) {
@@ -51,6 +65,36 @@ export function parseCSV(text) {
 export function parseXLSX(ab) {
   const wb = XLSX.read(ab, { type: 'array', cellDates: true });
   const cell = (sheet, address) => wb.Sheets[sheet]?.[address]?.v;
+  const currentYear = new Date().getFullYear();
+  const isoDate = (value) => {
+    if (value instanceof Date && !Number.isNaN(value.getTime())) {
+      return `${value.getUTCFullYear()}-${String(value.getUTCMonth() + 1).padStart(2, '0')}-${String(value.getUTCDate()).padStart(2, '0')}`;
+    }
+    const match = String(value || '').match(/^(\d{1,2})\/(\d{1,2})/);
+    if (!match) return '';
+    return `${currentYear}-${match[2].padStart(2, '0')}-${match[1].padStart(2, '0')}`;
+  };
+  // As abas "produtos pausados"/marcas têm duas seções de colunas a partir
+  // da linha 7: "Status" (uma data por coluna, com uma contagem — não A/P)
+  // e, logo depois, "Price" com as MESMAS datas repetidas. A largura da
+  // seção Status varia conforme quantos dias o Excel acumulou, então
+  // descobrimos o deslocamento certo contando quantas datas aparecem antes
+  // de uma se repetir, em vez de assumir uma largura fixa. O código antigo
+  // assumia sempre col+13 (e, nos blocos abaixo, a coluna 16 fixa) — isso
+  // lia a ÚLTIMA coluna de Status (uma contagem de lojas) como se fosse
+  // preço, por isso itens com preço real na planilha apareciam sem preço
+  // (ou com um número errado) no app.
+  function priceSectionOffset(headerRow) {
+    const seen = new Set();
+    let count = 0;
+    for (let col = 3; col < headerRow.length; col += 1) {
+      const date = isoDate(headerRow[col]);
+      if (!date || seen.has(date)) break;
+      seen.add(date);
+      count += 1;
+    }
+    return count;
+  }
   const priceMaps = {};
   for (const sheetName of ['Fast Food - Caipira', 'City Burger', 'Green']) {
     const sheet = wb.Sheets[sheetName];
@@ -60,10 +104,11 @@ export function parseXLSX(ab) {
       defval: '',
       range: `A1:AC${XLSX.utils.decode_range(sheet['!ref']).e.r + 1}`,
     });
+    const firstPriceCol = 3 + priceSectionOffset(matrix[6] || []);
     const prices = new Map();
     for (const row of matrix.slice(7)) {
-      const item = String(row[2] || '').trim().toLocaleLowerCase('pt-BR');
-      const price = Number(row[16]);
+      const item = priceKey(row[2]);
+      const price = Number(row[firstPriceCol]);
       if (item && Number.isFinite(price) && price > 0) prices.set(item, price);
     }
     priceMaps[sheetName] = prices;
@@ -79,9 +124,10 @@ export function parseXLSX(ab) {
       raw: false,
       range: `A1:AC${XLSX.utils.decode_range(unifiedProductsSheet['!ref']).e.r + 1}`,
     });
+    const firstPriceCol = 3 + priceSectionOffset(unifiedMatrix[6] || []);
     for (const row of unifiedMatrix.slice(7)) {
-      const item = String(row[2] || '').trim().toLocaleLowerCase('pt-BR');
-      const latestPrice = parsePrice(row[16]);
+      const item = priceKey(row[2]);
+      const latestPrice = parsePrice(row[firstPriceCol]);
       if (item && Number.isFinite(latestPrice) && latestPrice > 0) {
         sharedPrices.set(item, latestPrice);
       }
@@ -92,15 +138,6 @@ export function parseXLSX(ab) {
     if (name.includes('city') || name.includes('burger')) return priceMaps['City Burger'] || sharedPrices;
     if (name.includes('green')) return priceMaps.Green || sharedPrices;
     return priceMaps['Fast Food - Caipira'] || sharedPrices;
-  };
-  const currentYear = new Date().getFullYear();
-  const isoDate = (value) => {
-    if (value instanceof Date && !Number.isNaN(value.getTime())) {
-      return `${value.getUTCFullYear()}-${String(value.getUTCMonth() + 1).padStart(2, '0')}-${String(value.getUTCDate()).padStart(2, '0')}`;
-    }
-    const match = String(value || '').match(/^(\d{1,2})\/(\d{1,2})/);
-    if (!match) return '';
-    return `${currentYear}-${match[2].padStart(2, '0')}-${match[1].padStart(2, '0')}`;
   };
   const currentShift = String(cell('din', 'B8') || 'Não informado').trim();
   const productHistory = [];
@@ -120,10 +157,11 @@ export function parseXLSX(ab) {
       range: `A1:AC${XLSX.utils.decode_range(sheet['!ref']).e.r + 1}`,
     });
     const headers = matrix[6] || [];
+    const offset = priceSectionOffset(headers);
     const dateColumns = [];
-    for (let col = 3; col < Math.min(headers.length, 16); col += 1) {
+    for (let col = 3; col < 3 + offset; col += 1) {
       const date = isoDate(headers[col]);
-      if (date) dateColumns.push({ col, date, priceCol: col + 13 });
+      if (date) dateColumns.push({ col, date, priceCol: col + offset });
     }
     let category = 'Sem categoria';
     for (const row of matrix.slice(7)) {
@@ -321,7 +359,7 @@ export function parseXLSX(ab) {
     best = matrix.slice(1)
       .filter((row) => row[2] && row[4])
       .map((row) => {
-        const itemKey = String(row[4]).trim().toLocaleLowerCase('pt-BR');
+        const itemKey = priceKey(row[4]);
         const price = sharedPrices.get(itemKey) ?? priceMapForStore(row[2]).get(itemKey);
         return normalizeRow({
           lojasSimpleName: row[2],
@@ -388,8 +426,8 @@ export function parseXLSX(ab) {
         const statusCode = rawStatus === 0 ? 'A' : rawStatus === 1 ? 'P' : String(rawStatus || '').trim().toUpperCase();
         if (statusCode !== 'A' && statusCode !== 'P') continue;
         const store = resolveStore(stores[col]);
-        const price = sharedPrices.get(item.toLocaleLowerCase('pt-BR'))
-          ?? priceMapForStore(store).get(item.toLocaleLowerCase('pt-BR'));
+        const price = sharedPrices.get(priceKey(item))
+          ?? priceMapForStore(store).get(priceKey(item));
         const parsed = normalizeRow({
           lojasSimpleName: store,
           categoriesName: category || 'Sem categoria',

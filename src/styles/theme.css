@@ -506,6 +506,9 @@
 [data-theme="dark"] .pause-frequency-list>div{background:var(--ih-surface-2);border-color:var(--ih-border)}
 [data-theme="dark"] .pause-frequency-list small,[data-theme="dark"] .pause-frequency-list p{color:var(--ih-muted)}
 [data-theme="dark"] .portal-sidebar .brand-lockup{color:var(--ih-text)}
+[data-theme="dark"] .portal-sidebar .brand-context strong,[data-theme="dark"] .portal-header .brand-context strong{color:var(--ih-text)}
+[data-theme="dark"] .portal-sidebar .brand-context small,[data-theme="dark"] .portal-header .brand-context small{color:var(--ih-muted)}
+[data-theme="dark"] .portal-sidebar .brand-context:before,[data-theme="dark"] .portal-header .brand-context:before{background:var(--ih-border)}
 
 /* Rodada 4: modo escuro também antes do login — senha, identificação do
    franqueado e seleção de marca. A identidade vermelha da marca é mantida

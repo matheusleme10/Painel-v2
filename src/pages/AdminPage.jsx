@@ -5,7 +5,7 @@ import { Card } from '../components/ui/Card.jsx';
 import { Kpi } from '../components/ui/Kpi.jsx';
 import { Ic } from '../components/ui/Icon.jsx';
 import { sha256 } from '../utils/security.js';
-import { parseCSV, parseXLSX } from '../utils/parser.js';
+import { parseCSV, parseXLSX, priceKey } from '../utils/parser.js';
 import { parsePivotCatalog } from '../utils/pivot-cache.js';
 import { mergeRows } from '../utils/merge.js';
 import { getLastDate } from '../utils/date.js';
@@ -273,7 +273,7 @@ export function AdminPage({ all, onUpdate, correctHash, onClear, initialAuth = f
                 const [storeIndex, itemIndex, categoryIndex, dateIndex, shiftIndex, paused, price] = record;
                 if (price > 0) return record;
                 const itemName = pivot.catalogCube.items[itemIndex];
-                const fallback = priceLookup[String(itemName || '').trim().toLocaleLowerCase('pt-BR')];
+                const fallback = priceLookup[priceKey(itemName)];
                 if (!(fallback > 0)) return record;
                 return [storeIndex, itemIndex, categoryIndex, dateIndex, shiftIndex, paused, fallback];
               });
