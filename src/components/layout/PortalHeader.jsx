@@ -1,25 +1,11 @@
-import { useEffect, useState } from 'react';
 import { ADMIN_TABS, C, FRANCHISE_TABS } from '../../constants.js';
 import { Ic } from '../ui/Icon.jsx';
+import { ThemeToggle } from '../ui/ThemeToggle.jsx';
 import { formatDateBR } from '../../utils/format.js';
 import { IHMonogram } from '../ui/IHMonogram.jsx';
 
-const THEME_KEY = 'ih-theme';
-
-function useTheme() {
-  const [dark, setDark] = useState(() => {
-    try { return localStorage.getItem(THEME_KEY) === 'dark'; } catch { return false; }
-  });
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
-    try { localStorage.setItem(THEME_KEY, dark ? 'dark' : 'light'); } catch { /* ignora */ }
-  }, [dark]);
-  return [dark, setDark];
-}
-
 export function PortalHeader({ tab, onTabChange, all, lastDate, shift, syncing, context, role, onChangeContext, onLogout }) {
   const tabs = role === 'admin' ? ADMIN_TABS : FRANCHISE_TABS;
-  const [dark, setDark] = useTheme();
   return (
     <aside className="portal-sidebar">
       <button className="brand-lockup" onClick={() => onTabChange(role === 'admin' ? 'network' : 'dash')} aria-label="Ir ao dashboard">
@@ -48,9 +34,7 @@ export function PortalHeader({ tab, onTabChange, all, lastDate, shift, syncing, 
           </span>
         </div>
         <div className="header-actions">
-          <button className="theme-toggle-btn" onClick={() => setDark((current) => !current)} title={dark ? 'Modo claro' : 'Modo escuro'} aria-label={dark ? 'Ativar modo claro' : 'Ativar modo escuro'}>
-            <Ic n={dark ? 'sun' : 'moon'} s={14} c={C.muted} />
-          </button>
+          <ThemeToggle />
           {onChangeContext && context?.store && <button onClick={onChangeContext} title="Trocar marca ou unidade">Trocar unidade</button>}
           <button onClick={onLogout}>Sair</button>
         </div>

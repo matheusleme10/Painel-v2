@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { BRANDS, identifyBrand } from '../utils/brands.js';
 import { storeKey } from '../utils/stores.js';
+import { ThemeToggle } from './ui/ThemeToggle.jsx';
 
 export function BrandSelector({ rows, onSelect }) {
   const [brandId, setBrandId] = useState('');
@@ -24,6 +25,7 @@ export function BrandSelector({ rows, onSelect }) {
 
   return (
     <main className="selector-shell">
+      <ThemeToggle className="theme-toggle-btn theme-toggle-fixed" />
       <header className="selector-heading">
         <span className="eyebrow">ESCOLHA SEU PAINEL</span>
         <h1>Qual operação vamos acompanhar hoje?</h1>

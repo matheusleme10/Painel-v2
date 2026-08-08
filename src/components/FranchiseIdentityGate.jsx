@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { ThemeToggle } from './ui/ThemeToggle.jsx';
 
 export function FranchiseIdentityGate({ onIdentified, onCancel }) {
   const [name, setName] = useState('');
@@ -31,6 +32,7 @@ export function FranchiseIdentityGate({ onIdentified, onCancel }) {
 
   return (
     <main className="identity-shell">
+      <ThemeToggle className="theme-toggle-btn theme-toggle-fixed" />
       <section className="identity-card">
         <div className="identity-mark">IH</div>
         <span className="eyebrow">IDENTIFICAÇÃO DE ACESSO</span>

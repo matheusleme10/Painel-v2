@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { IHMonogram } from './ui/IHMonogram.jsx';
+import { ThemeToggle } from './ui/ThemeToggle.jsx';
 
 export function PortalLogin({ onAuthenticated }) {
   const [password, setPassword] = useState('');
@@ -30,6 +31,7 @@ export function PortalLogin({ onAuthenticated }) {
 
   return (
     <main className="login-shell">
+      <ThemeToggle className="theme-toggle-btn theme-toggle-fixed" />
       <section className="login-panel">
         <div className="login-intro">
           <IHMonogram className="login-main-logo" />
