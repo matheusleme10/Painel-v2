@@ -265,64 +265,66 @@ export function App() {
   const displayShift = effectiveShift;
 
   return (
-    <div className="app-shell" style={activeBrand ? { '--portal-accent': activeBrand.color, '--portal-accent-soft': activeBrand.soft } : undefined}>
+    <div className="app-shell has-sidebar" style={activeBrand ? { '--portal-accent': activeBrand.color, '--portal-accent-soft': activeBrand.soft } : undefined}>
       <PortalHeader tab={tab} onTabChange={setTab} all={pageRows} lastDate={lastDate}
         shift={displayShift} syncing={syncing} context={context} role={auth.role}
         onChangeContext={isAdmin ? null : () => { setContext(null); setTab('dash'); }} onLogout={logout} />
 
-      {all.length > 0 && !['notify', 'update', 'access'].includes(tab) && (
-        <AnalysisFilters
-          dates={sortedDates}
-          value={{ from: effectiveFrom, to: effectiveTo, shift: effectiveShift }}
-          onChange={(next) => setFilters((current) => ({ ...current, ...next }))}
-          dataShift={metadata.dataShift}
-        />
-      )}
-      {all.length > 0 && isAdmin && !['notify', 'update', 'access'].includes(tab) && (
-        <BrandScopeBar
-          value={scopeBrand}
-          stores={brandStores}
-          onChange={(brandId) => setFilters((current) => ({ ...current, brandId }))}
-        />
-      )}
-      {all.length > 0 && !['notify', 'update', 'access'].includes(tab) && !shiftHasNetworkData && (
-        <div className="shift-data-notice">
-          A carga geral deste XLSX foi exportada para {metadata.dataShift || 'outro turno'}.
-          Para {effectiveShift}, este arquivo possui consolidado específico somente de Cannoli, Crostini e Palha na Forneria.
-        </div>
-      )}
+      <div className="app-content">
+        {all.length > 0 && !['notify', 'update', 'access'].includes(tab) && (
+          <AnalysisFilters
+            dates={sortedDates}
+            value={{ from: effectiveFrom, to: effectiveTo, shift: effectiveShift }}
+            onChange={(next) => setFilters((current) => ({ ...current, ...next }))}
+            dataShift={metadata.dataShift}
+          />
+        )}
+        {all.length > 0 && isAdmin && !['notify', 'update', 'access'].includes(tab) && (
+          <BrandScopeBar
+            value={scopeBrand}
+            stores={brandStores}
+            onChange={(brandId) => setFilters((current) => ({ ...current, brandId }))}
+          />
+        )}
+        {all.length > 0 && !['notify', 'update', 'access'].includes(tab) && !shiftHasNetworkData && (
+          <div className="shift-data-notice">
+            A carga geral deste XLSX foi exportada para {metadata.dataShift || 'outro turno'}.
+            Para {effectiveShift}, este arquivo possui consolidado específico somente de Cannoli, Crostini e Palha na Forneria.
+          </div>
+        )}
 
-      <main className="app-main">
-        {tab === 'network' && isAdmin && <NetworkPage all={networkRows} financialRows={exactSnapshotDates.length ? detailRows : productRows} summary={networkSnapshot} />}
-        {tab === 'dash' && !isAdmin && (
-          <DashPage all={detailRows} today={pageRows} systemicRows={detailRows}
-            lastDate={selectedDate} periodFrom={effectiveFrom} periodTo={effectiveTo}
-            historical={!isLatestSingle || Boolean(detailReferenceDate)} />
-        )}
-        {tab === 'franch' && isAdmin && <FranchPage today={pageRows} detailRows={detailRows} historical={!isLatestSingle} />}
-        {tab === 'items' && (isAdmin ? <ItemsOverviewPage rows={exactSnapshotDates.length ? detailRows : productRows} /> : <FranchiseCatalogPage rows={detailRows} />)}
-        {tab === 'cats' && <CatPage today={isAdmin && productRows.length ? productRows : detailRows} showFinancials={isAdmin} />}
-        {tab === 'rank' && <RankPage today={isAdmin ? networkRows : rankingRows} periodFrom={effectiveFrom} periodTo={effectiveTo}
-          showFinancials={isAdmin} selectedStore={isAdmin ? '' : context?.store} />}
-        {tab === 'forneria' && <ForneriaPage rows={exactSnapshotDates.length ? detailRows : productRows}
-          summaryRows={!metadata.catalogCube?.records?.length && effectiveShift === 'Almoço' ? forneriaSummaries : []}
-          showFinancials={isAdmin} />}
-        {tab === 'revenue' && (isAdmin
-          ? <PotentialPageV2 rows={detailRows} isAdmin />
-          : <PotentialAccessGate><PotentialPageV2 rows={detailRows} /></PotentialAccessGate>)}
-        {tab === 'alerts' && isAdmin && <AlertsPage today={exactSnapshotDates.length ? detailRows : productRows} />}
-        {tab === 'notify' && isAdmin && <AutomatedNotificationPage />}
-        {tab === 'access' && isAdmin && <ManagementPage />}
-        {tab === 'feedback' && !isAdmin && <FranchiseFeedbackPage />}
-        {tab === 'update' && isAdmin && (
-          <AdminPage all={all} initialAuth
-            onUpdate={(rows) => {
-              setAll(rows);
-              setFilters({ from: null, to: null, shift: null, brandId: 'all' });
-            }}
-            onClear={() => setAll([])} />
-        )}
-      </main>
+        <main className="app-main">
+          {tab === 'network' && isAdmin && <NetworkPage all={networkRows} financialRows={exactSnapshotDates.length ? detailRows : productRows} summary={networkSnapshot} />}
+          {tab === 'dash' && !isAdmin && (
+            <DashPage all={detailRows} today={pageRows} systemicRows={detailRows}
+              lastDate={selectedDate} periodFrom={effectiveFrom} periodTo={effectiveTo}
+              historical={!isLatestSingle || Boolean(detailReferenceDate)} />
+          )}
+          {tab === 'franch' && isAdmin && <FranchPage today={pageRows} detailRows={detailRows} historical={!isLatestSingle} />}
+          {tab === 'items' && (isAdmin ? <ItemsOverviewPage rows={exactSnapshotDates.length ? detailRows : productRows} /> : <FranchiseCatalogPage rows={detailRows} />)}
+          {tab === 'cats' && <CatPage today={isAdmin && productRows.length ? productRows : detailRows} showFinancials={isAdmin} />}
+          {tab === 'rank' && <RankPage today={isAdmin ? networkRows : rankingRows} periodFrom={effectiveFrom} periodTo={effectiveTo}
+            showFinancials={isAdmin} selectedStore={isAdmin ? '' : context?.store} />}
+          {tab === 'forneria' && <ForneriaPage rows={exactSnapshotDates.length ? detailRows : productRows}
+            summaryRows={!metadata.catalogCube?.records?.length && effectiveShift === 'Almoço' ? forneriaSummaries : []}
+            showFinancials={isAdmin} />}
+          {tab === 'revenue' && (isAdmin
+            ? <PotentialPageV2 rows={detailRows} isAdmin />
+            : <PotentialAccessGate><PotentialPageV2 rows={detailRows} /></PotentialAccessGate>)}
+          {tab === 'alerts' && isAdmin && <AlertsPage today={exactSnapshotDates.length ? detailRows : productRows} />}
+          {tab === 'notify' && isAdmin && <AutomatedNotificationPage />}
+          {tab === 'access' && isAdmin && <ManagementPage />}
+          {tab === 'feedback' && !isAdmin && <FranchiseFeedbackPage />}
+          {tab === 'update' && isAdmin && (
+            <AdminPage all={all} initialAuth
+              onUpdate={(rows) => {
+                setAll(rows);
+                setFilters({ from: null, to: null, shift: null, brandId: 'all' });
+              }}
+              onClear={() => setAll([])} />
+          )}
+        </main>
+      </div>
     </div>
   );
 }

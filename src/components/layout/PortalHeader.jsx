@@ -6,22 +6,25 @@ import { IHMonogram } from '../ui/IHMonogram.jsx';
 export function PortalHeader({ tab, onTabChange, all, lastDate, shift, syncing, context, role, onChangeContext, onLogout }) {
   const tabs = role === 'admin' ? ADMIN_TABS : FRANCHISE_TABS;
   return (
-    <header className="portal-header">
-      <div className="portal-header-inner">
-        <button className="brand-lockup" onClick={() => onTabChange(role === 'admin' ? 'network' : 'dash')} aria-label="Ir ao dashboard">
-          <span className="brand-mark"><IHMonogram /></span>
-          <span className="brand-context"><strong>Operação</strong><small>{role === 'admin' ? 'Inteligência da Rede' : 'Portal do Franqueado'}</small></span>
-        </button>
-        <nav className="portal-nav" aria-label="Navegação principal">
-          {tabs.map(({ id, label, icon }) => {
-            const active = tab === id;
-            return (
-              <button key={id} className={active ? 'nav-item active' : 'nav-item'} onClick={() => onTabChange(id)}>
-                <Ic n={icon} s={14} c={active ? C.red : C.muted} /><span>{label}</span>
-              </button>
-            );
-          })}
-        </nav>
+    <aside className="portal-sidebar">
+      <button className="brand-lockup" onClick={() => onTabChange(role === 'admin' ? 'network' : 'dash')} aria-label="Ir ao dashboard">
+        <span className="brand-mark"><IHMonogram /></span>
+        <span className="brand-context"><strong>Operação</strong><small>{role === 'admin' ? 'Inteligência da Rede' : 'Portal do Franqueado'}</small></span>
+      </button>
+
+      <nav className="sidebar-nav" aria-label="Navegação principal">
+        {tabs.map(({ id, label, icon }) => {
+          const active = tab === id;
+          return (
+            <button key={id} className={active ? 'sidebar-nav-item active' : 'sidebar-nav-item'} onClick={() => onTabChange(id)} title={label}>
+              <Ic n={icon} s={16} c={active ? C.red : C.muted} />
+              <span>{label}</span>
+            </button>
+          );
+        })}
+      </nav>
+
+      <div className="sidebar-footer">
         <div className="data-status">
           <span className={`status-orb ${syncing ? 'syncing' : all.length ? 'ready' : ''}`} />
           <span>
@@ -34,6 +37,6 @@ export function PortalHeader({ tab, onTabChange, all, lastDate, shift, syncing, 
           <button onClick={onLogout}>Sair</button>
         </div>
       </div>
-    </header>
+    </aside>
   );
 }

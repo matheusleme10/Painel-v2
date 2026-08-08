@@ -116,27 +116,53 @@ function dictionaryIndex(value, values, indexes) {
 
 const REQUIRED_PIVOT_FIELDS = ['lojasName', 'categoriesName', 'data', 'rowsName', 'priceValue', 'status', 'Horario'];
 
+// Lê só o começo do XML de registros (que já vem com count="N" no elemento
+// raiz) para saber quantos registros o cache tem, sem descomprimir o
+// arquivo inteiro (que pode passar de 200 MB).
+async function peekRecordCount(entry) {
+  const reader = decompressedStream(entry).pipeThrough(new TextDecoderStream()).getReader();
+  let text = '';
+  try {
+    while (text.length < 4000) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      text += value || '';
+    }
+  } finally {
+    reader.cancel().catch(() => {});
+  }
+  const match = text.match(/<pivotCacheRecords[^>]*\bcount="(\d+)"/);
+  return match ? Number(match[1]) : 0;
+}
+
 // Encontra, entre todos os caches de tabela dinâmica do arquivo, o par
 // definition/records que contém os campos necessários. O número
 // ("...Definition7.xml") não é fixo: muda conforme quantas tabelas
 // dinâmicas o Excel cria, então testamos todos em vez de assumir um índice.
+// Além disso, um mesmo workbook pode ter VÁRIOS caches compatíveis (mesmas
+// colunas) só que desatualizados uns em relação aos outros — por exemplo,
+// um deles pode não ter sido atualizado com o turno de Jantar mais recente.
+// Por isso não paramos no primeiro compatível: comparamos a contagem de
+// registros de cada um (informada no próprio cabeçalho do XML, então é
+// barato checar) e usamos o mais completo.
 async function findUsablePivotCache(entries) {
   const candidates = entries.names
     .map((name) => name.match(/^xl\/pivotCache\/pivotCacheDefinition(\d+)\.xml$/)?.[1])
     .filter(Boolean)
     .sort((a, b) => Number(a) - Number(b));
 
+  let best = null;
   for (const index of candidates) {
     const definitionEntry = entries.read(`xl/pivotCache/pivotCacheDefinition${index}.xml`);
     const recordsEntry = entries.read(`xl/pivotCache/pivotCacheRecords${index}.xml`);
     if (!definitionEntry || !recordsEntry) continue;
     const fields = parseDefinition(await readEntryText(definitionEntry));
     const fieldIndex = new Map(fields.map((field, fieldPos) => [field.name, fieldPos]));
-    if (REQUIRED_PIVOT_FIELDS.every((field) => fieldIndex.has(field))) {
-      return { fields, fieldIndex, recordsEntry };
-    }
+    if (!REQUIRED_PIVOT_FIELDS.every((field) => fieldIndex.has(field))) continue;
+    const count = await peekRecordCount(recordsEntry);
+    if (!best || count > best.count) best = { fields, fieldIndex, recordsEntry, count };
   }
-  return null;
+  return best;
 }
 
 export async function parsePivotCatalog(arrayBuffer, allowedDates = []) {
