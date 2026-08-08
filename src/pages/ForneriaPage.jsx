@@ -4,6 +4,11 @@ import { C } from '../constants.js';
 import { brl } from '../utils/format.js';
 import { FORNERIA_FAMILIES as FAMILIES, forneriaFamilyOf as familyOf } from '../utils/forneria.js';
 
+const DIACRITICS = new RegExp('[' + String.fromCharCode(0x0300) + '-' + String.fromCharCode(0x036f) + ']', 'g');
+const normalize = (value) => String(value || '')
+  .normalize('NFD').replace(DIACRITICS, '')
+  .toLocaleLowerCase('pt-BR');
+
 export function ForneriaPage({ rows, summaryRows = [], showFinancials }) {
   const [selectedFamilies, setSelectedFamilies] = useState(() => FAMILIES.map((entry) => entry.id));
   const [query, setQuery] = useState('');

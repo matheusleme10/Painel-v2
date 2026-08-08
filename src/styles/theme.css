@@ -325,6 +325,7 @@
 .price-editor{display:flex;align-items:center;gap:5px;margin-top:4px}.price-editor input{width:74px;padding:5px 7px;border:1px solid #d8dee9;border-radius:7px;font:inherit;font-size:10px}.price-editor button{padding:5px 9px;border:0;border-radius:7px;color:#fff;background:#e11d48;font-size:9px;font-weight:800;cursor:pointer}.price-editor button:disabled{opacity:.6;cursor:not-allowed}.price-editor-error{display:block;width:100%;margin-top:3px;color:#be123c;font-size:8px}
 .draft-price-field{display:inline-flex;margin-top:4px}.draft-price-field input{width:78px;padding:5px 7px;border:1px solid #d8dee9;border-radius:7px;font:inherit;font-size:10px;background:#fff;color:#1c2433}.draft-price-field.compact input{width:68px}.draft-price-field input:focus{outline:2px solid rgba(225,29,72,.25);border-color:#e11d48}
 .draft-price-toolbar{display:flex;flex-wrap:wrap;gap:14px;margin:8px 0 4px}.draft-price-toggle{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#475467;cursor:pointer}.draft-price-toggle input{cursor:pointer}
+.status-zero-toggle{margin:2px 0 10px}
 .draft-price-note{margin:2px 0 10px;padding:8px 11px;border-radius:9px;background:#f8fafc;border:1px dashed #d8dee9;color:#667085;font-size:10.5px;font-weight:600;line-height:1.5}
 .paused-item-manual>b{color:#0f9d68}.paused-item-manual>small{color:#0f9d68}
 .status-price-editor{display:flex;flex-direction:column;align-items:flex-end;gap:2px}

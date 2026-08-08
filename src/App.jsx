@@ -316,13 +316,12 @@ export function App() {
           {tab === 'dash' && !isAdmin && (
             <DashPage all={draftedDetailRows} today={pageRows} systemicRows={draftedDetailRows}
               lastDate={selectedDate} periodFrom={effectiveFrom} periodTo={effectiveTo}
-              historical={!isLatestSingle || Boolean(detailReferenceDate)}
-              priceDraftsApi={{ isAdmin: false, networkWide: false, onChange: setPriceDraft }} />
+              historical={!isLatestSingle || Boolean(detailReferenceDate)} />
           )}
           {tab === 'franch' && isAdmin && <FranchPage today={pageRows} detailRows={draftedDetailRows} historical={!isLatestSingle} />}
           {tab === 'items' && (isAdmin
             ? <ItemsOverviewPage rows={exactSnapshotDates.length ? draftedDetailRows : draftedProductRows} onSetDraft={setPriceDraft} />
-            : <FranchiseCatalogPage rows={draftedDetailRows} priceDraftsApi={{ isAdmin: false, networkWide: false, onChange: setPriceDraft }} />)}
+            : <FranchiseCatalogPage rows={draftedDetailRows} onSetDraft={setPriceDraft} />)}
           {tab === 'cats' && <CatPage today={isAdmin && productRows.length ? draftedProductRows : draftedDetailRows} showFinancials={isAdmin} />}
           {tab === 'rank' && <RankPage today={isAdmin ? networkRows : rankingRows} periodFrom={effectiveFrom} periodTo={effectiveTo}
             showFinancials={isAdmin} selectedStore={isAdmin ? '' : context?.store} />}

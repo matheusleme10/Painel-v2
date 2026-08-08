@@ -8,7 +8,7 @@ import { parseDate } from '../utils/date.js';
 import { StatusItemsPanel } from '../components/ui/StatusItemsPanel.jsx';
 import { displayStoreName } from '../utils/stores.js';
 
-export function DashPage({ all, today, systemicRows = today, lastDate, periodFrom, periodTo, historical = false, showPausedRevenue = false, priceDraftsApi }) {
+export function DashPage({ all, today, systemicRows = today, lastDate, periodFrom, periodTo, historical = false, showPausedRevenue = false }) {
   const unitSummary = today.find((r) => r.unitTotal > 0);
   const total = unitSummary?.unitTotal || today.length;
   const pausados = unitSummary?.unitPaused ?? today.filter((r) => r.status === 'Pausado').length;
@@ -17,6 +17,8 @@ export function DashPage({ all, today, systemicRows = today, lastDate, periodFro
   const lojas = [...new Set(today.map((r) => r.loja))];
   const activePrices = all.filter((row) => row.status === 'Ativo' && Number(row.precoNum) > 0).map((row) => Number(row.precoNum));
   const averageActivePrice = activePrices.length ? activePrices.reduce((sum, price) => sum + price, 0) / activePrices.length : 0;
+  const pausedPrices = all.filter((row) => row.status === 'Pausado' && Number(row.precoNum) > 0).map((row) => Number(row.precoNum));
+  const averagePausedPrice = pausedPrices.length ? pausedPrices.reduce((sum, price) => sum + price, 0) / pausedPrices.length : 0;
   const risco = today
     .filter((r) => r.status === 'Pausado' && r.precoNum > 0)
     .reduce((s, r) => s + r.precoNum, 0);
@@ -128,9 +130,18 @@ export function DashPage({ all, today, systemicRows = today, lastDate, periodFro
           sub={`${activePrices.length} itens ativos com preço`}
           small
         />
+        <Kpi
+          label="Preço Médio dos Pausados"
+          value={brl(averagePausedPrice)}
+          icon="money"
+          accent={C.orange}
+          accentBg={C.orangeL}
+          sub={`${pausedPrices.length} itens pausados com preço`}
+          small
+        />
       </div>
 
-    <StatusItemsPanel rows={menuRows} title="Ativos e pausados da sua unidade" priceDraftsApi={priceDraftsApi} />
+    <StatusItemsPanel rows={menuRows} title="Ativos e pausados da sua unidade" />
 
     <Card>
       <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 12 }}>

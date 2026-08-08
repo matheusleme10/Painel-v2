@@ -45,7 +45,7 @@ export function ItemsOverviewPage({ rows, onSetDraft }) {
         active: 0,
         paused: 0,
         risk: 0,
-        pausedPriced: 0,
+        pricedCount: 0,
         manual: false,
         stores: new Set(),
         pausedStores: new Set(),
@@ -57,20 +57,22 @@ export function ItemsOverviewPage({ rows, onSetDraft }) {
       if (row.status === 'Pausado') {
         item.paused += 1;
         item.pausedStores.add(row.loja);
-        if (Number(row.precoNum) > 0) {
-          item.risk += Number(row.precoNum);
-          item.pausedPriced += 1;
-          if (row.precoManual) item.manual = true;
-        }
+      }
+      if (Number(row.precoNum) > 0) {
+        item.pricedCount += 1;
+        if (row.status === 'Pausado') item.risk += Number(row.precoNum);
+        if (row.precoManual) item.manual = true;
       }
       map.set(key, item);
     });
     return [...map.values()].sort((a, b) => b.paused - a.paused || a.name.localeCompare(b.name, 'pt-BR'));
   }, [scopedRows]);
 
-  const unpricedPaused = useMemo(() => items
-    .filter((item) => item.paused > 0 && (item.pausedPriced === 0 || item.manual))
-    .sort((a, b) => b.paused - a.paused), [items]);
+  // Qualquer item sem preço em nenhuma ocorrência — ativo ou pausado, tanto
+  // faz — entra aqui pra poder receber um valor local (não salvo).
+  const unpricedItems = useMemo(() => items
+    .filter((item) => item.pricedCount === 0 || item.manual)
+    .sort((a, b) => (b.active + b.paused) - (a.active + a.paused)), [items]);
 
   const visible = useMemo(() => {
     const term = normalize(query);
@@ -175,10 +177,10 @@ export function ItemsOverviewPage({ rows, onSetDraft }) {
           </div>
         )}
       </Card>
-      {onSetDraft && unpricedPaused.length > 0 && (
+      {onSetDraft && unpricedItems.length > 0 && (
         <Card className="unpriced-items-card">
           <div className="paused-card-heading">
-            <div><span className="eyebrow">SEM PREÇO CADASTRADO</span><h2>Itens pausados sem preço</h2></div>
+            <div><span className="eyebrow">SEM PREÇO CADASTRADO</span><h2>Itens sem preço (ativos ou pausados)</h2></div>
           </div>
           <div className="draft-price-toolbar">
             <label className="draft-price-toggle">
@@ -187,14 +189,14 @@ export function ItemsOverviewPage({ rows, onSetDraft }) {
             </label>
           </div>
           <p className="draft-price-note">
-            Valor digitado aqui é local (não é salvo) e atualiza os cards e KPIs desta e de outras páginas enquanto a sessão estiver aberta. Desmarcado, o valor vale só para as unidades onde este item pausou.
+            Valor digitado aqui é local (não é salvo) e atualiza os cards e KPIs desta e de outras páginas enquanto a sessão estiver aberta. Desmarcado, o valor vale só para as unidades onde este item aparece.
           </p>
           <div className="unpriced-items-list">
-            {unpricedPaused.slice(0, 12).map((item) => (
+            {unpricedItems.slice(0, 20).map((item) => (
               <article key={item.name} className="unpriced-item-row">
-                <span><strong>{item.name}</strong><small>{item.category || 'Sem categoria'} · {item.pausedStores.size} unidade(s)</small></span>
-                <span><b>{item.paused}×</b><small>pausado</small></span>
-                <DraftPriceField itemName={item.name} stores={item.pausedStores} isAdmin networkWide={applyNetworkWide} onChange={onSetDraft} compact />
+                <span><strong>{item.name}</strong><small>{item.category || 'Sem categoria'} · {item.stores.size} unidade(s)</small></span>
+                <span><b>{item.active}× ativo</b><small>{item.paused}× pausado</small></span>
+                <DraftPriceField itemName={item.name} stores={item.stores} isAdmin networkWide={applyNetworkWide} onChange={onSetDraft} compact />
               </article>
             ))}
           </div>
