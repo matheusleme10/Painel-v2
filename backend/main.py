@@ -536,9 +536,15 @@ def filter_payload_for_store(payload: dict, selected_store: str) -> dict:
     meta = dict(metadata)
     meta["networkHistory"] = []
     meta["networkSummary"] = None
+    # O ranking do franqueado compara disponibilidade entre unidades. Mantemos
+    # os totais operacionais da rede, mas retiramos qualquer valor financeiro
+    # das lojas que não são a unidade selecionada.
     meta["unitHistory"] = [
-        entry for entry in metadata.get("unitHistory", [])
-        if _store_key(entry.get("label")) == target
+        {
+            **entry,
+            "pausedRevenue": (entry.get("pausedRevenue", 0) if _store_key(entry.get("label")) == target else 0),
+        }
+        for entry in metadata.get("unitHistory", [])
     ]
     meta["unitStats"] = [
         entry for entry in metadata.get("unitStats", [])

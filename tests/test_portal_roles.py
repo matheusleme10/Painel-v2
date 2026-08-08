@@ -87,7 +87,10 @@ def test_store_scoped_payload_keeps_paused_prices_and_removes_other_units():
     assert scoped["rows"][0]["precoNum"] == 25
     assert scoped["rows"][0]["networkHistory"] == []
     assert scoped["rows"][0]["networkSummary"] is None
-    assert scoped["rows"][0]["unitHistory"] == [{"label": "Loja A", "date": "2026-08-08"}]
+    assert scoped["rows"][0]["unitHistory"] == [
+        {"label": "Loja A", "date": "2026-08-08", "pausedRevenue": 0},
+        {"label": "Loja B", "date": "2026-08-08", "pausedRevenue": 0},
+    ]
     assert scoped["rows"][0]["catalogRows"] == [
         {"loja": "Loja A", "status": "Pausado", "precoNum": 25}
     ]
