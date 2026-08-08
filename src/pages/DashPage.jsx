@@ -8,7 +8,7 @@ import { parseDate } from '../utils/date.js';
 import { StatusItemsPanel } from '../components/ui/StatusItemsPanel.jsx';
 import { displayStoreName } from '../utils/stores.js';
 
-export function DashPage({ all, today, systemicRows = today, lastDate, periodFrom, periodTo, historical = false, showPausedRevenue = false }) {
+export function DashPage({ all, today, systemicRows = today, lastDate, periodFrom, periodTo, historical = false, showPausedRevenue = false, priceDraftsApi }) {
   const unitSummary = today.find((r) => r.unitTotal > 0);
   const total = unitSummary?.unitTotal || today.length;
   const pausados = unitSummary?.unitPaused ?? today.filter((r) => r.status === 'Pausado').length;
@@ -130,7 +130,7 @@ export function DashPage({ all, today, systemicRows = today, lastDate, periodFro
         />
       </div>
 
-    <StatusItemsPanel rows={menuRows} title="Ativos e pausados da sua unidade" />
+    <StatusItemsPanel rows={menuRows} title="Ativos e pausados da sua unidade" priceDraftsApi={priceDraftsApi} />
 
     <Card>
       <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 12 }}>

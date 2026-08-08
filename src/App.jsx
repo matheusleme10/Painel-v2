@@ -26,6 +26,7 @@ import { FranchiseAlertsPage } from './pages/FranchiseAlertsPage.jsx';
 import { brandById, identifyBrand } from './utils/brands.js';
 import { decodeCatalogCube } from './utils/pivot-cache.js';
 import { isSameStore, resolveStoreSelection } from './utils/stores.js';
+import { applyPriceDrafts, emptyDrafts, withPriceDraft } from './utils/price-drafts.js';
 
 function summarizeUnits(entries, effectiveTo, effectiveShift) {
   const range = new Map();
@@ -67,6 +68,11 @@ export function App() {
   const [tab, setTab] = useState('network');
   const [all, setAll] = useState([]);
   const [syncing, setSyncing] = useState(false);
+  // Ajustes de preço locais (não salvos) para itens sem preço cadastrado —
+  // ver src/utils/price-drafts.js. Fica no App porque precisa refletir em
+  // todas as páginas que usam detailRows/productRows, não só na de Potencial.
+  const [priceDrafts, setPriceDrafts] = useState(emptyDrafts());
+  const setPriceDraft = (info) => setPriceDrafts((current) => withPriceDraft(current, info));
   const [filters, setFilters] = useState({
     from: null,
     to: null,
@@ -221,6 +227,12 @@ export function App() {
   const brandStores = [...new Set(unitHistory.map((entry) => entry.label).filter(Boolean))];
   const isLatestSingle = effectiveFrom === lastDate && effectiveTo === lastDate;
   const pageRows = networkRows;
+  // Aplica os ajustes locais de preço por cima das linhas reais de item —
+  // um único ponto central, então qualquer página que use draftedDetailRows
+  // ou draftedProductRows já reflete o valor digitado, sem precisar mexer
+  // em cada página separadamente.
+  const draftedDetailRows = useMemo(() => applyPriceDrafts(detailRows, priceDrafts), [detailRows, priceDrafts]);
+  const draftedProductRows = useMemo(() => applyPriceDrafts(productRows, priceDrafts), [productRows, priceDrafts]);
   const shiftHasNetworkData = effectiveShift === 'Ambos'
     || (metadata.networkHistory || []).some((entry) => entry.shift === effectiveShift);
 
@@ -300,25 +312,28 @@ export function App() {
         )}
 
         <main className="app-main">
-          {tab === 'network' && isAdmin && <NetworkPage all={networkRows} financialRows={exactSnapshotDates.length ? detailRows : productRows} summary={networkSnapshot} />}
+          {tab === 'network' && isAdmin && <NetworkPage all={networkRows} financialRows={exactSnapshotDates.length ? draftedDetailRows : draftedProductRows} summary={networkSnapshot} />}
           {tab === 'dash' && !isAdmin && (
-            <DashPage all={detailRows} today={pageRows} systemicRows={detailRows}
+            <DashPage all={draftedDetailRows} today={pageRows} systemicRows={draftedDetailRows}
               lastDate={selectedDate} periodFrom={effectiveFrom} periodTo={effectiveTo}
-              historical={!isLatestSingle || Boolean(detailReferenceDate)} />
+              historical={!isLatestSingle || Boolean(detailReferenceDate)}
+              priceDraftsApi={{ isAdmin: false, networkWide: false, onChange: setPriceDraft }} />
           )}
-          {tab === 'franch' && isAdmin && <FranchPage today={pageRows} detailRows={detailRows} historical={!isLatestSingle} />}
-          {tab === 'items' && (isAdmin ? <ItemsOverviewPage rows={exactSnapshotDates.length ? detailRows : productRows} /> : <FranchiseCatalogPage rows={detailRows} />)}
-          {tab === 'cats' && <CatPage today={isAdmin && productRows.length ? productRows : detailRows} showFinancials={isAdmin} />}
+          {tab === 'franch' && isAdmin && <FranchPage today={pageRows} detailRows={draftedDetailRows} historical={!isLatestSingle} />}
+          {tab === 'items' && (isAdmin
+            ? <ItemsOverviewPage rows={exactSnapshotDates.length ? draftedDetailRows : draftedProductRows} onSetDraft={setPriceDraft} />
+            : <FranchiseCatalogPage rows={draftedDetailRows} priceDraftsApi={{ isAdmin: false, networkWide: false, onChange: setPriceDraft }} />)}
+          {tab === 'cats' && <CatPage today={isAdmin && productRows.length ? draftedProductRows : draftedDetailRows} showFinancials={isAdmin} />}
           {tab === 'rank' && <RankPage today={isAdmin ? networkRows : rankingRows} periodFrom={effectiveFrom} periodTo={effectiveTo}
             showFinancials={isAdmin} selectedStore={isAdmin ? '' : context?.store} />}
-          {tab === 'forneria' && <ForneriaPage rows={exactSnapshotDates.length ? detailRows : productRows}
+          {tab === 'forneria' && <ForneriaPage rows={exactSnapshotDates.length ? draftedDetailRows : draftedProductRows}
             summaryRows={!metadata.catalogCube?.records?.length && effectiveShift === 'Almoço' ? forneriaSummaries : []}
             showFinancials={isAdmin} />}
           {tab === 'revenue' && (isAdmin
-            ? <PotentialPageV2 rows={detailRows} isAdmin />
-            : <PotentialAccessGate><PotentialPageV2 rows={detailRows} /></PotentialAccessGate>)}
-          {tab === 'alerts' && isAdmin && <AlertsPage today={exactSnapshotDates.length ? detailRows : productRows} />}
-          {tab === 'alerts' && !isAdmin && <FranchiseAlertsPage all={detailRows} />}
+            ? <PotentialPageV2 rows={draftedDetailRows} isAdmin onSetDraft={setPriceDraft} />
+            : <PotentialAccessGate><PotentialPageV2 rows={draftedDetailRows} onSetDraft={setPriceDraft} /></PotentialAccessGate>)}
+          {tab === 'alerts' && isAdmin && <AlertsPage today={exactSnapshotDates.length ? draftedDetailRows : draftedProductRows} />}
+          {tab === 'alerts' && !isAdmin && <FranchiseAlertsPage all={draftedDetailRows} />}
           {tab === 'notify' && isAdmin && <AutomatedNotificationPage />}
           {tab === 'access' && isAdmin && <ManagementPage />}
           {tab === 'feedback' && !isAdmin && <FranchiseFeedbackPage />}

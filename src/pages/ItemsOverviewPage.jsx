@@ -5,6 +5,7 @@ import { Kpi } from '../components/ui/Kpi.jsx';
 import { Pill } from '../components/ui/Pill.jsx';
 import { brl } from '../utils/format.js';
 import { DailyItemsMatrix } from '../components/ui/DailyItemsMatrix.jsx';
+import { DraftPriceField } from '../components/ui/DraftPriceField.jsx';
 
 const PAGE_SIZE = 10;
 
@@ -12,7 +13,7 @@ const normalize = (value) => String(value || '')
   .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
   .toLocaleLowerCase('pt-BR');
 
-export function ItemsOverviewPage({ rows }) {
+export function ItemsOverviewPage({ rows, onSetDraft }) {
   const [query, setQuery] = useState('');
   const [storeQuery, setStoreQuery] = useState('');
   const [storeOpen, setStoreOpen] = useState(false);
@@ -20,6 +21,7 @@ export function ItemsOverviewPage({ rows }) {
   const [sortCol, setSortCol] = useState('paused');
   const [sortDir, setSortDir] = useState('desc');
   const [page, setPage] = useState(0);
+  const [applyNetworkWide, setApplyNetworkWide] = useState(false);
 
   const stores = useMemo(() => [...new Set(rows.map((row) => row.loja).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'pt-BR')), [rows]);
   const scopedRows = useMemo(() => {
@@ -43,6 +45,8 @@ export function ItemsOverviewPage({ rows }) {
         active: 0,
         paused: 0,
         risk: 0,
+        pausedPriced: 0,
+        manual: false,
         stores: new Set(),
         pausedStores: new Set(),
         dates: new Set(),
@@ -52,13 +56,21 @@ export function ItemsOverviewPage({ rows }) {
       if (row.status === 'Ativo') item.active += 1;
       if (row.status === 'Pausado') {
         item.paused += 1;
-        item.risk += Number(row.precoNum) || 0;
         item.pausedStores.add(row.loja);
+        if (Number(row.precoNum) > 0) {
+          item.risk += Number(row.precoNum);
+          item.pausedPriced += 1;
+          if (row.precoManual) item.manual = true;
+        }
       }
       map.set(key, item);
     });
     return [...map.values()].sort((a, b) => b.paused - a.paused || a.name.localeCompare(b.name, 'pt-BR'));
   }, [scopedRows]);
+
+  const unpricedPaused = useMemo(() => items
+    .filter((item) => item.paused > 0 && (item.pausedPriced === 0 || item.manual))
+    .sort((a, b) => b.paused - a.paused), [items]);
 
   const visible = useMemo(() => {
     const term = normalize(query);
@@ -163,6 +175,31 @@ export function ItemsOverviewPage({ rows }) {
           </div>
         )}
       </Card>
+      {onSetDraft && unpricedPaused.length > 0 && (
+        <Card className="unpriced-items-card">
+          <div className="paused-card-heading">
+            <div><span className="eyebrow">SEM PREÇO CADASTRADO</span><h2>Itens pausados sem preço</h2></div>
+          </div>
+          <div className="draft-price-toolbar">
+            <label className="draft-price-toggle">
+              <input type="checkbox" checked={applyNetworkWide} onChange={(event) => setApplyNetworkWide(event.target.checked)} />
+              Aplicar preço em todas as unidades
+            </label>
+          </div>
+          <p className="draft-price-note">
+            Valor digitado aqui é local (não é salvo) e atualiza os cards e KPIs desta e de outras páginas enquanto a sessão estiver aberta. Desmarcado, o valor vale só para as unidades onde este item pausou.
+          </p>
+          <div className="unpriced-items-list">
+            {unpricedPaused.slice(0, 12).map((item) => (
+              <article key={item.name} className="unpriced-item-row">
+                <span><strong>{item.name}</strong><small>{item.category || 'Sem categoria'} · {item.pausedStores.size} unidade(s)</small></span>
+                <span><b>{item.paused}×</b><small>pausado</small></span>
+                <DraftPriceField itemName={item.name} stores={item.pausedStores} isAdmin networkWide={applyNetworkWide} onChange={onSetDraft} compact />
+              </article>
+            ))}
+          </div>
+        </Card>
+      )}
       <DailyItemsMatrix rows={scopedRows} title={storeQuery ? `Evolução diária · ${storeQuery}` : 'Evolução diária dos itens da rede'} />
     </section>
   );

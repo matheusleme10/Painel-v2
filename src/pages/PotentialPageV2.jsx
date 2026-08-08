@@ -1,12 +1,12 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { C } from '../constants.js';
 import { Card } from '../components/ui/Card.jsx';
 import { Kpi } from '../components/ui/Kpi.jsx';
 import { HBar } from '../components/ui/charts/HBar.jsx';
+import { DraftPriceField } from '../components/ui/DraftPriceField.jsx';
 import { brl } from '../utils/format.js';
 import { rowsByStatus } from '../utils/analytics.js';
 import { forneriaFamilyOf, FORNERIA_FAMILIES } from '../utils/forneria.js';
-import { applyPriceOverrides, fetchPriceOverrides, savePriceOverride } from '../utils/price-overrides.js';
 
 const DIACRITICS = new RegExp('[' + String.fromCharCode(0x0300) + '-' + String.fromCharCode(0x036f) + ']', 'g');
 const normalize = (value) => String(value || '').normalize('NFD').replace(DIACRITICS, '').toLocaleLowerCase('pt-BR').replace(/[^a-z0-9]+/g, ' ').trim();
@@ -25,62 +25,16 @@ function groupByKey(rows, keyOf, labelOf) {
   return [...map.values()];
 }
 
-function PriceEditor({ item, isAdmin, onSaved }) {
-  const [draft, setDraft] = useState('');
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState('');
-  if (isAdmin || item.priced) return null;
-  const store = [...item.stores][0];
-  if (!store) return null;
-
-  async function submit(event) {
-    event.preventDefault();
-    const price = Number(String(draft).replace(',', '.'));
-    if (!(price > 0)) { setError('Informe um preço válido.'); return; }
-    setBusy(true);
-    setError('');
-    try {
-      await savePriceOverride({ store, item: item.name, categoria: item.category, price });
-      setDraft('');
-      onSaved();
-    } catch (reason) {
-      setError(reason.message);
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  return (
-    <form onSubmit={submit} className="price-editor" onClick={(event) => event.stopPropagation()}>
-      <input
-        type="number" min="0.01" step="0.01" inputMode="decimal" placeholder="Preço R$"
-        value={draft} onChange={(event) => setDraft(event.target.value)}
-      />
-      <button type="submit" disabled={busy}>{busy ? '...' : 'Salvar'}</button>
-      {error && <small className="price-editor-error">{error}</small>}
-    </form>
-  );
-}
-
-export function PotentialPageV2({ rows, isAdmin = false }) {
+export function PotentialPageV2({ rows, isAdmin = false, onSetDraft }) {
   const [ordersPerDay, setOrdersPerDay] = useState(30);
   const [storeQuery, setStoreQuery] = useState('');
   const [itemQuery, setItemQuery] = useState('');
-  const [overrides, setOverrides] = useState({});
-
-  useEffect(() => {
-    let active = true;
-    fetchPriceOverrides().then((next) => { if (active) setOverrides(next); });
-    return () => { active = false; };
-  }, []);
-
-  const reloadOverrides = () => fetchPriceOverrides().then(setOverrides);
-
-  const effectiveRows = useMemo(() => applyPriceOverrides(rows, overrides), [rows, overrides]);
+  const [showOnlyPriced, setShowOnlyPriced] = useState(false);
+  const [applyNetworkWide, setApplyNetworkWide] = useState(false);
 
   const storeTerm = normalize(storeQuery);
-  const filteredRows = useMemo(() => storeTerm ? effectiveRows.filter((row) => normalize(row.loja).includes(storeTerm)) : effectiveRows, [effectiveRows, storeTerm]);
-  const allStores = useMemo(() => [...new Set(effectiveRows.map((row) => row.loja).filter(Boolean))].sort(), [effectiveRows]);
+  const filteredRows = useMemo(() => storeTerm ? rows.filter((row) => normalize(row.loja).includes(storeTerm)) : rows, [rows, storeTerm]);
+  const allStores = useMemo(() => [...new Set(rows.map((row) => row.loja).filter(Boolean))].sort(), [rows]);
   const stores = useMemo(() => [...new Set(filteredRows.map((row) => row.loja).filter(Boolean))], [filteredRows]);
   const dates = useMemo(() => [...new Set(filteredRows.map((row) => row.dia).filter(Boolean))].sort(), [filteredRows]);
   const active = useMemo(() => rowsByStatus(filteredRows, 'Ativo'), [filteredRows]);
@@ -110,8 +64,10 @@ export function PotentialPageV2({ rows, isAdmin = false }) {
   const topActive = useMemo(() => {
     const map = new Map();
     pricedActive.forEach((row) => {
-      const key = normalize(row.item);
-      const entry = map.get(key) || { name: row.item, sum: 0, count: 0 };
+      const name = String(row.item || '').trim();
+      if (!name) return;
+      const key = normalize(name);
+      const entry = map.get(key) || { name, sum: 0, count: 0 };
       entry.sum += Number(row.precoNum);
       entry.count += 1;
       map.set(key, entry);
@@ -143,13 +99,16 @@ export function PotentialPageV2({ rows, isAdmin = false }) {
     return [...map.values()].map((item) => {
       const averagePrice = item.priced ? item.priceSum / item.priced : 0;
       // Impacto estimado usa o preço real do próprio item (cadastrado ou
-      // ajustado manualmente). Sem preço, não inventamos um número — fica
-      // marcado como "sem preço" até alguém informar um valor real.
+      // ajustado localmente). Sem preço, não inventamos um número — fica
+      // marcado como "sem preço" até alguém informar um valor.
       const estimate = item.priced ? averagePrice * item.occurrences : 0;
       return { ...item, averagePrice, estimate };
     }).filter((item) => matchesTerm(item.name) || matchesTerm(item.category))
       .sort((a, b) => b.occurrences - a.occurrences || b.estimate - a.estimate);
   }, [paused, term]);
+
+  const visiblePausedItems = showOnlyPriced ? pausedItems.filter((item) => item.priced) : pausedItems;
+  const hiddenByPricedFilter = pausedItems.length - visiblePausedItems.length;
 
   const leader = pausedItems[0];
   const runnerUp = pausedItems[1];
@@ -159,7 +118,7 @@ export function PotentialPageV2({ rows, isAdmin = false }) {
   const actions = [
     hasCriticalOutlier && { level: 'critical', title: `Prioridade imediata: ${leader.name}`, text: `${leader.occurrences} pausas no período, bem acima dos demais itens. Valide estoque, cadastro e operação.` },
     pausedOnLatestDate > 0 && { level: 'attention', title: 'Revisar a carga mais recente', text: `${pausedOnLatestDate} item(ns) continuam pausados na última data selecionada.` },
-    missingPausedPrices > 0 && { level: 'attention', title: 'Completar preços ausentes', text: `${missingPausedPrices} ocorrência(s) pausada(s) sem preço reduzem a precisão da estimativa.${!isAdmin ? ' Você pode informar o preço direto na lista abaixo.' : ''}` },
+    missingPausedPrices > 0 && { level: 'attention', title: 'Completar preços ausentes', text: `${missingPausedPrices} ocorrência(s) pausada(s) sem preço reduzem a precisão da estimativa. Você pode informar o preço direto na lista abaixo.` },
     pauseRate >= 20 && { level: 'critical', title: 'Plano de recuperação do cardápio', text: `${pauseRate}% das observações do período estão pausadas. Priorize os itens mais recorrentes.` },
     { level: 'ok', title: 'Acompanhar após a correção', text: 'Após reativar os itens, compare a próxima carga para confirmar que o status voltou a Ativo.' },
   ].filter(Boolean).slice(0, 4);
@@ -215,10 +174,55 @@ export function PotentialPageV2({ rows, isAdmin = false }) {
         <Kpi label="Taxa de pausas" value={`${pauseRate}%`} icon="alert" accent={pauseRate >= 20 ? C.red : C.amber} accentBg={pauseRate >= 20 ? C.redL : C.amberL} sub="sobre as observações do período" />
         <Kpi label="Preço médio dos pausados" value={brl(averagePausedTicket)} icon="item" accent={C.orange} accentBg={C.orangeL} sub={`${pricedPaused.length} pausas com preço`} />
         <Kpi label="Potencial em risco estimado" value={brl(potentialAtRisk)} icon="alert" accent={C.red} accentBg={C.redL} sub="soma do preço real de cada item pausado" />
-        <Kpi label="Pausados sem preço" value={missingPausedPrices} icon="pause" accent={C.amber} accentBg={C.amberL} sub={!isAdmin ? 'informe o preço na lista abaixo' : 'reduz a precisão da estimativa'} small />
+        <Kpi label="Pausados sem preço" value={missingPausedPrices} icon="pause" accent={C.amber} accentBg={C.amberL} sub="informe o preço na lista abaixo" small />
       </div>
       <div className="paused-impact-grid">
-        <Card className="paused-ranking-card"><div className="paused-card-heading"><div><span className="eyebrow">MAIS RECORRENTES</span><h2>Itens que mais pausaram</h2></div>{hasCriticalOutlier && <b>Fora do padrão</b>}</div><div className="paused-item-cards">{pausedItems.slice(0, 8).map((item, index) => { const critical = hasCriticalOutlier && index === 0; return <article key={`${item.name}-${item.category}`} className={critical ? 'is-critical' : ''}><span className="paused-item-position">#{index + 1}</span><span><strong>{item.name}</strong><small>{item.category} · {item.dates.size} dia(s) · {item.stores.size} unidade(s)</small></span><span><b>{item.occurrences}×</b><small>pausado</small></span>{item.priced ? <span><b>{brl(item.estimate)}</b><small>{item.manual ? 'inclui preço ajustado' : 'impacto estimado'}</small></span> : <span className="paused-item-noprice"><b>Sem preço</b><PriceEditor item={item} isAdmin={isAdmin} onSaved={reloadOverrides} /></span>}</article>; })}{!pausedItems.length && <div className="empty-state">Nenhum item pausado no período selecionado.</div>}</div></Card>
+        <Card className="paused-ranking-card">
+          <div className="paused-card-heading"><div><span className="eyebrow">MAIS RECORRENTES</span><h2>Itens que mais pausaram</h2></div>{hasCriticalOutlier && <b>Fora do padrão</b>}</div>
+          <div className="draft-price-toolbar">
+            <label className="draft-price-toggle">
+              <input type="checkbox" checked={showOnlyPriced} onChange={(event) => setShowOnlyPriced(event.target.checked)} />
+              Mostrar só os itens com preço
+            </label>
+            {isAdmin && (
+              <label className="draft-price-toggle">
+                <input type="checkbox" checked={applyNetworkWide} onChange={(event) => setApplyNetworkWide(event.target.checked)} />
+                Aplicar preço em todas as unidades
+              </label>
+            )}
+          </div>
+          {(showOnlyPriced ? hiddenByPricedFilter > 0 : missingPausedPrices > 0) && (
+            <p className="draft-price-note">
+              {showOnlyPriced
+                ? `${hiddenByPricedFilter} item(ns) sem preço estão ocultos da lista abaixo.`
+                : `${missingPausedPrices} ocorrência(s) sem preço não entram nas somas e médias — marque "mostrar só os itens com preço" pra ver a lista sem elas.`}
+            </p>
+          )}
+          <div className="paused-item-cards">
+            {visiblePausedItems.slice(0, 8).map((item, index) => {
+              const critical = hasCriticalOutlier && pausedItems[0] === item;
+              const needsInput = !item.priced || item.manual;
+              return (
+                <article key={`${item.name}-${item.category}`} className={critical ? 'is-critical' : ''}>
+                  <span className="paused-item-position">#{index + 1}</span>
+                  <span><strong>{item.name}</strong><small>{item.category} · {item.dates.size} dia(s) · {item.stores.size} unidade(s)</small></span>
+                  <span><b>{item.occurrences}×</b><small>pausado</small></span>
+                  {item.priced
+                    ? <span className={item.manual ? 'paused-item-manual' : ''}>
+                        <b>{brl(item.estimate)}</b>
+                        <small>{item.manual ? 'valor local (não salvo)' : 'impacto estimado'}</small>
+                        {needsInput && <DraftPriceField itemName={item.name} stores={item.stores} isAdmin={isAdmin} networkWide={applyNetworkWide} onChange={onSetDraft} compact />}
+                      </span>
+                    : <span className="paused-item-noprice">
+                        <b>Sem preço</b>
+                        <DraftPriceField itemName={item.name} stores={item.stores} isAdmin={isAdmin} networkWide={applyNetworkWide} onChange={onSetDraft} compact />
+                      </span>}
+                </article>
+              );
+            })}
+            {!visiblePausedItems.length && <div className="empty-state">Nenhum item pausado no período selecionado.</div>}
+          </div>
+        </Card>
         <Card className="action-plan-card"><span className="eyebrow">PLANO DE AÇÃO</span><h2>O que fazer agora</h2><div className="action-plan-list">{actions.map((action) => <article key={action.title} className={action.level}><i /><span><strong>{action.title}</strong><small>{action.text}</small></span></article>)}</div></Card>
       </div>
       <div className="projection-loss-disclaimer"><strong>Importante:</strong> Cenário indicativo, não previsão contábil. Não considera quantidade por pedido, descontos, taxas, impostos ou demanda real. Os valores servem para priorização operacional e não comprovam receita efetivamente perdida.</div>

@@ -3,7 +3,13 @@ import { pct } from '../../../utils/format.js';
 import { Ic } from '../Icon.jsx';
 
 export function HBar({ data, maxItems = 8, color = C.red, fmtVal }) {
-  const top = [...data].sort((a, b) => b.v - a.v).slice(0, maxItems);
+  // Alguns nomes vêm da planilha com espaços sobrando (ou, raramente,
+  // vazios) — sem o trim/fallback aqui o rótulo podia renderizar em
+  // branco mesmo com a barra e o valor certos.
+  const top = [...data]
+    .map((d) => ({ ...d, n: String(d.n ?? '').trim() || 'Item sem nome' }))
+    .sort((a, b) => b.v - a.v)
+    .slice(0, maxItems);
   const max = top[0]?.v || 1;
 
   return (
@@ -15,9 +21,10 @@ export function HBar({ data, maxItems = 8, color = C.red, fmtVal }) {
             <div
               title={d.n}
               style={{
-                width: 120,
+                width: 128,
+                minWidth: 128,
                 fontSize: 11,
-                color: C.muted,
+                color: C.text,
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
