@@ -177,6 +177,7 @@ export function ItemsOverviewPage({ rows, onSetDraft }) {
           </div>
         )}
       </Card>
+      <DailyItemsMatrix rows={scopedRows} title={storeQuery ? `Evolução diária · ${storeQuery}` : 'Evolução diária dos itens da rede'} />
       {onSetDraft && unpricedItems.length > 0 && (
         <Card className="unpriced-items-card">
           <div className="paused-card-heading">
@@ -202,7 +203,6 @@ export function ItemsOverviewPage({ rows, onSetDraft }) {
           </div>
         </Card>
       )}
-      <DailyItemsMatrix rows={scopedRows} title={storeQuery ? `Evolução diária · ${storeQuery}` : 'Evolução diária dos itens da rede'} />
     </section>
   );
 }

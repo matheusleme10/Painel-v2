@@ -41,6 +41,7 @@ export function FranchiseCatalogPage({ rows, onSetDraft }) {
         </div>
       </div>
       <StatusItemsPanel rows={rows} title="Catálogo operacional" />
+      <DailyItemsMatrix rows={rows} title="Evolução diária do cardápio" />
       {onSetDraft && unpricedItems.length > 0 && (
         <Card className="unpriced-items-card">
           <div className="paused-card-heading">
@@ -60,7 +61,6 @@ export function FranchiseCatalogPage({ rows, onSetDraft }) {
           </div>
         </Card>
       )}
-      <DailyItemsMatrix rows={rows} title="Evolução diária do cardápio" />
     </div>
   );
 }

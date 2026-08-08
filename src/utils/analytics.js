@@ -4,6 +4,32 @@ export function rowsByStatus(rows, status) {
   return rows.filter((row) => row.status === status);
 }
 
+// Quando o filtro "Ambos" (Almoço + Jantar) está ativo, cada item aparece
+// em até 2 linhas nesse mesmo dia — uma por turno. Somar as duas linhas
+// direto infla a contagem (um item pausado nos dois turnos contava como 2
+// itens pausados, em vez de 1). O que faz sentido pra um resumo do dia é a
+// UNIÃO dos itens diferentes: se pausou em qualquer um dos turnos, conta
+// como pausado 1x nesse dia — e um item que só existe num dos turnos ainda
+// entra na conta normalmente. Ex.: turno A com 50 pausados + turno B com só
+// 2 itens diferentes (não presentes em A) = 52, não 100.
+export function collapseShiftRows(rows) {
+  const map = new Map();
+  rows.forEach((row) => {
+    const key = `${row.loja}|${row.item}|${row.categoria}|${row.dia}`;
+    const current = map.get(key);
+    if (!current) {
+      map.set(key, { ...row });
+      return;
+    }
+    if (row.status === 'Pausado') current.status = 'Pausado';
+    if (!(Number(current.precoNum) > 0) && Number(row.precoNum) > 0) {
+      current.precoNum = row.precoNum;
+      current.preco = row.preco;
+    }
+  });
+  return [...map.values()];
+}
+
 export function sumPrice(rows, status) {
   return rows.reduce(
     (total, row) => total + (status && row.status !== status ? 0 : Number(row.precoNum) || 0),

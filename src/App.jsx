@@ -27,6 +27,7 @@ import { brandById, identifyBrand } from './utils/brands.js';
 import { decodeCatalogCube } from './utils/pivot-cache.js';
 import { isSameStore, resolveStoreSelection } from './utils/stores.js';
 import { applyPriceDrafts, emptyDrafts, withPriceDraft } from './utils/price-drafts.js';
+import { collapseShiftRows } from './utils/analytics.js';
 
 function summarizeUnits(entries, effectiveTo, effectiveShift) {
   const range = new Map();
@@ -227,12 +228,21 @@ export function App() {
   const brandStores = [...new Set(unitHistory.map((entry) => entry.label).filter(Boolean))];
   const isLatestSingle = effectiveFrom === lastDate && effectiveTo === lastDate;
   const pageRows = networkRows;
+  // Com "Ambos" selecionado, um item pode aparecer 1x por turno no mesmo
+  // dia — sem isso, contagens de pausados/ativos ficavam infladas (somando
+  // turnos em vez de olhar itens distintos). Ver collapseShiftRows.
+  const shiftCollapsedDetailRows = useMemo(() => (
+    effectiveShift === 'Ambos' ? collapseShiftRows(detailRows) : detailRows
+  ), [detailRows, effectiveShift]);
+  const shiftCollapsedProductRows = useMemo(() => (
+    effectiveShift === 'Ambos' ? collapseShiftRows(productRows) : productRows
+  ), [productRows, effectiveShift]);
   // Aplica os ajustes locais de preço por cima das linhas reais de item —
   // um único ponto central, então qualquer página que use draftedDetailRows
   // ou draftedProductRows já reflete o valor digitado, sem precisar mexer
   // em cada página separadamente.
-  const draftedDetailRows = useMemo(() => applyPriceDrafts(detailRows, priceDrafts), [detailRows, priceDrafts]);
-  const draftedProductRows = useMemo(() => applyPriceDrafts(productRows, priceDrafts), [productRows, priceDrafts]);
+  const draftedDetailRows = useMemo(() => applyPriceDrafts(shiftCollapsedDetailRows, priceDrafts), [shiftCollapsedDetailRows, priceDrafts]);
+  const draftedProductRows = useMemo(() => applyPriceDrafts(shiftCollapsedProductRows, priceDrafts), [shiftCollapsedProductRows, priceDrafts]);
   const shiftHasNetworkData = effectiveShift === 'Ambos'
     || (metadata.networkHistory || []).some((entry) => entry.shift === effectiveShift);
 

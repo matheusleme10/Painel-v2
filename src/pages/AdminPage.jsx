@@ -262,10 +262,27 @@ export function AdminPage({ all, onUpdate, correctHash, onClear, initialAuth = f
           const allowedDates = (metadata.networkHistory || []).map((entry) => entry.date);
           const pivot = await parsePivotCatalog(e.target.result, allowedDates);
           if (pivot?.totalRecords) {
+            // O cache de PivotTable às vezes vem com preço zerado para itens
+            // pausados (a tabela de origem do Excel parece só gravar o preço
+            // enquanto o item está ativo). A aba "produtos pausados" tem o
+            // preço correto desses itens — completamos aqui, sem sobrescrever
+            // nenhum preço que o cache já trouxe preenchido.
+            const priceLookup = metadata.catalogPriceLookup || {};
+            if (Object.keys(priceLookup).length) {
+              pivot.catalogCube.records = pivot.catalogCube.records.map((record) => {
+                const [storeIndex, itemIndex, categoryIndex, dateIndex, shiftIndex, paused, price] = record;
+                if (price > 0) return record;
+                const itemName = pivot.catalogCube.items[itemIndex];
+                const fallback = priceLookup[String(itemName || '').trim().toLocaleLowerCase('pt-BR')];
+                if (!(fallback > 0)) return record;
+                return [storeIndex, itemIndex, categoryIndex, dateIndex, shiftIndex, paused, fallback];
+              });
+            }
             metadata.catalogCube = pivot.catalogCube;
             metadata.networkHistory = pivot.networkHistory;
             metadata.unitHistory = pivot.unitHistory;
           }
+          delete metadata.catalogPriceLookup;
           setPrev(rows);
           setLoading(false);
         } catch (ex) {

@@ -498,6 +498,11 @@ export function parseXLSX(ab) {
     best[0].catalogHistory = catalogHistory;
     best[0].productHistory = uniqueProductHistory;
     best[0].forneriaSummaryHistory = forneriaSummaryHistory;
+    // sharedPrices já prioriza a aba "produtos pausados" (ela sobrescreve os
+    // preços das abas por marca — ver acima). O catálogo em cube (pivot
+    // cache) não passa por essa aba, então expomos esse mapa aqui pra
+    // AdminPage.jsx poder completar os preços que o cache trouxe zerados.
+    best[0].catalogPriceLookup = Object.fromEntries(sharedPrices);
   }
   return best;
 }
