@@ -288,7 +288,7 @@ export function RankPage({ today, periodFrom, periodTo, showFinancials = false, 
                       transition: 'background .1s',
                     }}
                     onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.background = C.bg; }}
-                    onMouseLeave={(e) => { if (!isSelected) e.currentTarget.style.background = 'white'; }}
+                    onMouseLeave={(e) => { if (!isSelected) e.currentTarget.style.background = 'transparent'; }}
                   >
                     {/* Ranking */}
                     <td style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>
