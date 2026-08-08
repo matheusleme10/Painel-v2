@@ -56,11 +56,19 @@ function PriorityCard({ icon, iconColor, iconBg, title, subtitle, titleColor, gr
   );
 }
 
-export function FranchiseAlertsPage({ all, today }) {
+export function FranchiseAlertsPage({ all }) {
   const [query, setQuery] = useState('');
 
+  // Importante: `all` traz as linhas reais item a item (com status/preço).
+  // O prop `today` que outras páginas recebem por aqui é um resumo por loja
+  // (sem status por item), então os alertas — e o filtro "Ambos" — precisam
+  // ser calculados 100% a partir de `all`, olhando sempre a última data
+  // presente no período selecionado como "hoje".
   const data = useMemo(() => {
     const dates = [...new Set(all.map((row) => row.dia).filter(Boolean))].sort();
+    const latestDate = dates.at(-1) || null;
+    const todayRows = latestDate ? all.filter((row) => row.dia === latestDate) : [];
+
     const byItem = new Map();
     all.forEach((row) => {
       if (!row.item || !row.dia) return;
@@ -81,7 +89,6 @@ export function FranchiseAlertsPage({ all, today }) {
         if (item.byDate.get(dates[index])?.paused) streak += 1;
         else break;
       }
-      const lastCell = dates.length ? item.byDate.get(dates.at(-1)) : null;
       const price = [...item.byDate.values()].reduce((max, cell) => Math.max(max, cell.price || 0), 0);
       return { ...item, streak, price };
     });
@@ -92,7 +99,7 @@ export function FranchiseAlertsPage({ all, today }) {
     const recente = pausedNow.filter((item) => item.streak === 1);
 
     const catMap = {};
-    today.forEach((row) => {
+    todayRows.forEach((row) => {
       if (!row.categoria) return;
       if (!catMap[row.categoria]) catMap[row.categoria] = { t: 0, p: 0, risco: 0 };
       catMap[row.categoria].t += 1;
@@ -103,13 +110,14 @@ export function FranchiseAlertsPage({ all, today }) {
       .map(([cat, stats]) => ({ cat, percent: pct(stats.p, stats.t), risco: stats.risco }))
       .sort((a, b) => b.percent - a.percent);
 
-    return { critico, atencao, recente, atencaoCategories, dates };
-  }, [all, today]);
+    const total = todayRows.length;
+    const pausedTotal = todayRows.filter((row) => row.status === 'Pausado').length;
+    const totalRisk = todayRows.filter((row) => row.status === 'Pausado' && row.precoNum > 0).reduce((sum, row) => sum + row.precoNum, 0);
 
-  const total = today.length;
-  const pausedTotal = today.filter((row) => row.status === 'Pausado').length;
-  const disponib = pct(total - pausedTotal, total);
-  const totalRisk = today.filter((row) => row.status === 'Pausado' && row.precoNum > 0).reduce((sum, row) => sum + row.precoNum, 0);
+    return { critico, atencao, recente, atencaoCategories, dates, total, pausedTotal, totalRisk };
+  }, [all]);
+
+  const disponib = pct(data.total - data.pausedTotal, data.total);
   const longPausedCount = data.critico.length;
 
   const term = query.trim().toLocaleLowerCase('pt-BR');
@@ -137,9 +145,9 @@ export function FranchiseAlertsPage({ all, today }) {
         <Kpi label="Disponibilidade Atual" value={`${disponib}%`} icon="check"
           accent={disponib >= 80 ? C.green : disponib >= 60 ? C.amber : C.red}
           accentBg={disponib >= 80 ? C.greenL : disponib >= 60 ? C.amberL : C.redL} />
-        <Kpi label="Itens Pausados Agora" value={pausedTotal} icon="pause" accent={C.red} accentBg={C.redL} />
+        <Kpi label="Itens Pausados Agora" value={data.pausedTotal} icon="pause" accent={C.red} accentBg={C.redL} />
         <Kpi label="Pausados há 3+ dias" value={longPausedCount} icon="fire" accent={C.red2} accentBg={C.redL} sub="urgente: pode estar perdendo pedidos" />
-        <Kpi label="Receita Pausada Estimada" value={brl(totalRisk)} icon="money" accent={C.orange} accentBg={C.orangeL} small />
+        <Kpi label="Receita Pausada Estimada" value={brl(data.totalRisk)} icon="money" accent={C.orange} accentBg={C.orangeL} small />
       </div>
 
       <Card>

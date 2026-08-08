@@ -2,23 +2,7 @@ import { useMemo, useState } from 'react';
 import { Card } from '../components/ui/Card.jsx';
 import { C } from '../constants.js';
 import { brl } from '../utils/format.js';
-
-const FAMILIES = [
-  { id: 'cannoli', label: 'Cannoli', terms: ['cannoli'] },
-  { id: 'crostini', label: 'Crostini', terms: ['crostini'] },
-  { id: 'palha', label: 'Palha Italiana', terms: ['palha', 'palha italiana'] },
-  { id: 'brownie', label: 'Brownie', terms: ['brownie'] },
-  { id: 'tiramisu', label: 'Tiramisu', terms: ['tiramisu', 'tiramisù'] },
-];
-
-const normalize = (value) => String(value || '')
-  .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-  .toLocaleLowerCase('pt-BR');
-
-function familyOf(item) {
-  const name = normalize(item);
-  return FAMILIES.find((family) => family.terms.some((term) => name.startsWith(normalize(term))))?.id || null;
-}
+import { FORNERIA_FAMILIES as FAMILIES, forneriaFamilyOf as familyOf } from '../utils/forneria.js';
 
 export function ForneriaPage({ rows, summaryRows = [], showFinancials }) {
   const [selectedFamilies, setSelectedFamilies] = useState(() => FAMILIES.map((entry) => entry.id));

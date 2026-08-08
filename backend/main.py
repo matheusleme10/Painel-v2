@@ -43,6 +43,8 @@ NOTIFICATION_SETTINGS_PATH = DATA_DIR / "notification-settings.json"
 NOTIFICATION_SETTINGS_BLOB_PATH = "ital-dashboard/notification-settings.json"
 FEEDBACK_SETTINGS_PATH = DATA_DIR / "feedback-settings.json"
 FEEDBACK_SETTINGS_BLOB_PATH = "ital-dashboard/feedback-settings.json"
+PRICE_OVERRIDES_PATH = DATA_DIR / "price-overrides.json"
+PRICE_OVERRIDES_BLOB_PATH = "ital-dashboard/price-overrides.json"
 load_dotenv(ROOT / ".env")
 load_dotenv(ROOT / ".env.local", override=True)
 
@@ -185,6 +187,13 @@ class FranchiseContextRequest(BaseModel):
 
 class AccessSettingsRequest(BaseModel):
     allowedDomains: list[str] = Field(default_factory=list, max_length=100)
+
+
+class PriceOverrideRequest(BaseModel):
+    store: str = Field(min_length=1, max_length=180)
+    item: str = Field(min_length=1, max_length=300)
+    categoria: str = ""
+    price: float = Field(gt=0, le=100000)
 
 
 def client() -> IFoodClient:
@@ -649,6 +658,55 @@ async def write_feedback_settings(settings: dict) -> None:
     temporary.replace(FEEDBACK_SETTINGS_PATH)
 
 
+def price_override_key(store: str, item: str) -> str:
+    return f"{' '.join(store.strip().split()).lower()}||{' '.join(item.strip().split()).lower()}"
+
+
+async def read_price_overrides() -> dict:
+    """Preços definidos manualmente por franqueados/admins para itens sem
+    preço cadastrado na planilha. Fica num arquivo separado do upload
+    principal de propósito: assim uma nova carga de XLSX pelo admin nunca
+    apaga os ajustes que a franquia já fez."""
+    if BLOB_TOKEN:
+        from vercel.blob import AsyncBlobClient, BlobNotFoundError
+
+        try:
+            async with AsyncBlobClient(token=BLOB_TOKEN) as blob_client:
+                result = await blob_client.get(PRICE_OVERRIDES_BLOB_PATH, access="private")
+                raw = await _blob_result_bytes(result)
+                if raw is None:
+                    return {}
+        except BlobNotFoundError:
+            return {}
+        return json.loads(raw.decode("utf-8"))
+
+    if not PRICE_OVERRIDES_PATH.is_file():
+        return {}
+    return json.loads(PRICE_OVERRIDES_PATH.read_text(encoding="utf-8"))
+
+
+async def write_price_overrides(overrides: dict) -> None:
+    serialized = json.dumps(overrides, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+    if BLOB_TOKEN:
+        from vercel.blob import AsyncBlobClient
+
+        async with AsyncBlobClient(token=BLOB_TOKEN) as blob_client:
+            await blob_client.put(
+                PRICE_OVERRIDES_BLOB_PATH,
+                serialized,
+                access="private",
+                content_type="application/json",
+                overwrite=True,
+                cache_control_max_age=0,
+            )
+        return
+
+    DATA_DIR.mkdir(exist_ok=True)
+    temporary = DATA_DIR / "price-overrides.next.json"
+    temporary.write_bytes(serialized)
+    temporary.replace(PRICE_OVERRIDES_PATH)
+
+
 def _build_critical_summary(rows: list[dict], date: str) -> str:
     """Resume os alertas mais críticos do dia (mesma lógica da página
     "Central de Alertas" do portal) para deixar o aviso automático acionável,
@@ -964,6 +1022,38 @@ async def clear_access_logs(request: Request) -> dict:
     if require_session(request) != "admin":
         raise HTTPException(status_code=403, detail="Apenas administradores podem apagar os acessos.")
     return {"deleted": await delete_access_events()}
+
+
+@app.get("/api/price-overrides")
+async def get_price_overrides(request: Request) -> dict:
+    # Admin e franqueado podem ler — o admin precisa ver o ajuste feito pela
+    # franquia, e a franquia precisa ver o que já cadastrou.
+    require_session(request)
+    overrides = await read_price_overrides()
+    return {"overrides": overrides}
+
+
+@app.post("/api/price-overrides")
+async def set_price_override(action: PriceOverrideRequest, request: Request) -> dict:
+    role = require_session(request)
+    store = " ".join(action.store.strip().split())
+    item = " ".join(action.item.strip().split())
+    if not store or not item:
+        raise HTTPException(status_code=400, detail="Informe a unidade e o item.")
+    identity = _get_identity(request) if role == "franchise" else None
+    key = price_override_key(store, item)
+    overrides = await read_price_overrides()
+    overrides[key] = {
+        "store": store,
+        "item": item,
+        "categoria": action.categoria.strip(),
+        "price": round(action.price, 2),
+        "setByRole": role,
+        "setByName": identity["name"] if identity else None,
+        "updatedAt": datetime.now(timezone.utc).isoformat(),
+    }
+    await write_price_overrides(overrides)
+    return {"success": True, "key": key, "override": overrides[key]}
 
 
 @app.get("/api/feedback/settings")

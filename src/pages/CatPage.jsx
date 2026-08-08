@@ -22,8 +22,17 @@ function Empty() {
   );
 }
 
+const CAT_FILTERS = [
+  ['all', 'Todas'],
+  ['most-paused', 'Mais pausados'],
+  ['zero-active', 'Sem nenhum ativo'],
+  ['zero-paused', '100% ativo'],
+];
+
 export function CatPage({ today, showFinancials = false }) {
   const [sel, setSel] = useState(null);
+  const [query, setQuery] = useState('');
+  const [catFilter, setCatFilter] = useState('all');
 
   const cats = useMemo(() => {
     const map = {};
@@ -49,6 +58,15 @@ export function CatPage({ today, showFinancials = false }) {
       .map((m) => ({ ...m, score: pct(m.a, m.t) }))
       .sort((a, b) => b.p - a.p);
   }, [today]);
+
+  const visibleCats = useMemo(() => {
+    const term = query.trim().toLocaleLowerCase('pt-BR');
+    let list = cats.filter((c) => !term || String(c.cat || '').toLocaleLowerCase('pt-BR').includes(term));
+    if (catFilter === 'zero-active') list = list.filter((c) => c.a === 0 && c.t > 0);
+    if (catFilter === 'zero-paused') list = list.filter((c) => c.p === 0 && c.t > 0);
+    if (catFilter === 'most-paused') list = [...list].sort((a, b) => b.p - a.p);
+    return list;
+  }, [cats, query, catFilter]);
 
   if (!today.length) return <Empty />;
 
@@ -113,8 +131,21 @@ export function CatPage({ today, showFinancials = false }) {
           <span><b>Ativos</b> itens disponíveis agora</span>
           <span><b>Disponibilidade</b> percentual ativo da categoria</span>
         </div>
+        <div className="category-toolbar">
+          <input
+            type="search"
+            value={query}
+            placeholder="Pesquisar categoria..."
+            onChange={(event) => setQuery(event.target.value)}
+          />
+          <div className="items-status-chips">
+            {CAT_FILTERS.map(([value, label]) => (
+              <button type="button" key={value} className={catFilter === value ? 'active' : ''} onClick={() => setCatFilter(value)}>{label}</button>
+            ))}
+          </div>
+        </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-          {cats.map((c) => {
+          {visibleCats.map((c) => {
             const on = sel?.cat === c.cat;
             const sc = c.score;
             const scColor = sc >= 80 ? C.green : sc >= 60 ? C.amber : C.red;
@@ -242,6 +273,7 @@ export function CatPage({ today, showFinancials = false }) {
               </div>
             );
           })}
+          {!visibleCats.length && <div className="empty-state">Nenhuma categoria encontrada neste filtro.</div>}
         </div>
       </Card>
     </div>

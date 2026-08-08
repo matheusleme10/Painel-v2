@@ -318,7 +318,7 @@ export function App() {
             ? <PotentialPageV2 rows={detailRows} isAdmin />
             : <PotentialAccessGate><PotentialPageV2 rows={detailRows} /></PotentialAccessGate>)}
           {tab === 'alerts' && isAdmin && <AlertsPage today={exactSnapshotDates.length ? detailRows : productRows} />}
-          {tab === 'alerts' && !isAdmin && <FranchiseAlertsPage all={detailRows} today={pageRows} />}
+          {tab === 'alerts' && !isAdmin && <FranchiseAlertsPage all={detailRows} />}
           {tab === 'notify' && isAdmin && <AutomatedNotificationPage />}
           {tab === 'access' && isAdmin && <ManagementPage />}
           {tab === 'feedback' && !isAdmin && <FranchiseFeedbackPage />}
