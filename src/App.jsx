@@ -27,6 +27,7 @@ import { brandById, identifyBrand } from './utils/brands.js';
 import { decodeCatalogCube } from './utils/pivot-cache.js';
 import { isSameStore, resolveStoreSelection } from './utils/stores.js';
 import { applyPriceDrafts, emptyDrafts, withPriceDraft } from './utils/price-drafts.js';
+import { applyPriceOverrides, fetchPriceOverrides, overrideKey, savePriceOverride } from './utils/price-overrides.js';
 import { collapseShiftRows } from './utils/analytics.js';
 
 function summarizeUnits(entries, effectiveTo, effectiveShift) {
@@ -73,7 +74,13 @@ export function App() {
   // ver src/utils/price-drafts.js. Fica no App porque precisa refletir em
   // todas as páginas que usam detailRows/productRows, não só na de Potencial.
   const [priceDrafts, setPriceDrafts] = useState(emptyDrafts());
+  const [priceOverrides, setPriceOverrides] = useState({});
   const setPriceDraft = (info) => setPriceDrafts((current) => withPriceDraft(current, info));
+  const persistPrice = async (info) => {
+    const result = await savePriceOverride(info);
+    setPriceOverrides((current) => ({ ...current, [overrideKey(info.store, info.item)]: result.override }));
+    return result.override;
+  };
   const [filters, setFilters] = useState({
     from: null,
     to: null,
@@ -104,6 +111,11 @@ export function App() {
       })
       .finally(() => setSyncing(false));
   }, [auth, context?.store]);
+
+  useEffect(() => {
+    if (!auth?.role || (auth.role === 'franchise' && !context?.store)) return;
+    fetchPriceOverrides().then(setPriceOverrides);
+  }, [auth?.role, context?.store]);
 
   const metadata = all.find((row) => row.networkSummary || row.catalogRows) || {};
   const unitHistory = metadata.unitHistory || [];
@@ -237,18 +249,23 @@ export function App() {
   // Com "Ambos" selecionado, um item pode aparecer 1x por turno no mesmo
   // dia — sem isso, contagens de pausados/ativos ficavam infladas (somando
   // turnos em vez de olhar itens distintos). Ver collapseShiftRows.
+  const overriddenDetailRows = useMemo(() => applyPriceOverrides(detailRows, priceOverrides), [detailRows, priceOverrides]);
+  const overriddenProductRows = useMemo(() => applyPriceOverrides(productRows, priceOverrides), [productRows, priceOverrides]);
   const shiftCollapsedDetailRows = useMemo(() => (
-    effectiveShift === 'Ambos' ? collapseShiftRows(detailRows) : detailRows
-  ), [detailRows, effectiveShift]);
+    effectiveShift === 'Ambos' ? collapseShiftRows(overriddenDetailRows) : overriddenDetailRows
+  ), [overriddenDetailRows, effectiveShift]);
   const shiftCollapsedProductRows = useMemo(() => (
-    effectiveShift === 'Ambos' ? collapseShiftRows(productRows) : productRows
-  ), [productRows, effectiveShift]);
+    effectiveShift === 'Ambos' ? collapseShiftRows(overriddenProductRows) : overriddenProductRows
+  ), [overriddenProductRows, effectiveShift]);
   // Aplica os ajustes locais de preço por cima das linhas reais de item —
   // um único ponto central, então qualquer página que use draftedDetailRows
   // ou draftedProductRows já reflete o valor digitado, sem precisar mexer
   // em cada página separadamente.
   const draftedDetailRows = useMemo(() => applyPriceDrafts(shiftCollapsedDetailRows, priceDrafts), [shiftCollapsedDetailRows, priceDrafts]);
   const draftedProductRows = useMemo(() => applyPriceDrafts(shiftCollapsedProductRows, priceDrafts), [shiftCollapsedProductRows, priceDrafts]);
+  // Potencial precisa preservar Almoço e Jantar separadamente quando o filtro
+  // está em Ambos; as demais páginas podem colapsar turnos para contar itens.
+  const potentialRows = useMemo(() => applyPriceDrafts(overriddenDetailRows, priceDrafts), [overriddenDetailRows, priceDrafts]);
   const shiftHasNetworkData = effectiveShift === 'Ambos'
     || (metadata.networkHistory || []).some((entry) => entry.shift === effectiveShift)
     || unitHistory.some((entry) => entry.shift === effectiveShift);
@@ -337,8 +354,8 @@ export function App() {
           )}
           {tab === 'franch' && isAdmin && <FranchPage today={pageRows} detailRows={draftedDetailRows} historical={!isLatestSingle} />}
           {tab === 'items' && (isAdmin
-            ? <ItemsOverviewPage rows={exactSnapshotDates.length ? draftedDetailRows : draftedProductRows} onSetDraft={setPriceDraft} />
-            : <FranchiseCatalogPage rows={draftedDetailRows} onSetDraft={setPriceDraft} />)}
+            ? <ItemsOverviewPage rows={exactSnapshotDates.length ? draftedDetailRows : draftedProductRows} onSetDraft={setPriceDraft} onSavePrice={persistPrice} />
+            : <FranchiseCatalogPage rows={draftedDetailRows} onSetDraft={setPriceDraft} onSavePrice={persistPrice} />)}
           {tab === 'cats' && <CatPage today={isAdmin && productRows.length ? draftedProductRows : draftedDetailRows} showFinancials={isAdmin} />}
           {tab === 'rank' && <RankPage today={isAdmin ? networkRows : rankingRows} periodFrom={effectiveFrom} periodTo={effectiveTo}
             showFinancials={isAdmin} selectedStore={isAdmin ? '' : context?.store} />}
@@ -346,8 +363,8 @@ export function App() {
             summaryRows={!metadata.catalogCube?.records?.length && effectiveShift === 'Almoço' ? forneriaSummaries : []}
             showFinancials={isAdmin} />}
           {tab === 'revenue' && (isAdmin
-            ? <PotentialPageV2 rows={draftedDetailRows} isAdmin onSetDraft={setPriceDraft} />
-            : <PotentialAccessGate><PotentialPageV2 rows={draftedDetailRows} onSetDraft={setPriceDraft} /></PotentialAccessGate>)}
+            ? <PotentialPageV2 rows={potentialRows} shift={effectiveShift} isAdmin onSetDraft={setPriceDraft} />
+            : <PotentialAccessGate><PotentialPageV2 rows={potentialRows} shift={effectiveShift} onSetDraft={setPriceDraft} /></PotentialAccessGate>)}
           {tab === 'alerts' && isAdmin && <AlertsPage today={exactSnapshotDates.length ? draftedDetailRows : draftedProductRows} />}
           {tab === 'alerts' && !isAdmin && <FranchiseAlertsPage all={draftedDetailRows} />}
           {tab === 'notify' && isAdmin && <AutomatedNotificationPage />}

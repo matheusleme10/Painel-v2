@@ -1141,8 +1141,17 @@ async def clear_access_logs(request: Request) -> dict:
 async def get_price_overrides(request: Request) -> dict:
     # Admin e franqueado podem ler — o admin precisa ver o ajuste feito pela
     # franquia, e a franquia precisa ver o que já cadastrou.
-    require_session(request)
+    role = require_session(request)
     overrides = await read_price_overrides()
+    if role == "franchise":
+        context = _get_franchise_context(request)
+        if context is None:
+            return {"overrides": {}}
+        target = _store_key(context["store"])
+        overrides = {
+            key: value for key, value in overrides.items()
+            if _store_key(value.get("store")) == target
+        }
     return {"overrides": overrides}
 
 
@@ -1153,6 +1162,10 @@ async def set_price_override(action: PriceOverrideRequest, request: Request) -> 
     item = " ".join(action.item.strip().split())
     if not store or not item:
         raise HTTPException(status_code=400, detail="Informe a unidade e o item.")
+    if role == "franchise":
+        context = _get_franchise_context(request)
+        if context is None or _store_key(context["store"]) != _store_key(store):
+            raise HTTPException(status_code=403, detail="Você só pode ajustar preços da unidade selecionada.")
     identity = _get_identity(request) if role == "franchise" else None
     key = price_override_key(store, item)
     overrides = await read_price_overrides()

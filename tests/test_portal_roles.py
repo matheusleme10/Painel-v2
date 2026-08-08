@@ -125,6 +125,7 @@ def test_franchise_identification_and_unit_access_are_audited(monkeypatch, tmp_p
     monkeypatch.setenv("SESSION_SECRET", "segredo-de-sessao-com-mais-de-trinta-e-dois-caracteres")
     monkeypatch.setattr(main_module, "BLOB_TOKEN", "")
     monkeypatch.setattr(main_module, "ACCESS_LOG_PATH", tmp_path / "access-logs.jsonl")
+    monkeypatch.setattr(main_module, "PRICE_OVERRIDES_PATH", tmp_path / "price-overrides.json")
 
     with TestClient(app) as franchise:
         login = franchise.post("/api/session", json={"password": franchise_password})
@@ -147,6 +148,23 @@ def test_franchise_identification_and_unit_access_are_audited(monkeypatch, tmp_p
             "store": "Ital in House - São Carlos - 123456",
         })
         assert selected.status_code == 200
+        saved_price = franchise.post("/api/price-overrides", json={
+            "store": "Ital in House - São Carlos - 123456",
+            "item": "Refrigerante lata",
+            "categoria": "Bebidas",
+            "price": 8.9,
+        })
+        assert saved_price.status_code == 200
+        denied_other_store = franchise.post("/api/price-overrides", json={
+            "store": "Outra Loja",
+            "item": "Refrigerante lata",
+            "categoria": "Bebidas",
+            "price": 1.0,
+        })
+        assert denied_other_store.status_code == 403
+        visible_overrides = franchise.get("/api/price-overrides").json()["overrides"]
+        assert len(visible_overrides) == 1
+        assert next(iter(visible_overrides.values()))["price"] == 8.9
         assert franchise.get("/api/access-logs").status_code == 403
 
     with TestClient(app) as admin:

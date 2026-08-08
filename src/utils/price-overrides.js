@@ -38,7 +38,7 @@ export async function savePriceOverride({ store, item, categoria = '', price }) 
 export function applyPriceOverrides(rows, overrides) {
   if (!overrides || !Object.keys(overrides).length) return rows;
   return rows.map((row) => {
-    if (Number(row.precoNum) > 0 || !row.item || !row.loja) return row;
+    if (!row.item || !row.loja) return row;
     const override = overrides[overrideKey(row.loja, row.item)];
     if (!override) return row;
     return { ...row, precoNum: override.price, preco: override.price, precoManual: true };

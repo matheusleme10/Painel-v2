@@ -53,7 +53,7 @@ export function hasDrafts(drafts) {
 export function applyPriceDrafts(rows, drafts) {
   if (!hasDrafts(drafts)) return rows;
   return rows.map((row) => {
-    if (!row.item || Number(row.precoNum) > 0) return row;
+    if (!row.item) return row;
     const draft = drafts.byStore[draftStoreKey(row.loja, row.item)] ?? drafts.byItem[draftItemKey(row.item)];
     if (!draft) return row;
     return { ...row, precoNum: draft.price, preco: draft.price, precoManual: true, precoDraft: true };

@@ -25,7 +25,7 @@ function groupByKey(rows, keyOf, labelOf) {
   return [...map.values()];
 }
 
-export function PotentialPageV2({ rows, isAdmin = false, onSetDraft }) {
+export function PotentialPageV2({ rows, shift = 'Jantar', isAdmin = false, onSetDraft }) {
   const [ordersPerDay, setOrdersPerDay] = useState(30);
   const [storeQuery, setStoreQuery] = useState('');
   const [itemQuery, setItemQuery] = useState('');
@@ -41,13 +41,42 @@ export function PotentialPageV2({ rows, isAdmin = false, onSetDraft }) {
   const paused = useMemo(() => rowsByStatus(filteredRows, 'Pausado'), [filteredRows]);
   const pricedActive = active.filter((row) => Number(row.precoNum) > 0);
   const pricedPaused = paused.filter((row) => Number(row.precoNum) > 0);
-  const averageActiveTicket = pricedActive.length ? pricedActive.reduce((sum, row) => sum + Number(row.precoNum), 0) / pricedActive.length : 0;
+  // Métricas cadastrais usam um item uma vez por unidade. Sem essa
+  // deduplicação, selecionar 14 dias multiplicava artificialmente tanto a
+  // contagem quanto a soma dos preços por 14.
+  const activeCatalog = new Map();
+  pricedActive.forEach((row) => {
+    const key = `${normalize(row.loja)}|${normalize(row.item)}|${normalize(row.categoria)}`;
+    const entry = activeCatalog.get(key) || { sum: 0, count: 0 };
+    entry.sum += Number(row.precoNum);
+    entry.count += 1;
+    activeCatalog.set(key, entry);
+  });
+  const activeCatalogPrices = [...activeCatalog.values()].map((entry) => entry.sum / entry.count);
+  const uniqueActiveItems = new Set(active.map((row) => normalize(`${row.item}|${row.categoria}`))).size;
+  const averageActiveTicket = activeCatalogPrices.length ? activeCatalogPrices.reduce((sum, price) => sum + price, 0) / activeCatalogPrices.length : 0;
   const averagePausedTicket = pricedPaused.length ? pricedPaused.reduce((sum, row) => sum + Number(row.precoNum), 0) / pricedPaused.length : 0;
-  const activePriceSum = pricedActive.reduce((sum, row) => sum + Number(row.precoNum), 0);
+  const activePriceSum = activeCatalogPrices.reduce((sum, price) => sum + price, 0);
   const pausedPriceSum = pricedPaused.reduce((sum, row) => sum + Number(row.precoNum), 0);
   const storeCount = stores.length;
   const analysisDays = Math.max(1, dates.length);
-  const dailyPotential = averageActiveTicket * ordersPerDay * storeCount;
+  const scenarioShifts = shift === 'Ambos' ? ['Almoço', 'Jantar'] : [shift];
+  const potentialByShift = scenarioShifts.map((scenarioShift) => {
+    const shiftRows = pricedActive.filter((row) => row.shift === scenarioShift || (!row.shift && scenarioShifts.length === 1));
+    const catalog = new Map();
+    shiftRows.forEach((row) => {
+      const key = `${normalize(row.loja)}|${normalize(row.item)}|${normalize(row.categoria)}`;
+      const entry = catalog.get(key) || { sum: 0, count: 0 };
+      entry.sum += Number(row.precoNum);
+      entry.count += 1;
+      catalog.set(key, entry);
+    });
+    const prices = [...catalog.values()].map((entry) => entry.sum / entry.count);
+    const average = prices.length ? prices.reduce((sum, price) => sum + price, 0) / prices.length : 0;
+    const units = new Set(shiftRows.map((row) => row.loja).filter(Boolean)).size;
+    return { shift: scenarioShift, value: average * ordersPerDay * units };
+  });
+  const dailyPotential = potentialByShift.reduce((sum, entry) => sum + entry.value, 0);
   const periodPotential = dailyPotential * analysisDays;
   // Importante: o valor em risco é a SOMA do preço real de cada item pausado
   // (não uma média multiplicada pela contagem) — senão itens bem diferentes
@@ -137,10 +166,17 @@ export function PotentialPageV2({ rows, isAdmin = false, onSetDraft }) {
       (row) => FORNERIA_FAMILIES.find((family) => family.id === forneriaFamilyOf(row.item))?.label || row.item,
     ).sort((a, b) => b.pausedSum - a.pausedSum);
     const totals = forneriaRows.reduce((sum, row) => {
-      if (row.status === 'Ativo') sum.activeSum += Number(row.precoNum) || 0;
-      if (row.status === 'Pausado') sum.pausedSum += Number(row.precoNum) || 0;
+      const price = Number(row.precoNum) || 0;
+      sum.total += 1;
+      sum.items.add(normalize(row.item));
+      if (row.status === 'Ativo') { sum.active += 1; sum.activeSum += price; if (price > 0) sum.pricedActive += 1; }
+      if (row.status === 'Pausado') { sum.paused += 1; sum.pausedSum += price; if (price > 0) sum.pricedPaused += 1; }
+      if (!(price > 0)) sum.missingPrice += 1;
       return sum;
-    }, { activeSum: 0, pausedSum: 0 });
+    }, { total: 0, active: 0, paused: 0, activeSum: 0, pausedSum: 0, pricedActive: 0, pricedPaused: 0, missingPrice: 0, items: new Set() });
+    totals.pauseRate = totals.total ? Math.round(totals.paused / totals.total * 100) : 0;
+    totals.averageActive = totals.pricedActive ? totals.activeSum / totals.pricedActive : 0;
+    totals.averagePaused = totals.pricedPaused ? totals.pausedSum / totals.pricedPaused : 0;
     return { byFamily, totals, hasData: forneriaRows.length > 0 };
   }, [filteredRows]);
 
@@ -157,14 +193,14 @@ export function PotentialPageV2({ rows, isAdmin = false, onSetDraft }) {
     <section className="projection-zone projection-gain-zone">
       <div className="projection-zone-heading"><span>01</span><div><small>POTENCIAL DE GANHO</small><h2>O que a operação pode capturar</h2><p>Itens ativos, preço médio cadastrado, unidades e datas selecionadas.</p></div></div>
       <div className="network-kpis">
-        <Kpi label="Itens ativos identificados" value={active.length} icon="check" accent={C.green} accentBg={C.greenL} />
+        <Kpi label="Itens ativos distintos" value={uniqueActiveItems} icon="check" accent={C.green} accentBg={C.greenL} sub={`${active.length} observações no período`} />
         <Kpi label="Unidades no cenário" value={storeCount} icon="store" accent={C.red} accentBg={C.redL} sub={storeTerm ? 'resultado da pesquisa' : 'escopo atual'} />
-        <Kpi label="Preço médio dos ativos" value={brl(averageActiveTicket)} icon="item" accent={C.purple} accentBg={C.purpleL} sub={`${pricedActive.length} observações com preço`} />
-        <Kpi label="Soma dos preços dos ativos" value={brl(activePriceSum)} icon="money" accent={C.teal} accentBg={C.tealL} sub="valor cadastral do cardápio ativo" small />
-        <Kpi label="Potencial diário" value={brl(dailyPotential)} icon="money" accent={C.orange} accentBg={C.orangeL} sub={`${ordersPerDay} pedidos × ${storeCount} unidade(s)`} />
-        <Kpi label="Potencial do período" value={brl(periodPotential)} icon="trophy" accent={C.green} accentBg={C.greenL} sub={`${analysisDays} dia(s) selecionado(s)`} />
+        <Kpi label="Preço médio do cardápio ativo" value={brl(averageActiveTicket)} icon="item" accent={C.purple} accentBg={C.purpleL} sub={`${activeCatalogPrices.length} item(ns)-unidade com preço`} />
+        <Kpi label="Valor cadastral ativo" value={brl(activePriceSum)} icon="money" accent={C.teal} accentBg={C.tealL} sub="cada item contado uma vez por unidade" small />
+        <Kpi label="Cenário diário (1 item/pedido)" value={brl(dailyPotential)} icon="money" accent={C.orange} accentBg={C.orangeL} sub={shift === 'Ambos' ? `Almoço ${brl(potentialByShift[0]?.value || 0)} + Jantar ${brl(potentialByShift[1]?.value || 0)}` : `${ordersPerDay} pedidos × ${storeCount} unidade(s) · ${shift}`} />
+        <Kpi label="Cenário do período" value={brl(periodPotential)} icon="trophy" accent={C.green} accentBg={C.greenL} sub={`${analysisDays} dia(s) selecionado(s)`} />
       </div>
-      <div className="network-panels"><Card><h2>Premissa ajustável</h2><label className="projection-field">Pedidos por dia<input type="number" min="1" max="1000" value={ordersPerDay} onChange={(event) => setOrdersPerDay(Math.max(1, Number(event.target.value) || 1))} /></label><p className="projection-disclaimer">O período usa automaticamente {analysisDays} data(s) do filtro global. "Potencial diário" estima receita por volume de pedidos; "Soma dos preços dos ativos" é o valor cadastral do cardápio hoje — são leituras diferentes de propósito.</p></Card><Card><h2>Itens ativos de maior preço</h2><HBar data={topActive} color={C.green} fmtVal={brl} />{!topActive.length && <div className="empty-state">Nenhum item ativo com preço encontrado.</div>}</Card></div>
+      <div className="network-panels"><Card><h2>Premissa ajustável</h2><label className="projection-field">Pedidos por dia por turno<input type="number" min="1" max="1000" value={ordersPerDay} onChange={(event) => setOrdersPerDay(Math.max(1, Number(event.target.value) || 1))} /></label><p className="projection-disclaimer">O período usa automaticamente {analysisDays} data(s) do filtro global. Em "Ambos", o cenário soma Almoço + Jantar. O cálculo assume 1 item por pedido e o mesmo volume informado em cada turno.</p></Card><Card><h2>Itens ativos de maior preço</h2><HBar data={topActive} color={C.green} fmtVal={brl} />{!topActive.length && <div className="empty-state">Nenhum item ativo com preço encontrado.</div>}</Card></div>
     </section>
 
     <section className="projection-zone projection-loss-zone">
@@ -231,7 +267,7 @@ export function PotentialPageV2({ rows, isAdmin = false, onSetDraft }) {
     <section className="projection-zone">
       <div className="projection-zone-heading"><span>03</span><div><small>POR CATEGORIA</small><h2>Onde focar dentro do cardápio</h2><p>Quanto cada categoria pode estar faturando (itens ativos) e perdendo (itens pausados), pelo preço cadastrado.</p></div></div>
       <div className="category-potential-table">
-        <div className="category-potential-row category-potential-head"><span>Categoria</span><span>Ativos</span><span>Pode faturar</span><span>Pausados</span><span>Pode perder</span></div>
+        <div className="category-potential-row category-potential-head"><span>Categoria</span><span>Ativos</span><span>Soma ativa observada</span><span>Pausados</span><span>Soma pausada observada</span></div>
         {categoryBreakdown.slice(0, 12).map((entry) => (
           <div key={entry.key} className="category-potential-row">
             <span className="category-potential-name">{entry.label}</span>
@@ -246,13 +282,20 @@ export function PotentialPageV2({ rows, isAdmin = false, onSetDraft }) {
     </section>
 
     {forneriaBreakdown.hasData && <section className="projection-zone">
-      <div className="projection-zone-heading"><span>04</span><div><small>FORNERIA</small><h2>Quanto a Forneria pode faturar e perder</h2><p>Cannoli, Crostini, Palha Italiana, Brownie e Tiramisu no escopo selecionado.</p></div></div>
+      <div className="projection-zone-heading"><span>04</span><div><small>FORNERIA</small><h2>Exposição cadastral da Forneria</h2><p>Cannoli, Crostini, Palha Italiana, Brownie e Tiramisu no escopo selecionado.</p></div></div>
       <div className="network-kpis">
-        <Kpi label="Forneria pode faturar" value={brl(forneriaBreakdown.totals.activeSum)} icon="bakery" accent={C.green} accentBg={C.greenL} sub="soma dos preços dos itens ativos" />
-        <Kpi label="Forneria pode estar perdendo" value={brl(forneriaBreakdown.totals.pausedSum)} icon="bakery" accent={C.red} accentBg={C.redL} sub="soma dos preços dos itens pausados" />
+        <Kpi label="Produtos distintos da Forneria" value={forneriaBreakdown.totals.items.size} icon="bakery" accent={C.purple} accentBg={C.purpleL} />
+        <Kpi label="Ocorrências ativas" value={forneriaBreakdown.totals.active} icon="check" accent={C.green} accentBg={C.greenL} />
+        <Kpi label="Ocorrências pausadas" value={forneriaBreakdown.totals.paused} icon="pause" accent={C.red} accentBg={C.redL} />
+        <Kpi label="Taxa de pausa da Forneria" value={`${forneriaBreakdown.totals.pauseRate}%`} icon="alert" accent={forneriaBreakdown.totals.pauseRate >= 20 ? C.red : C.amber} accentBg={forneriaBreakdown.totals.pauseRate >= 20 ? C.redL : C.amberL} sub="pausas ÷ observações" />
+        <Kpi label="Preço médio ativo" value={brl(forneriaBreakdown.totals.averageActive)} icon="item" accent={C.green} accentBg={C.greenL} sub={`${forneriaBreakdown.totals.pricedActive} observações com preço`} />
+        <Kpi label="Preço médio pausado" value={brl(forneriaBreakdown.totals.averagePaused)} icon="item" accent={C.orange} accentBg={C.orangeL} sub={`${forneriaBreakdown.totals.pricedPaused} observações com preço`} />
+        <Kpi label="Ocorrências sem preço" value={forneriaBreakdown.totals.missingPrice} icon="alert" accent={C.amber} accentBg={C.amberL} sub="revisar cadastro" />
+        <Kpi label="Soma ativa observada" value={brl(forneriaBreakdown.totals.activeSum)} icon="bakery" accent={C.green} accentBg={C.greenL} sub="não representa faturamento realizado" />
+        <Kpi label="Soma pausada observada" value={brl(forneriaBreakdown.totals.pausedSum)} icon="bakery" accent={C.red} accentBg={C.redL} sub="não representa venda perdida" />
       </div>
       <div className="category-potential-table">
-        <div className="category-potential-row category-potential-head"><span>Produto</span><span>Ativos</span><span>Pode faturar</span><span>Pausados</span><span>Pode perder</span></div>
+        <div className="category-potential-row category-potential-head"><span>Produto</span><span>Ativos</span><span>Soma ativa</span><span>Pausados</span><span>Soma pausada</span></div>
         {forneriaBreakdown.byFamily.map((entry) => (
           <div key={entry.key} className="category-potential-row">
             <span className="category-potential-name">{entry.label}</span>

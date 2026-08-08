@@ -13,7 +13,7 @@ const normalize = (value) => String(value || '')
   .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
   .toLocaleLowerCase('pt-BR');
 
-export function ItemsOverviewPage({ rows, onSetDraft }) {
+export function ItemsOverviewPage({ rows, onSetDraft, onSavePrice }) {
   const [query, setQuery] = useState('');
   const [storeQuery, setStoreQuery] = useState('');
   const [storeOpen, setStoreOpen] = useState(false);
@@ -46,6 +46,7 @@ export function ItemsOverviewPage({ rows, onSetDraft }) {
         paused: 0,
         risk: 0,
         pricedCount: 0,
+        priceSum: 0,
         manual: false,
         stores: new Set(),
         pausedStores: new Set(),
@@ -60,6 +61,7 @@ export function ItemsOverviewPage({ rows, onSetDraft }) {
       }
       if (Number(row.precoNum) > 0) {
         item.pricedCount += 1;
+        item.priceSum += Number(row.precoNum);
         if (row.status === 'Pausado') item.risk += Number(row.precoNum);
         if (row.precoManual) item.manual = true;
       }
@@ -70,8 +72,7 @@ export function ItemsOverviewPage({ rows, onSetDraft }) {
 
   // Qualquer item sem preço em nenhuma ocorrência — ativo ou pausado, tanto
   // faz — entra aqui pra poder receber um valor local (não salvo).
-  const unpricedItems = useMemo(() => items
-    .filter((item) => item.pricedCount === 0 || item.manual)
+  const editableItems = useMemo(() => [...items]
     .sort((a, b) => (b.active + b.paused) - (a.active + a.paused)), [items]);
 
   const visible = useMemo(() => {
@@ -178,10 +179,10 @@ export function ItemsOverviewPage({ rows, onSetDraft }) {
         )}
       </Card>
       <DailyItemsMatrix rows={scopedRows} title={storeQuery ? `Evolução diária · ${storeQuery}` : 'Evolução diária dos itens da rede'} />
-      {onSetDraft && unpricedItems.length > 0 && (
+      {onSetDraft && editableItems.length > 0 && (
         <Card className="unpriced-items-card">
           <div className="paused-card-heading">
-            <div><span className="eyebrow">SEM PREÇO CADASTRADO</span><h2>Itens sem preço (ativos ou pausados)</h2></div>
+            <div><span className="eyebrow">AJUSTE DE PREÇOS</span><h2>Corrigir preço dos itens</h2></div>
           </div>
           <div className="draft-price-toolbar">
             <label className="draft-price-toggle">
@@ -190,14 +191,14 @@ export function ItemsOverviewPage({ rows, onSetDraft }) {
             </label>
           </div>
           <p className="draft-price-note">
-            Valor digitado aqui é local (não é salvo) e atualiza os cards e KPIs desta e de outras páginas enquanto a sessão estiver aberta. Desmarcado, o valor vale só para as unidades onde este item aparece.
+            Digite o valor correto e clique em Salvar. O ajuste tem prioridade sobre a planilha e permanece após novos uploads.
           </p>
           <div className="unpriced-items-list">
-            {unpricedItems.slice(0, 20).map((item) => (
+            {editableItems.map((item) => (
               <article key={item.name} className="unpriced-item-row">
                 <span><strong>{item.name}</strong><small>{item.category || 'Sem categoria'} · {item.stores.size} unidade(s)</small></span>
                 <span><b>{item.active}× ativo</b><small>{item.paused}× pausado</small></span>
-                <DraftPriceField itemName={item.name} stores={item.stores} isAdmin networkWide={applyNetworkWide} onChange={onSetDraft} compact />
+                <DraftPriceField itemName={item.name} category={item.category} stores={item.stores} isAdmin networkWide={applyNetworkWide} onChange={onSetDraft} onSave={onSavePrice} currentPrice={item.pricedCount ? item.priceSum / item.pricedCount : 0} compact />
               </article>
             ))}
           </div>
