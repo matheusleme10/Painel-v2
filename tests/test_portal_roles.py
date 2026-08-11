@@ -1,8 +1,34 @@
 from fastapi.testclient import TestClient
+import asyncio
+import gzip
 import hashlib
+import json
 
 import backend.main as main_module
 from backend.main import LOGIN_ATTEMPTS, app, filter_payload_for_store, redact_paused_revenue
+
+
+def test_local_payload_cache_reuses_data_and_invalidates_when_file_changes(monkeypatch, tmp_path):
+    current_data = tmp_path / "current.json.gz"
+
+    def save(version):
+        with gzip.open(current_data, "wt", encoding="utf-8") as output:
+            json.dump({"rows": [{"version": version}]}, output)
+
+    save(1)
+    monkeypatch.setattr(main_module, "BLOB_TOKEN", "")
+    monkeypatch.setattr(main_module, "CURRENT_DATA", current_data)
+    monkeypatch.setattr(main_module, "_CURRENT_PAYLOAD_CACHE", None)
+    monkeypatch.setattr(main_module, "_CURRENT_PAYLOAD_LOCAL_MTIME_NS", None)
+
+    first = asyncio.run(main_module.read_current_payload())
+    second = asyncio.run(main_module.read_current_payload())
+    assert second is first
+
+    save(2)
+    changed = asyncio.run(main_module.read_current_payload())
+    assert changed is not first
+    assert changed["rows"][0]["version"] == 2
 
 
 def test_franchise_payload_keeps_active_prices_and_redacts_paused_prices():
@@ -46,6 +72,7 @@ def test_franchise_payload_keeps_active_prices_and_redacts_paused_prices():
     assert safe["rows"][0]["catalogCube"]["records"][0][6] == 30
     assert safe["rows"][0]["catalogCube"]["records"][1][6] == 0
     assert payload["rows"][0]["precoNum"] == 25
+    assert payload["rows"][0]["catalogCube"]["records"][1][6] == 40
 
 
 def test_store_scoped_payload_keeps_paused_prices_and_removes_other_units():

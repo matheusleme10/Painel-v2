@@ -63,6 +63,10 @@ def _resolve_blob_token() -> tuple[str, str]:
 
 
 BLOB_TOKEN, BLOB_TOKEN_SOURCE = _resolve_blob_token()
+CURRENT_PAYLOAD_CACHE_TTL_SECONDS = 60
+_CURRENT_PAYLOAD_CACHE: dict | None = None
+_CURRENT_PAYLOAD_CACHE_AT = 0.0
+_CURRENT_PAYLOAD_LOCAL_MTIME_NS: int | None = None
 
 
 class CloudStorageError(RuntimeError):
@@ -510,9 +514,15 @@ def redact_paused_revenue(payload: dict) -> dict:
             safe["productHistory"] = [redact_row(entry) for entry in safe["productHistory"]]
         cube = safe.get("catalogCube")
         if isinstance(cube, dict) and isinstance(cube.get("records"), list):
+            safe_cube = dict(cube)
+            safe_records = []
             for record in cube["records"]:
-                if isinstance(record, list) and len(record) >= 7 and record[5] == 1:
-                    record[6] = 0
+                safe_record = list(record) if isinstance(record, list) else record
+                if isinstance(safe_record, list) and len(safe_record) >= 7 and safe_record[5] == 1:
+                    safe_record[6] = 0
+                safe_records.append(safe_record)
+            safe_cube["records"] = safe_records
+            safe["catalogCube"] = safe_cube
         return safe
 
     safe_payload = dict(payload)
@@ -595,6 +605,16 @@ def filter_payload_for_store(payload: dict, selected_store: str) -> dict:
 
 
 async def read_current_payload() -> dict | None:
+    global _CURRENT_PAYLOAD_CACHE, _CURRENT_PAYLOAD_CACHE_AT, _CURRENT_PAYLOAD_LOCAL_MTIME_NS
+    now = time.monotonic()
+    if BLOB_TOKEN and _CURRENT_PAYLOAD_CACHE is not None:
+        if now - _CURRENT_PAYLOAD_CACHE_AT < CURRENT_PAYLOAD_CACHE_TTL_SECONDS:
+            return _CURRENT_PAYLOAD_CACHE
+    elif not BLOB_TOKEN and not _is_vercel_runtime() and CURRENT_DATA.is_file():
+        current_mtime_ns = CURRENT_DATA.stat().st_mtime_ns
+        if _CURRENT_PAYLOAD_CACHE is not None and current_mtime_ns == _CURRENT_PAYLOAD_LOCAL_MTIME_NS:
+            return _CURRENT_PAYLOAD_CACHE
+
     if BLOB_TOKEN:
         from vercel.blob import AsyncBlobClient, BlobNotFoundError
 
@@ -611,7 +631,11 @@ async def read_current_payload() -> dict | None:
             raise CloudStorageError(
                 "Não foi possível ler a base no Vercel Blob. Confira se o Blob está conectado ao projeto e faça um redeploy."
             ) from error
-        return json.loads(gzip.decompress(compressed).decode("utf-8"))
+        payload = json.loads(gzip.decompress(compressed).decode("utf-8"))
+        _CURRENT_PAYLOAD_CACHE = payload
+        _CURRENT_PAYLOAD_CACHE_AT = now
+        _CURRENT_PAYLOAD_LOCAL_MTIME_NS = None
+        return payload
 
     if _is_vercel_runtime():
         return None
@@ -619,10 +643,15 @@ async def read_current_payload() -> dict | None:
     if not CURRENT_DATA.is_file():
         return None
     with gzip.open(CURRENT_DATA, "rt", encoding="utf-8") as source:
-        return json.load(source)
+        payload = json.load(source)
+    _CURRENT_PAYLOAD_CACHE = payload
+    _CURRENT_PAYLOAD_CACHE_AT = now
+    _CURRENT_PAYLOAD_LOCAL_MTIME_NS = CURRENT_DATA.stat().st_mtime_ns
+    return payload
 
 
 async def write_current_payload(payload: dict) -> None:
+    global _CURRENT_PAYLOAD_CACHE, _CURRENT_PAYLOAD_CACHE_AT, _CURRENT_PAYLOAD_LOCAL_MTIME_NS
     compressed = gzip.compress(
         json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8"),
         compresslevel=9,
@@ -645,6 +674,9 @@ async def write_current_payload(payload: dict) -> None:
             raise CloudStorageError(
                 "O Vercel Blob recusou a gravação. Reconecte o Blob ao projeto e faça um redeploy sem cache."
             ) from error
+        _CURRENT_PAYLOAD_CACHE = payload
+        _CURRENT_PAYLOAD_CACHE_AT = time.monotonic()
+        _CURRENT_PAYLOAD_LOCAL_MTIME_NS = None
         return
 
     if _is_vercel_runtime():
@@ -656,6 +688,9 @@ async def write_current_payload(payload: dict) -> None:
     temporary = DATA_DIR / "current.next.json.gz"
     temporary.write_bytes(compressed)
     temporary.replace(CURRENT_DATA)
+    _CURRENT_PAYLOAD_CACHE = payload
+    _CURRENT_PAYLOAD_CACHE_AT = time.monotonic()
+    _CURRENT_PAYLOAD_LOCAL_MTIME_NS = CURRENT_DATA.stat().st_mtime_ns
 
 
 def _default_notification_settings() -> dict:
