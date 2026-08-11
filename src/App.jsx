@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { Splash } from './components/layout/Splash.jsx';
 import { PortalHeader } from './components/layout/PortalHeader.jsx';
 import { AnalysisFilters } from './components/ui/AnalysisFilters.jsx';
@@ -9,17 +9,14 @@ import { ItemsOverviewPage } from './pages/ItemsOverviewPage.jsx';
 import { CatPage } from './pages/CatPage.jsx';
 import { RankPage } from './pages/RankPage.jsx';
 import { NetworkPage } from './pages/NetworkPage.jsx';
-import { AutomatedNotificationPage } from './pages/AutomatedNotificationPage.jsx';
 import { PotentialPageV2 } from './pages/PotentialPageV2.jsx';
 import { FranchiseCatalogPage } from './pages/FranchiseCatalogPage.jsx';
 import { ForneriaPage } from './pages/ForneriaPage.jsx';
-import { AdminPage } from './pages/AdminPage.jsx';
 import { loadDataRemote } from './utils/remote-storage.js';
 import { PortalLogin } from './components/PortalLogin.jsx';
 import { BrandSelector } from './components/BrandSelector.jsx';
 import { PotentialAccessGate } from './components/PotentialAccessGate.jsx';
 import { FranchiseIdentityGate } from './components/FranchiseIdentityGate.jsx';
-import { ManagementPage } from './pages/ManagementPage.jsx';
 import { FranchiseFeedbackPage } from './pages/FranchiseFeedbackPage.jsx';
 import { AlertsPage } from './pages/AlertsPage.jsx';
 import { FranchiseAlertsPage } from './pages/FranchiseAlertsPage.jsx';
@@ -29,6 +26,10 @@ import { isSameStore, resolveStoreSelection } from './utils/stores.js';
 import { applyPriceDrafts, emptyDrafts, withPriceDraft } from './utils/price-drafts.js';
 import { applyPriceOverrides, fetchPriceOverrides, overrideKey, savePriceOverride } from './utils/price-overrides.js';
 import { collapseShiftRows } from './utils/analytics.js';
+
+const AdminPage = lazy(() => import('./pages/AdminPage.jsx').then((module) => ({ default: module.AdminPage })));
+const AutomatedNotificationPage = lazy(() => import('./pages/AutomatedNotificationPage.jsx').then((module) => ({ default: module.AutomatedNotificationPage })));
+const ManagementPage = lazy(() => import('./pages/ManagementPage.jsx').then((module) => ({ default: module.ManagementPage })));
 
 function summarizeUnits(entries, effectiveTo, effectiveShift) {
   const range = new Map();
@@ -117,7 +118,7 @@ export function App() {
     fetchPriceOverrides().then(setPriceOverrides);
   }, [auth?.role, context?.store]);
 
-  const metadata = all.find((row) => row.networkSummary || row.catalogRows) || {};
+  const metadata = useMemo(() => all.find((row) => row.networkSummary || row.catalogRows) || {}, [all]);
   const unitHistory = metadata.unitHistory || [];
   const catalogHistory = metadata.catalogHistory?.length
     ? metadata.catalogHistory
@@ -166,41 +167,50 @@ export function App() {
     resolveStoreSelection(context?.store, franchiseStoreCandidates)
   ), [context?.store, franchiseStoreCandidates]);
   const scopeStore = isAdmin ? 'all' : (resolvedFranchiseStore || context?.store || 'all');
-  const matchesScope = (store) => (
+  const matchesScope = useCallback((store) => (
     (scopeBrand === 'all' || identifyBrand(store) === scopeBrand)
     && (scopeStore === 'all' || isSameStore(store, scopeStore))
-  );
+  ), [scopeBrand, scopeStore]);
   // 'Ambos' combina Almoço e Jantar em vez de filtrar por um turno só — útil
   // porque um item pode pausar em turnos diferentes (ou no mesmo) e cada
   // pausa é uma perda de receita separada; olhando só um turno por vez isso
   // fica subestimado.
-  const matchesShift = (shift) => effectiveShift === 'Ambos' || !shift || shift === effectiveShift;
-  const unitEntries = unitHistory.filter((entry) => (
+  const matchesShift = useCallback(
+    (shift) => effectiveShift === 'Ambos' || !shift || shift === effectiveShift,
+    [effectiveShift],
+  );
+  const unitEntries = useMemo(() => unitHistory.filter((entry) => (
     entry.date >= effectiveFrom
     && entry.date <= effectiveTo
     && matchesShift(entry.shift)
     && matchesScope(entry.label)
-  ));
-  const networkRows = summarizeUnits(unitEntries, effectiveTo, effectiveShift);
-  const rankingEntries = unitHistory.filter((entry) => (
+  )), [unitHistory, effectiveFrom, effectiveTo, matchesShift, matchesScope]);
+  const networkRows = useMemo(
+    () => summarizeUnits(unitEntries, effectiveTo, effectiveShift),
+    [unitEntries, effectiveTo, effectiveShift],
+  );
+  const rankingEntries = useMemo(() => unitHistory.filter((entry) => (
     entry.date >= effectiveFrom
     && entry.date <= effectiveTo
     && matchesShift(entry.shift)
     && (scopeBrand === 'all' || identifyBrand(entry.label) === scopeBrand)
-  ));
-  const rankingRows = summarizeUnits(rankingEntries, effectiveTo, effectiveShift);
-  const scopedSnapshot = networkRows.reduce((summary, row) => ({
+  )), [unitHistory, effectiveFrom, effectiveTo, matchesShift, scopeBrand]);
+  const rankingRows = useMemo(
+    () => summarizeUnits(rankingEntries, effectiveTo, effectiveShift),
+    [rankingEntries, effectiveTo, effectiveShift],
+  );
+  const scopedSnapshot = useMemo(() => networkRows.reduce((summary, row) => ({
     activeItems: summary.activeItems + row.unitActive,
     pausedItems: summary.pausedItems + row.unitPaused,
     totalItems: summary.totalItems + row.unitTotal,
     shift: effectiveShift,
     updatedAt: `${effectiveFrom}${effectiveFrom !== effectiveTo ? ` a ${effectiveTo}` : ''}`,
-  }), { activeItems: 0, pausedItems: 0, totalItems: 0 });
-  const networkHistoryEntries = (metadata.networkHistory || []).filter((entry) => (
+  }), { activeItems: 0, pausedItems: 0, totalItems: 0 }), [networkRows, effectiveShift, effectiveFrom, effectiveTo]);
+  const networkHistoryEntries = useMemo(() => (metadata.networkHistory || []).filter((entry) => (
     entry.date >= effectiveFrom
     && entry.date <= effectiveTo
     && matchesShift(entry.shift)
-  ));
+  )), [metadata.networkHistory, effectiveFrom, effectiveTo, matchesShift]);
   const networkSnapshot = scopeBrand === 'all' && scopeStore === 'all' && networkHistoryEntries.length
     ? networkHistoryEntries.reduce((summary, entry) => ({
       activeItems: summary.activeItems + entry.activeItems,
@@ -217,33 +227,41 @@ export function App() {
     brand: scopeBrand,
     store: scopeStore,
   }), [metadata.catalogCube, effectiveFrom, effectiveTo, effectiveShift, scopeBrand, scopeStore]);
-  const snapshotDates = metadata.catalogCube?.dates?.length
+  const snapshotDates = useMemo(() => metadata.catalogCube?.dates?.length
     ? [...metadata.catalogCube.dates].sort()
-    : [...new Set(catalogHistory.map((row) => row.dia).filter(Boolean))].sort();
-  const exactSnapshotDates = snapshotDates.filter((date) => date >= effectiveFrom && date <= effectiveTo);
-  const detailReferenceDate = metadata.catalogCube?.records?.length || exactSnapshotDates.length
-    ? null
-    : [...snapshotDates].sort((a, b) => Math.abs(new Date(a) - new Date(effectiveTo)) - Math.abs(new Date(b) - new Date(effectiveTo)))[0];
-  const detailDates = exactSnapshotDates.length ? new Set(exactSnapshotDates) : new Set(detailReferenceDate ? [detailReferenceDate] : []);
-  const fallbackDetailRows = catalogHistory.filter((row) => (
+    : [...new Set(catalogHistory.map((row) => row.dia).filter(Boolean))].sort(), [metadata.catalogCube?.dates, catalogHistory]);
+  const exactSnapshotDates = useMemo(
+    () => snapshotDates.filter((date) => date >= effectiveFrom && date <= effectiveTo),
+    [snapshotDates, effectiveFrom, effectiveTo],
+  );
+  const detailReferenceDate = useMemo(() => (
+    metadata.catalogCube?.records?.length || exactSnapshotDates.length
+      ? null
+      : [...snapshotDates].sort((a, b) => Math.abs(new Date(a) - new Date(effectiveTo)) - Math.abs(new Date(b) - new Date(effectiveTo)))[0]
+  ), [metadata.catalogCube?.records, exactSnapshotDates, snapshotDates, effectiveTo]);
+  const detailDates = useMemo(
+    () => exactSnapshotDates.length ? new Set(exactSnapshotDates) : new Set(detailReferenceDate ? [detailReferenceDate] : []),
+    [exactSnapshotDates, detailReferenceDate],
+  );
+  const fallbackDetailRows = useMemo(() => catalogHistory.filter((row) => (
     detailDates.has(row.dia)
     && matchesShift(row.shift || metadata.dataShift)
     && matchesScope(row.loja)
-  )).map((row) => detailReferenceDate ? { ...row, snapshotReference: true } : row);
+  )).map((row) => detailReferenceDate ? { ...row, snapshotReference: true } : row), [catalogHistory, detailDates, matchesShift, matchesScope, metadata.dataShift, detailReferenceDate]);
   const detailRows = metadata.catalogCube?.records?.length ? cubeRows : fallbackDetailRows;
-  const productRows = productHistory.filter((row) => (
+  const productRows = useMemo(() => productHistory.filter((row) => (
     row.dia >= effectiveFrom
     && row.dia <= effectiveTo
     && matchesShift(row.shift)
     && (scopeBrand === 'all' || row.brandId === scopeBrand || identifyBrand(row.loja) === scopeBrand)
-  ));
-  const forneriaSummaries = (metadata.forneriaSummaryHistory || []).filter((entry) => (
+  )), [productHistory, effectiveFrom, effectiveTo, matchesShift, scopeBrand]);
+  const forneriaSummaries = useMemo(() => (metadata.forneriaSummaryHistory || []).filter((entry) => (
     entry.date >= effectiveFrom
     && entry.date <= effectiveTo
     && entry.shift === effectiveShift
     && (scopeBrand === 'all' || entry.brandId === scopeBrand)
-  ));
-  const brandStores = [...new Set(unitHistory.map((entry) => entry.label).filter(Boolean))];
+  )), [metadata.forneriaSummaryHistory, effectiveFrom, effectiveTo, effectiveShift, scopeBrand]);
+  const brandStores = useMemo(() => [...new Set(unitHistory.map((entry) => entry.label).filter(Boolean))], [unitHistory]);
   const isLatestSingle = effectiveFrom === lastDate && effectiveTo === lastDate;
   const pageRows = networkRows;
   // Com "Ambos" selecionado, um item pode aparecer 1x por turno no mesmo
@@ -345,6 +363,7 @@ export function App() {
           </div>
         )}
 
+        <Suspense fallback={<main className="app-main"><div className="loading-state">Carregando...</div></main>}>
         <main className="app-main">
           {tab === 'network' && isAdmin && <NetworkPage all={networkRows} financialRows={exactSnapshotDates.length ? draftedDetailRows : draftedProductRows} summary={networkSnapshot} />}
           {tab === 'dash' && !isAdmin && (
@@ -379,6 +398,7 @@ export function App() {
               onClear={() => setAll([])} />
           )}
         </main>
+        </Suspense>
       </div>
     </div>
   );
