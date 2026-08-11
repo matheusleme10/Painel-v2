@@ -6,6 +6,9 @@ dist
 *.log
 npm-debug.log*
 vite.config.js.timestamp-*
+Manuais/*.inspect.ndjson
+Manuais/ppt_manuals_tmp/*_montage.png
+Manuais/ppt_manuals_tmp/Manual_*/
 __pycache__/
 *.py[cod]
 .pytest_cache/
