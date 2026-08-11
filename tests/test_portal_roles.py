@@ -332,6 +332,65 @@ def test_notification_status_requires_admin_and_never_exposes_provider_tokens(mo
         assert "senha-que-nao-pode-sair" not in serialized
 
 
+def test_notification_message_uses_payload_shift_date_and_safe_access_instruction(monkeypatch):
+    monkeypatch.setenv("DASHBOARD_PUBLIC_URL", "https://italinhouse-ip.vercel.app/")
+    context = main_module._notification_context({
+        "rows": [{
+            "networkHistory": [{"date": "2026-08-11"}],
+            "dataShift": "Jantar",
+        }],
+    })
+
+    assert context["subject"] == "Dashboard atualizado – Jantar – 11/08/2026"
+    assert context["message"] == (
+        "Boa noite! O Dashboard de Itens Pausados foi atualizado com os dados de Jantar, dia 11/08/2026.\n\n"
+        "Acesse o portal: https://italinhouse-ip.vercel.app\n"
+        "Senha: utilize a senha de acesso já informada pela rede.\n\n"
+        "Aqui você consegue consultar itens ativos, pausados, o ranking da rede e outras métricas."
+    )
+
+
+def test_smtp_sends_recipient_batches_without_exposing_one_batch_to_another(monkeypatch):
+    sent_messages = []
+
+    class FakeSMTP:
+        def __init__(self, host, port, timeout):
+            assert (host, port, timeout) == ("smtp.example.com", 465, 20)
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            return False
+
+        def login(self, username, password):
+            assert (username, password) == ("sender@example.com", "secret")
+
+        def send_message(self, message):
+            sent_messages.append(message)
+
+    monkeypatch.setenv("SMTP_HOST", "smtp.example.com")
+    monkeypatch.setenv("SMTP_PORT", "465")
+    monkeypatch.setenv("SMTP_SECURITY", "ssl")
+    monkeypatch.setenv("SMTP_BATCH_SIZE", "2")
+    monkeypatch.setenv("SMTP_USER", "sender@example.com")
+    monkeypatch.setenv("SMTP_PASSWORD", "secret")
+    monkeypatch.setattr(main_module.smtplib, "SMTP_SSL", FakeSMTP)
+
+    count = main_module._send_emails(
+        "Assunto",
+        "Mensagem",
+        ["one@example.com", "two@example.com", "three@example.com"],
+        "sender@example.com",
+        "Ital in House",
+    )
+
+    assert count == 3
+    assert len(sent_messages) == 2
+    assert sent_messages[0]["Bcc"] == "one@example.com, two@example.com"
+    assert sent_messages[1]["Bcc"] == "three@example.com"
+
+
 def test_admin_can_persist_notification_toggle_and_many_recipients(monkeypatch, tmp_path):
     LOGIN_ATTEMPTS.clear()
     admin_password = "admin-settings-test"

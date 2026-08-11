@@ -909,20 +909,18 @@ def _notification_context(payload: dict) -> dict[str, str]:
     ]
     date = max((str(value)[:10] for value in dates if value), default=datetime.now().date().isoformat())
     now = datetime.now(ZoneInfo("America/Sao_Paulo"))
-    shift = "Almoço" if now.hour < 17 else "Jantar"
+    payload_shift = metadata.get("dataShift")
+    shift = payload_shift if payload_shift in {"Almoço", "Jantar"} else ("Almoço" if now.hour < 17 else "Jantar")
     greeting = "Boa tarde" if shift == "Almoço" else "Boa noite"
     formatted_date = datetime.fromisoformat(date).strftime("%d/%m/%Y")
-    dashboard_url = os.getenv("DASHBOARD_PUBLIC_URL", "").strip()
+    dashboard_url = os.getenv("DASHBOARD_PUBLIC_URL", "https://italinhouse-ip.vercel.app").strip().rstrip("/")
     default_message = (
         f"{greeting}! O Dashboard de Itens Pausados foi atualizado com os dados de "
-        f"{shift}, {formatted_date}."
+        f"{shift}, dia {formatted_date}."
+        f"\n\nAcesse o portal: {dashboard_url}"
+        "\nSenha: utilize a senha de acesso já informada pela rede."
+        "\n\nAqui você consegue consultar itens ativos, pausados, o ranking da rede e outras métricas."
     )
-    default_message += _build_critical_summary(rows, date)
-    default_message += (
-        "\n\nAcesse o portal para consultar itens ativos, pausados e o ranking da rede."
-    )
-    if dashboard_url:
-        default_message += f"\n\n{dashboard_url}"
     return {
         "date": date,
         "formattedDate": formatted_date,
@@ -944,12 +942,6 @@ def _send_emails(subject: str, body: str, recipients: list[str], sender_email: s
         )
     if not sender_email:
         raise RuntimeError("Informe o e-mail remetente na página Avisos.")
-    message = EmailMessage()
-    message["Subject"] = subject
-    message["From"] = f"{sender_name} <{sender_email}>" if sender_name else sender_email
-    message["To"] = sender_email
-    message["Bcc"] = ", ".join(recipients)
-    message.set_content(body)
     host = os.environ["SMTP_HOST"].strip()
     username = os.environ["SMTP_USER"].strip()
     password = os.environ["SMTP_PASSWORD"].strip()
@@ -957,6 +949,25 @@ def _send_emails(subject: str, body: str, recipients: list[str], sender_email: s
         password = password.replace(" ", "")
     port = int(os.getenv("SMTP_PORT", "465"))
     security = os.getenv("SMTP_SECURITY", "ssl" if port == 465 else "starttls").strip().lower()
+    if security not in {"ssl", "starttls"}:
+        raise RuntimeError("SMTP_SECURITY deve ser ssl ou starttls.")
+    try:
+        batch_size = max(1, min(100, int(os.getenv("SMTP_BATCH_SIZE", "50"))))
+    except ValueError as error:
+        raise RuntimeError("SMTP_BATCH_SIZE deve ser um número entre 1 e 100.") from error
+
+    def send_batches(smtp) -> None:
+        for start in range(0, len(recipients), batch_size):
+            batch = recipients[start:start + batch_size]
+            message = EmailMessage()
+            message["Subject"] = subject
+            message["From"] = f"{sender_name} <{sender_email}>" if sender_name else sender_email
+            message["To"] = sender_email
+            message["Bcc"] = ", ".join(batch)
+            message["Reply-To"] = sender_email
+            message.set_content(body)
+            smtp.send_message(message)
+
     try:
         if security == "starttls":
             with smtplib.SMTP(host, port, timeout=20) as smtp:
@@ -964,11 +975,11 @@ def _send_emails(subject: str, body: str, recipients: list[str], sender_email: s
                 smtp.starttls()
                 smtp.ehlo()
                 smtp.login(username, password)
-                smtp.send_message(message)
+                send_batches(smtp)
         else:
             with smtplib.SMTP_SSL(host, port, timeout=20) as smtp:
                 smtp.login(username, password)
-                smtp.send_message(message)
+                send_batches(smtp)
     except smtplib.SMTPAuthenticationError as error:
         provider_hint = (
             " Para Gmail, use o e-mail completo em SMTP_USER e uma Senha de app de 16 caracteres; "

@@ -117,6 +117,7 @@ DASHBOARD_PUBLIC_URL=https://seu-dashboard.vercel.app
 SMTP_HOST=
 SMTP_PORT=465
 SMTP_SECURITY=ssl
+SMTP_BATCH_SIZE=50
 SMTP_USER=
 SMTP_PASSWORD=
 SMTP_FROM=
@@ -132,6 +133,11 @@ administradores. A senha SMTP e os tokens continuam somente nas variáveis da Ve
 O nome e o e-mail remetente também são configurados nessa página. Normalmente o
 remetente precisa ser o mesmo endereço autenticado em `SMTP_USER`, ou um endereço
 previamente autorizado pelo seu provedor de e-mail.
+
+Os destinatários são enviados em lotes BCC de até `SMTP_BATCH_SIZE` (50 por padrão),
+evitando expor a lista e reduzindo o risco de rejeição por excesso de destinatários.
+Nunca coloque a senha compartilhada do portal no código ou na mensagem automática;
+o aviso orienta o usuário a utilizar a senha já fornecida pela rede.
 
 Use **Enviar e-mail de teste** antes de ligar a automação. Se o painel indicar
 `SMTP pendente`, preencher apenas o remetente não enviará mensagens: ainda será
