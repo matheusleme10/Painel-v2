@@ -48,14 +48,18 @@ export function DailyItemsMatrix({ rows, title = 'Histórico diário dos itens' 
         return prices.length ? prices.reduce((sum, price) => sum + price, 0) / prices.length : 0;
       });
       const changedDates = new Set();
+      const priceDirection = new Map();
       let previousPrice = 0;
       pricesAsc.forEach((price, index) => {
-        if (price > 0 && previousPrice > 0 && Math.abs(price - previousPrice) >= 0.005) changedDates.add(datesAsc[index]);
+        if (price > 0 && previousPrice > 0 && Math.abs(price - previousPrice) >= 0.005) {
+          changedDates.add(datesAsc[index]);
+          priceDirection.set(datesAsc[index], price > previousPrice ? 'up' : 'down');
+        }
         if (price > 0) previousPrice = price;
       });
       const firstPrice = pricesAsc.find((price) => price > 0) || 0;
       const lastPrice = [...pricesAsc].reverse().find((price) => price > 0) || 0;
-      return { ...item, currentStreak, pausedDays, changedDates, firstPrice, lastPrice };
+      return { ...item, currentStreak, pausedDays, changedDates, priceDirection, firstPrice, lastPrice };
     }).sort((a, b) => b.currentStreak - a.currentStreak || b.pausedDays - a.pausedDays || a.name.localeCompare(b.name, 'pt-BR'));
 
     return { dates: [...datesAsc].reverse(), items: enriched, isSingleStore: stores.size <= 1 };
@@ -139,10 +143,18 @@ export function DailyItemsMatrix({ rows, title = 'Histórico diário dos itens' 
                   const paused = cell?.paused || 0;
                   const status = !cell ? '—' : paused > 0 ? (isSingleStore ? 'P' : `P ${paused}/${cell.total}`) : 'A';
                   const changed = item.changedDates.has(date);
-                  const cellClass = `${paused ? 'matrix-paused' : cell ? 'matrix-active' : 'matrix-empty'}${changed ? ' matrix-price-changed' : ''}`;
+                  const direction = item.priceDirection.get(date);
+                  const cellClass = paused ? 'matrix-paused' : cell ? 'matrix-active' : 'matrix-empty';
                   return <td key={date} className={cellClass}>
                     <strong>{status}</strong>
-                    <small className={changed ? 'price-changed' : ''}>{price > 0 ? brl(price) : 'sem preço'}</small>
+                    <small className={changed ? 'price-changed' : ''}>
+                      {price > 0 ? brl(price) : 'sem preço'}
+                      {changed && direction && (
+                        <span className={direction === 'up' ? 'price-arrow price-arrow-up' : 'price-arrow price-arrow-down'}>
+                          {direction === 'up' ? '▲' : '▼'}
+                        </span>
+                      )}
+                    </small>
                   </td>;
                 })}
               </tr>
