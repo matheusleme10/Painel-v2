@@ -9,10 +9,12 @@ export function AutomatedNotificationPage() {
   const [recipients, setRecipients] = useState('');
   const [senderEmail, setSenderEmail] = useState('');
   const [senderName, setSenderName] = useState('Ital in House');
+  const [messageTemplate, setMessageTemplate] = useState('');
   const [testRecipient, setTestRecipient] = useState('');
   const [sending, setSending] = useState(false);
   const [testing, setTesting] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [savingTemplate, setSavingTemplate] = useState(false);
   const [feedback, setFeedback] = useState('');
 
   function recipientList(value = recipients) {
@@ -35,6 +37,7 @@ export function AutomatedNotificationPage() {
     setRecipients((current) => current || (next.emailRecipients || []).join('\n'));
     setSenderEmail((current) => current || next.senderEmail || '');
     setSenderName((current) => current || next.senderName || 'Ital in House');
+    setMessageTemplate((current) => current || next.messageTemplate || '');
     setTestRecipient((current) => current || next.emailRecipients?.[0] || '');
   }
 
@@ -55,6 +58,7 @@ export function AutomatedNotificationPage() {
           emailRecipients: recipientList(),
           senderEmail,
           senderName,
+          messageTemplate,
         }),
       });
       const result = await response.json().catch(() => ({}));
@@ -70,6 +74,40 @@ export function AutomatedNotificationPage() {
       return false;
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function saveTemplate() {
+    setSavingTemplate(true);
+    setFeedback('');
+    try {
+      const response = await fetch('/api/notifications/settings', {
+        method: 'PUT',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          autoEnabled: Boolean(status?.autoEnabled),
+          emailRecipients: recipientList(),
+          senderEmail,
+          senderName,
+          messageTemplate,
+        }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.detail || 'Falha ao salvar o modelo.');
+      setStatus((current) => ({ ...current, ...result }));
+      setFeedback('Modelo salvo. Os próximos avisos já usam esse texto (só data e turno mudam sozinhos).');
+      const statusResponse = await fetch('/api/notifications/status', { credentials: 'same-origin', cache: 'no-store' });
+      if (statusResponse.ok) {
+        const next = await statusResponse.json();
+        setStatus(next);
+        setMessage(next.preview?.message || '');
+        setSubject(next.preview?.subject || '');
+      }
+    } catch (error) {
+      setFeedback(error.message);
+    } finally {
+      setSavingTemplate(false);
     }
   }
 
@@ -219,6 +257,34 @@ export function AutomatedNotificationPage() {
             {testing ? 'Enviando teste…' : 'Enviar e-mail de teste'}
           </button>
         </div>
+      </Card>
+
+      <Card>
+        <div className="notification-recipients-header">
+          <div>
+            <strong>Modelo padrão da mensagem</strong>
+            <p>
+              Escreva o texto do jeito que quer enviar sempre e use os códigos abaixo onde a informação deve
+              trocar sozinha a cada envio. Salvando aqui, os próximos avisos já nascem prontos com esse texto —
+              só data e turno mudam automaticamente.
+            </p>
+          </div>
+        </div>
+        <p className="draft-price-note" style={{ marginTop: 0 }}>
+          <code>{'{saudacao}'}</code> Boa tarde/Boa noite · <code>{'{turno}'}</code> Almoço/Jantar ·{' '}
+          <code>{'{data}'}</code> data da base · <code>{'{link}'}</code> link do portal ·{' '}
+          <code>{'{senha}'}</code> senha do portal
+        </p>
+        <label className="notification-field">Modelo salvo
+          <textarea
+            value={messageTemplate}
+            onChange={(event) => setMessageTemplate(event.target.value)}
+            placeholder={'{saudacao}! O Dashboard de Itens Pausados foi atualizado com os dados de {turno}, dia {data}.\n\nAcesse o portal: {link}\nSenha: {senha}\n\nAqui você consegue consultar itens ativos, pausados, o ranking da rede e outras métricas.'}
+          />
+        </label>
+        <button type="button" className="secondary-action" disabled={savingTemplate} onClick={saveTemplate}>
+          {savingTemplate ? 'Salvando…' : 'Salvar modelo padrão'}
+        </button>
       </Card>
 
       <Card>

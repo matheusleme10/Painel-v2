@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { brl, formatDateBR } from '../../utils/format.js';
 
 const normalize = (value) => String(value || '')
@@ -10,10 +10,12 @@ const keyOf = (row) => `${normalize(row.item)}::${normalize(row.categoria)}`;
 export function DailyItemsMatrix({ rows, title = 'Histórico diário dos itens' }) {
   const [query, setQuery] = useState('');
   const [onlyLongPauses, setOnlyLongPauses] = useState(false);
+  const [rangeFrom, setRangeFrom] = useState('');
+  const [rangeTo, setRangeTo] = useState('');
   const [sortCol, setSortCol] = useState('streak');
   const [sortDir, setSortDir] = useState('desc');
 
-  const { dates, items, isSingleStore } = useMemo(() => {
+  const { dates, datesAsc, items, isSingleStore } = useMemo(() => {
     const datesAsc = [...new Set(rows.map((row) => row.dia).filter(Boolean))].sort();
     const stores = new Set(rows.map((row) => row.loja).filter(Boolean));
     const map = new Map();
@@ -62,21 +64,46 @@ export function DailyItemsMatrix({ rows, title = 'Histórico diário dos itens' 
       return { ...item, currentStreak, pausedDays, changedDates, priceDirection, firstPrice, lastPrice };
     }).sort((a, b) => b.currentStreak - a.currentStreak || b.pausedDays - a.pausedDays || a.name.localeCompare(b.name, 'pt-BR'));
 
-    return { dates: [...datesAsc].reverse(), items: enriched, isSingleStore: stores.size <= 1 };
+    return { dates: [...datesAsc].reverse(), datesAsc, items: enriched, isSingleStore: stores.size <= 1 };
   }, [rows]);
 
+  const firstDate = datesAsc[0];
+  const lastDate = datesAsc.at(-1);
+
+  // Sempre que a base muda, volta a mostrar o período todo por padrão —
+  // sem isso, um "De/Até" salvo poderia apontar pra uma data que nem existe
+  // mais depois de um novo upload.
+  useEffect(() => {
+    setRangeFrom(firstDate || '');
+    setRangeTo(lastDate || '');
+  }, [firstDate, lastDate]);
+
+  function preset(from, to) {
+    setRangeFrom(from);
+    setRangeTo(to);
+  }
+
+  // A tabela pode ficar enorme com muitos dias; o filtro de período só recorta
+  // quais colunas de data aparecem (o histórico completo continua valendo
+  // para calcular streak de pausa, que é sempre sobre o período todo).
+  const visibleDates = useMemo(() => {
+    const from = rangeFrom || firstDate;
+    const to = rangeTo || lastDate;
+    return dates.filter((date) => (!from || date >= from) && (!to || date <= to));
+  }, [dates, rangeFrom, rangeTo, firstDate, lastDate]);
+
   const { avgActive, avgPaused } = useMemo(() => {
-    if (!dates.length || !items.length) return { avgActive: 0, avgPaused: 0 };
+    if (!visibleDates.length || !items.length) return { avgActive: 0, avgPaused: 0 };
     let totalActive = 0;
     let totalPaused = 0;
-    dates.forEach((date) => {
+    visibleDates.forEach((date) => {
       items.forEach((item) => {
         const cell = item.byDate.get(date);
         if (cell) { totalActive += cell.active; totalPaused += cell.paused; }
       });
     });
-    return { avgActive: totalActive / dates.length, avgPaused: totalPaused / dates.length };
-  }, [dates, items]);
+    return { avgActive: totalActive / visibleDates.length, avgPaused: totalPaused / visibleDates.length };
+  }, [visibleDates, items]);
 
   const visible = useMemo(() => {
     const term = normalize(query);
@@ -115,10 +142,31 @@ export function DailyItemsMatrix({ rows, title = 'Histórico diário dos itens' 
         </div>
       </div>
 
-      {dates.length > 1 && <div className="daily-matrix-stats">
+      {datesAsc.length > 1 && (
+        <div className="daily-matrix-date-filter">
+          <div className="date-presets">
+            <button type="button" onClick={() => preset(lastDate, lastDate)}>Último dia</button>
+            {datesAsc.length > 2 && <button type="button" onClick={() => preset(datesAsc[Math.max(0, datesAsc.length - 2)], lastDate)}>Últimos 2 dias</button>}
+            {datesAsc.length > 7 && <button type="button" onClick={() => preset(datesAsc[Math.max(0, datesAsc.length - 7)], lastDate)}>Últimos 7 dias</button>}
+            <button type="button" onClick={() => preset(firstDate, lastDate)}>Todos os dias</button>
+          </div>
+          <label>De
+            <select value={rangeFrom || firstDate} onChange={(event) => setRangeFrom(event.target.value)}>
+              {datesAsc.map((date) => <option key={date} value={date}>{formatDateBR(date)}</option>)}
+            </select>
+          </label>
+          <label>Até
+            <select value={rangeTo || lastDate} onChange={(event) => setRangeTo(event.target.value)}>
+              {datesAsc.map((date) => <option key={date} value={date}>{formatDateBR(date)}</option>)}
+            </select>
+          </label>
+        </div>
+      )}
+
+      {visibleDates.length > 1 && <div className="daily-matrix-stats">
         <div className="is-active"><small>Média de itens ativos por dia</small><strong>{Math.round(avgActive)}</strong></div>
         <div className="is-paused"><small>Média de itens pausados por dia</small><strong>{Math.round(avgPaused)}</strong></div>
-        <div><small>Período analisado</small><strong>{dates.length} dia(s)</strong></div>
+        <div><small>Período exibido</small><strong>{visibleDates.length} de {dates.length} dia(s)</strong></div>
       </div>}
 
       <div className="daily-matrix-wrap">
@@ -126,7 +174,7 @@ export function DailyItemsMatrix({ rows, title = 'Histórico diário dos itens' 
           <thead><tr>
             <th><button className="matrix-sort" type="button" onClick={() => toggleSort('product')}>Produto <span>{sortMark('product')}</span></button></th>
             <th><button className="matrix-sort" type="button" onClick={() => toggleSort('streak')}>Dias com pausa <span>{sortMark('streak')}</span></button></th>
-            {dates.map((date) => <th key={date}><button className="matrix-sort" type="button" onClick={() => toggleSort(date)}>{formatDateBR(date)} <span>{sortMark(date)}</span></button></th>)}
+            {visibleDates.map((date) => <th key={date}><button className="matrix-sort" type="button" onClick={() => toggleSort(date)}>{formatDateBR(date)} <span>{sortMark(date)}</span></button></th>)}
           </tr></thead>
           <tbody>
             {visible.map((item) => (
@@ -136,7 +184,7 @@ export function DailyItemsMatrix({ rows, title = 'Histórico diário dos itens' 
                   <b className={item.currentStreak >= 2 ? 'pause-streak is-long' : 'pause-streak'}>{item.currentStreak} consecutivo(s)</b>
                   <small>{item.pausedDays} no período</small>
                 </td>
-                {dates.map((date) => {
+                {visibleDates.map((date) => {
                   const cell = item.byDate.get(date);
                   const prices = cell?.prices || [];
                   const price = prices.length ? prices.reduce((sum, value) => sum + value, 0) / prices.length : 0;

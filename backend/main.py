@@ -165,6 +165,7 @@ class NotificationSettingsRequest(BaseModel):
     emailRecipients: list[str] = Field(default_factory=list)
     senderEmail: str = ""
     senderName: str = "Ital in House"
+    messageTemplate: str = ""
 
 
 class NotificationTestRequest(BaseModel):
@@ -704,6 +705,7 @@ def _default_notification_settings() -> dict:
         "emailRecipients": list(dict.fromkeys(recipients)),
         "senderEmail": os.getenv("SMTP_FROM", "").strip().lower(),
         "senderName": "Ital in House",
+        "messageTemplate": "",
     }
 
 
@@ -848,7 +850,7 @@ async def write_price_overrides(overrides: dict) -> None:
     temporary.replace(PRICE_OVERRIDES_PATH)
 
 
-def _notification_context(payload: dict) -> dict[str, str]:
+def _notification_context(payload: dict, settings: dict | None = None) -> dict[str, str]:
     rows = payload.get("rows") or []
     metadata = next((row for row in rows if row.get("networkHistory") or row.get("networkSummary")), {})
     dates = [
@@ -862,22 +864,37 @@ def _notification_context(payload: dict) -> dict[str, str]:
     formatted_date = datetime.fromisoformat(date).strftime("%d/%m/%Y")
     dashboard_url = os.getenv("DASHBOARD_PUBLIC_URL", "").strip()
     portal_password = os.getenv("DASHBOARD_PORTAL_PASSWORD", "").strip()
-    default_message = (
-        f"{greeting}! O Dashboard de Itens Pausados foi atualizado com os dados de "
-        f"{shift}, dia {formatted_date}."
-    )
-    default_message += f"\n\nAcesse o portal: {dashboard_url}" if dashboard_url else "\n\nAcesse o portal."
-    if portal_password:
-        default_message += f"\nSenha: {portal_password}"
-    default_message += (
-        "\n\nAqui você consegue consultar itens ativos, pausados, o ranking da rede e outras métricas."
-    )
+
+    # Se o admin salvou um modelo próprio (ver /api/notifications/settings),
+    # só trocamos os pedaços automáticos ({saudacao}/{turno}/{data}/{link}/{senha})
+    # e mantemos o resto do texto exatamente como ele escreveu.
+    template = ((settings or {}).get("messageTemplate") or "").strip()
+    if template:
+        message = (
+            template
+            .replace("{saudacao}", greeting)
+            .replace("{turno}", shift)
+            .replace("{data}", formatted_date)
+            .replace("{link}", dashboard_url)
+            .replace("{senha}", portal_password)
+        )
+    else:
+        message = (
+            f"{greeting}! O Dashboard de Itens Pausados foi atualizado com os dados de "
+            f"{shift}, dia {formatted_date}."
+        )
+        message += f"\n\nAcesse o portal: {dashboard_url}" if dashboard_url else "\n\nAcesse o portal."
+        if portal_password:
+            message += f"\nSenha: {portal_password}"
+        message += (
+            "\n\nAqui você consegue consultar itens ativos, pausados, o ranking da rede e outras métricas."
+        )
     return {
         "date": date,
         "formattedDate": formatted_date,
         "shift": shift,
         "greeting": greeting,
-        "message": default_message,
+        "message": message,
         "subject": f"Dashboard atualizado – {shift} – {formatted_date}",
     }
 
@@ -954,8 +971,8 @@ async def _send_whatsapp(body: str) -> int:
 
 
 async def send_notifications(payload: dict, message: str | None = None, subject: str | None = None) -> dict:
-    context = _notification_context(payload)
     settings = await read_notification_settings()
+    context = _notification_context(payload, settings)
     body = (message or context["message"]).strip()
     title = (subject or context["subject"]).strip()
     email_count, whatsapp_count = await asyncio.gather(
@@ -1374,9 +1391,10 @@ async def notification_status(request: Request) -> dict:
         "emailRecipients": settings["emailRecipients"],
         "senderEmail": settings["senderEmail"],
         "senderName": settings["senderName"],
+        "messageTemplate": settings["messageTemplate"],
         "smtpConfigured": all(os.getenv(key, "").strip() for key in ["SMTP_HOST", "SMTP_USER", "SMTP_PASSWORD"]),
         "whatsappConfigured": bool(os.getenv("WHATSAPP_TO", "").strip()),
-        "preview": _notification_context(payload),
+        "preview": _notification_context(payload, settings),
     }
 
 
@@ -1398,11 +1416,15 @@ async def notification_settings(action: NotificationSettingsRequest, request: Re
     if sender_email and not EMAIL_PATTERN.fullmatch(sender_email):
         raise HTTPException(status_code=400, detail="E-mail remetente inválido.")
     sender_name = action.senderName.strip()[:80] or "Ital in House"
+    message_template = action.messageTemplate.strip()
+    if len(message_template) > 4000:
+        raise HTTPException(status_code=400, detail="Modelo de mensagem muito longo (máx. 4.000 caracteres).")
     settings = {
         "autoEnabled": action.autoEnabled,
         "emailRecipients": recipients,
         "senderEmail": sender_email,
         "senderName": sender_name,
+        "messageTemplate": message_template,
     }
     await write_notification_settings(settings)
     return {

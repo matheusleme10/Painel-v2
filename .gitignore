@@ -1,6 +1,6 @@
 node_modules
-.vscode/
 dist
+.vscode/
 .env
 .env.local
 .DS_Store

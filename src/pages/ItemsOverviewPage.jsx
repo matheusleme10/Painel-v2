@@ -22,6 +22,10 @@ export function ItemsOverviewPage({ rows, onSetDraft, onSavePrice }) {
   const [sortDir, setSortDir] = useState('desc');
   const [page, setPage] = useState(0);
   const [applyNetworkWide, setApplyNetworkWide] = useState(false);
+  const [priceQuery, setPriceQuery] = useState('');
+  const [priceCategory, setPriceCategory] = useState('all');
+  const [priceOddOnly, setPriceOddOnly] = useState(false);
+  const [pricePage, setPricePage] = useState(0);
 
   const stores = useMemo(() => [...new Set(rows.map((row) => row.loja).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'pt-BR')), [rows]);
   const scopedRows = useMemo(() => {
@@ -47,6 +51,8 @@ export function ItemsOverviewPage({ rows, onSetDraft, onSavePrice }) {
         risk: 0,
         pricedCount: 0,
         priceSum: 0,
+        minPrice: 0,
+        maxPrice: 0,
         manual: false,
         stores: new Set(),
         pausedStores: new Set(),
@@ -60,9 +66,12 @@ export function ItemsOverviewPage({ rows, onSetDraft, onSavePrice }) {
         item.pausedStores.add(row.loja);
       }
       if (Number(row.precoNum) > 0) {
+        const price = Number(row.precoNum);
         item.pricedCount += 1;
-        item.priceSum += Number(row.precoNum);
-        if (row.status === 'Pausado') item.risk += Number(row.precoNum);
+        item.priceSum += price;
+        item.minPrice = item.minPrice ? Math.min(item.minPrice, price) : price;
+        item.maxPrice = Math.max(item.maxPrice, price);
+        if (row.status === 'Pausado') item.risk += price;
         if (row.precoManual) item.manual = true;
       }
       map.set(key, item);
@@ -74,6 +83,34 @@ export function ItemsOverviewPage({ rows, onSetDraft, onSavePrice }) {
   // faz — entra aqui pra poder receber um valor local (não salvo).
   const editableItems = useMemo(() => [...items]
     .sort((a, b) => (b.active + b.paused) - (a.active + a.paused)), [items]);
+
+  // "Preço esquisito" = mesmo item com preços bem diferentes entre unidades
+  // (provável erro de cadastro) — ajuda a achar rápido sem precisar olhar
+  // linha por linha numa lista com centenas de produtos.
+  const isOddPrice = (item) => item.pricedCount > 0 && item.minPrice > 0 && item.maxPrice / item.minPrice >= 1.15;
+
+  const priceCategories = useMemo(() => (
+    [...new Set(editableItems.map((item) => item.category || 'Sem categoria'))].sort((a, b) => a.localeCompare(b, 'pt-BR'))
+  ), [editableItems]);
+
+  const filteredEditableItems = useMemo(() => {
+    const term = normalize(priceQuery);
+    return editableItems.filter((item) => {
+      const matchesText = !term || normalize(`${item.name} ${item.category || ''}`).includes(term);
+      const matchesCategory = priceCategory === 'all' || (item.category || 'Sem categoria') === priceCategory;
+      const matchesOdd = !priceOddOnly || isOddPrice(item);
+      return matchesText && matchesCategory && matchesOdd;
+    });
+  }, [editableItems, priceQuery, priceCategory, priceOddOnly]);
+
+  const pricePages = Math.max(1, Math.ceil(filteredEditableItems.length / PAGE_SIZE));
+  const currentPricePage = Math.min(pricePage, pricePages - 1);
+  const paginatedEditableItems = filteredEditableItems.slice(currentPricePage * PAGE_SIZE, currentPricePage * PAGE_SIZE + PAGE_SIZE);
+
+  function changePriceFilter(action) {
+    action();
+    setPricePage(0);
+  }
 
   const visible = useMemo(() => {
     const term = normalize(query);
@@ -193,15 +230,43 @@ export function ItemsOverviewPage({ rows, onSetDraft, onSavePrice }) {
           <p className="draft-price-note">
             Digite o valor correto e clique em Salvar. O ajuste tem prioridade sobre a planilha e permanece após novos uploads.
           </p>
+          <div className="items-toolbar price-adjust-toolbar">
+            <input
+              type="search"
+              value={priceQuery}
+              placeholder="Pesquisar produto ou categoria..."
+              onChange={(event) => changePriceFilter(() => setPriceQuery(event.target.value))}
+            />
+            <select value={priceCategory} onChange={(event) => changePriceFilter(() => setPriceCategory(event.target.value))} aria-label="Filtrar por categoria">
+              <option value="all">Todas as categorias</option>
+              {priceCategories.map((category) => <option key={category} value={category}>{category}</option>)}
+            </select>
+            <label className="draft-price-toggle">
+              <input type="checkbox" checked={priceOddOnly} onChange={(event) => changePriceFilter(() => setPriceOddOnly(event.target.checked))} />
+              Só preços que variam entre lojas
+            </label>
+          </div>
           <div className="unpriced-items-list">
-            {editableItems.map((item) => (
+            {paginatedEditableItems.map((item) => (
               <article key={item.name} className="unpriced-item-row">
-                <span><strong>{item.name}</strong><small>{item.category || 'Sem categoria'} · {item.stores.size} unidade(s)</small></span>
+                <span>
+                  <strong>{item.name}</strong>
+                  <small>{item.category || 'Sem categoria'} · {item.stores.size} unidade(s)</small>
+                  {isOddPrice(item) && <em className="price-odd-badge">Varia de {brl(item.minPrice)} a {brl(item.maxPrice)} entre lojas</em>}
+                </span>
                 <span><b>{item.active}× ativo</b><small>{item.paused}× pausado</small></span>
                 <DraftPriceField itemName={item.name} category={item.category} stores={item.stores} isAdmin networkWide={applyNetworkWide} onChange={onSetDraft} onSave={onSavePrice} currentPrice={item.pricedCount ? item.priceSum / item.pricedCount : 0} compact />
               </article>
             ))}
+            {!paginatedEditableItems.length && <div className="empty-state">Nenhum item encontrado neste filtro.</div>}
           </div>
+          {pricePages > 1 && (
+            <div className="forneria-pagination">
+              <button disabled={currentPricePage === 0} onClick={() => setPricePage((value) => value - 1)}>Anterior</button>
+              <span>{currentPricePage + 1} de {pricePages}</span>
+              <button disabled={currentPricePage + 1 >= pricePages} onClick={() => setPricePage((value) => value + 1)}>Próxima</button>
+            </div>
+          )}
         </Card>
       )}
     </section>
