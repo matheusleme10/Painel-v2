@@ -329,13 +329,41 @@
 .draft-price-note code{padding:1px 5px;border-radius:5px;background:#eef0f4;color:#1d2939;font-size:10px;font-weight:700}
 .paused-item-manual>b{color:#0f9d68}.paused-item-manual>small{color:#0f9d68}
 .status-price-editor{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
-.unpriced-items-card{margin-top:4px}.unpriced-items-list{display:flex;flex-direction:column;gap:7px;margin-top:8px}
+/* Ajuste de Preços: card único (admin + franqueado), colunas de largura fixa
+   para não desalinhar quando faltar preço/situação em algumas linhas. */
+.price-adjust-card{margin-top:4px}
+.price-status-summary{display:flex;align-items:baseline;gap:8px}
+.price-status-summary b{font-size:15px;font-weight:900}
+.price-status-summary b.is-active{color:#047857}
+.price-status-summary b.is-paused{color:#be123c}
+.price-status-summary small{color:#98a2b3;font-size:10.5px;font-weight:700}
+.price-status-chips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 14px}
+.price-status-chips button{padding:7px 11px;border:1px solid #e4e8f0;border-radius:9px;color:#475467;background:#f8fafc;font:inherit;font-size:10px;font-weight:800;cursor:pointer;white-space:nowrap}
+.price-status-chips button.active{color:#fff;background:#101828;border-color:#101828}
 .price-adjust-toolbar{margin:4px 0 14px}
-.price-odd-badge{display:block;margin-top:4px;padding:2px 7px;border-radius:6px;color:#9a3412;background:#fff7ed;font-size:9px;font-weight:800;font-style:normal;width:fit-content}
-.unpriced-item-row{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:12px;padding:9px 12px;border-radius:10px;background:#f8fafc;border:1px solid #eef1f6}
-.unpriced-item-row strong{font-size:12.5px;color:#1c2433}.unpriced-item-row small{display:block;font-size:10.5px;color:#98a2b3;margin-top:2px}
-.unpriced-item-row b{font-size:12px;color:#c8102e}.unpriced-item-row>span:nth-child(2){text-align:right}.unpriced-item-row>span:nth-child(2) small{margin-top:0}
-@media(max-width:600px){.unpriced-item-row{grid-template-columns:1fr;justify-items:start}.unpriced-item-row>span:nth-child(2){text-align:left}}
+.price-adjust-table-wrap{overflow:auto;max-height:650px}
+.price-adjust-table{width:100%;min-width:760px;border-collapse:collapse;table-layout:fixed}
+.price-adjust-table th,.price-adjust-table td{padding:11px 12px;border-bottom:1px solid #eef1f5;text-align:left;font-size:11px;vertical-align:middle;overflow:hidden}
+.price-adjust-table th{position:sticky;top:0;z-index:3;color:#667085;background:#f7f8fb;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.05em}
+.price-adjust-table th:nth-child(1),.price-adjust-table td:nth-child(1){width:26%}
+.price-adjust-table th:nth-child(2),.price-adjust-table td:nth-child(2){width:16%}
+.price-adjust-table th:nth-child(3),.price-adjust-table td:nth-child(3){width:16%}
+.price-adjust-table th:nth-child(4),.price-adjust-table td:nth-child(4){width:14%}
+.price-adjust-table th:nth-child(5),.price-adjust-table td:nth-child(5){width:14%}
+.price-adjust-table th:nth-child(6),.price-adjust-table td:nth-child(6){width:16%}
+.price-adjust-name{overflow:hidden;color:#1d2939;font-weight:700;text-overflow:ellipsis;white-space:nowrap}
+.price-adjust-status{display:flex;flex-wrap:wrap;gap:4px}
+.price-adjust-status em{display:inline-flex;align-items:center;padding:3px 8px;border-radius:999px;font-size:9px;font-weight:800;font-style:normal;white-space:nowrap}
+.badge-active{color:#047857;background:#ecfdf5}
+.badge-paused{color:#be123c;background:#fff1f2}
+.price-adjust-price{white-space:nowrap}
+.price-adjust-odd-hint{display:block;margin-top:2px;color:#98a2b3;font-size:9px;font-weight:600}
+.badge-missing,.badge-suspicious,.badge-ok{display:inline-flex;padding:4px 9px;border-radius:999px;font-size:9px;font-weight:800;font-style:normal;white-space:nowrap}
+.badge-missing{color:#667085;background:#f1f2f5}
+.badge-suspicious{color:#9a3412;background:#fff7ed}
+.badge-ok{color:#047857;background:#ecfdf5}
+.price-adjust-action{white-space:nowrap}
+@media(max-width:900px){.price-adjust-table{min-width:680px}}
 .category-potential-table{display:grid;gap:4px;margin-top:4px}.category-potential-row{display:grid;grid-template-columns:minmax(140px,1.6fr) minmax(50px,.6fr) minmax(90px,.9fr) minmax(50px,.6fr) minmax(90px,.9fr);align-items:center;gap:10px;padding:10px 13px;border:1px solid #eef0f4;border-radius:10px;background:#fafbfc;font-size:11px}.category-potential-head{border:0;background:transparent;color:#98a2b3;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;padding:0 13px}.category-potential-name{overflow:hidden;color:#101828;font-weight:700;text-overflow:ellipsis;white-space:nowrap}.category-potential-row .is-gain{color:#047857;font-weight:800}.category-potential-row .is-loss{color:#be123c;font-weight:800}
 @media(max-width:760px){.category-potential-row{grid-template-columns:1.4fr .8fr .8fr}.category-potential-row>span:nth-child(2),.category-potential-row>span:nth-child(4){display:none}.category-potential-head>span:nth-child(2),.category-potential-head>span:nth-child(4){display:none}}
 .items-store-filter{display:flex;min-width:min(100%,360px);align-items:center;gap:7px}.items-store-filter input{min-width:220px;flex:1}.items-store-filter button{padding:9px 10px;border:1px solid #fecdd3;border-radius:9px;color:#be123c;background:#fff1f2;font:inherit;font-size:9px;font-weight:800;white-space:nowrap;cursor:pointer}
@@ -564,11 +592,20 @@
 [data-theme="dark"] .draft-price-note{background:var(--ih-surface-2);border-color:var(--ih-border);color:var(--ih-muted)}
 [data-theme="dark"] .draft-price-note code{background:var(--ih-surface);color:var(--ih-text)}
 [data-theme="dark"] .paused-item-manual>b,[data-theme="dark"] .paused-item-manual>small{color:var(--ih-green,#34d399)}
-[data-theme="dark"] .price-odd-badge{background:rgba(251,191,36,.14);color:var(--ih-amber)}
-[data-theme="dark"] .unpriced-item-row{background:var(--ih-surface-2);border-color:var(--ih-border)}
-[data-theme="dark"] .unpriced-item-row strong{color:var(--ih-text)}
-[data-theme="dark"] .unpriced-item-row small{color:var(--ih-muted)}
-[data-theme="dark"] .unpriced-item-row b{color:var(--ih-red,#fb4570)}
+[data-theme="dark"] .price-status-summary b.is-active{color:var(--ih-green)}
+[data-theme="dark"] .price-status-summary b.is-paused{color:var(--ih-red)}
+[data-theme="dark"] .price-status-summary small{color:var(--ih-muted)}
+[data-theme="dark"] .price-status-chips button{background:var(--ih-surface-2);border-color:var(--ih-border);color:var(--ih-muted)}
+[data-theme="dark"] .price-status-chips button.active{background:var(--ih-red);border-color:var(--ih-red);color:#fff}
+[data-theme="dark"] .price-adjust-table th{background:var(--ih-surface-2);color:var(--ih-muted)}
+[data-theme="dark"] .price-adjust-table td{border-color:var(--ih-border)}
+[data-theme="dark"] .price-adjust-name{color:var(--ih-text)}
+[data-theme="dark"] .badge-active{color:var(--ih-green);background:var(--ih-greenL)}
+[data-theme="dark"] .badge-paused{color:var(--ih-red);background:var(--ih-redL)}
+[data-theme="dark"] .badge-missing{color:var(--ih-muted);background:var(--ih-surface-2)}
+[data-theme="dark"] .badge-suspicious{color:var(--ih-amber);background:rgba(251,191,36,.14)}
+[data-theme="dark"] .badge-ok{color:var(--ih-green);background:var(--ih-greenL)}
+[data-theme="dark"] .price-adjust-odd-hint{color:var(--ih-muted)}
 [data-theme="dark"] .category-potential-row{background:var(--ih-surface-2);border-color:var(--ih-border)}
 [data-theme="dark"] .category-potential-head{color:var(--ih-muted)}
 [data-theme="dark"] .category-potential-name{color:var(--ih-text)}
@@ -587,3 +624,11 @@
 .daily-matrix th{font-size:10.5px}
 .daily-matrix th:first-child{font-size:11px}
 .projection-zone-heading small,.paused-card-heading>b{font-size:10px}
+
+/* Aviso de nova versão (após falha ao carregar um chunk lazy do build antigo). */
+.version-update-banner{max-width:420px;margin:60px auto;padding:26px 24px;border:1px solid #fde68a;border-radius:18px;text-align:center;color:#78350f;background:linear-gradient(120deg,#fffbeb,#fff7ed);box-shadow:0 14px 36px rgba(146,64,14,.08)}
+.version-update-banner strong{display:block;margin-bottom:8px;font-size:15px}
+.version-update-banner p{margin:0 0 16px;color:#92400e;font-size:12px;line-height:1.55}
+.version-update-banner button{padding:10px 16px;border:0;border-radius:10px;color:#fff;background:#b45309;font:inherit;font-size:12px;font-weight:800;cursor:pointer}
+[data-theme="dark"] .version-update-banner{border-color:rgba(251,191,36,.35);color:var(--ih-amber);background:rgba(251,191,36,.1)}
+[data-theme="dark"] .version-update-banner p{color:var(--ih-amber)}

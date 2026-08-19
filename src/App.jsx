@@ -1,6 +1,7 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { Splash } from './components/layout/Splash.jsx';
 import { PortalHeader } from './components/layout/PortalHeader.jsx';
+import { ChunkErrorBoundary } from './components/layout/ChunkErrorBoundary.jsx';
 import { AnalysisFilters } from './components/ui/AnalysisFilters.jsx';
 import { BrandScopeBar } from './components/ui/BrandScopeBar.jsx';
 import { DashPage } from './pages/DashPage.jsx';
@@ -363,6 +364,7 @@ export function App() {
           </div>
         )}
 
+        <ChunkErrorBoundary>
         <Suspense fallback={<main className="app-main"><div className="loading-state">Carregando...</div></main>}>
         <main className="app-main">
           {tab === 'network' && isAdmin && <NetworkPage all={networkRows} financialRows={exactSnapshotDates.length ? draftedDetailRows : draftedProductRows} summary={networkSnapshot} />}
@@ -399,6 +401,7 @@ export function App() {
           )}
         </main>
         </Suspense>
+        </ChunkErrorBoundary>
       </div>
     </div>
   );
