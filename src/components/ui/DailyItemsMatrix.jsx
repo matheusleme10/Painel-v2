@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { Fragment, useMemo, useState } from 'react';
 import { brl, formatDateBR } from '../../utils/format.js';
 
 const normalize = (value) => String(value || '')
@@ -13,6 +13,7 @@ export function DailyItemsMatrix({ rows, title = 'Histórico diário dos itens' 
   const [onlyLongPauses, setOnlyLongPauses] = useState(false);
   const [sortCol, setSortCol] = useState('streak');
   const [sortDir, setSortDir] = useState('desc');
+  const [collapsed, setCollapsed] = useState(() => new Set());
 
   // Esta tabela nunca filtra o período por conta própria — sempre mostra
   // todos os dias que vierem em `rows`. Quem decide o período é o filtro
@@ -101,6 +102,38 @@ export function DailyItemsMatrix({ rows, title = 'Histórico diário dos itens' 
     });
   }, [items, category, onlyLongPauses, query, sortCol, sortDir]);
 
+  // Agrupa os itens já filtrados/ordenados por categoria — cada categoria vira
+  // uma linha de cabeçalho que pode ser expandida ou recolhida, mantendo a
+  // ordenação escolhida (streak, produto ou data) dentro de cada grupo.
+  const grouped = useMemo(() => {
+    const buckets = new Map();
+    visible.forEach((item) => {
+      const cat = item.category || 'Sem categoria';
+      if (!buckets.has(cat)) buckets.set(cat, []);
+      buckets.get(cat).push(item);
+    });
+    return [...buckets.keys()]
+      .sort((a, b) => a.localeCompare(b, 'pt-BR'))
+      .map((cat) => [cat, buckets.get(cat)]);
+  }, [visible]);
+
+  function toggleCategory(cat) {
+    setCollapsed((current) => {
+      const next = new Set(current);
+      if (next.has(cat)) next.delete(cat);
+      else next.add(cat);
+      return next;
+    });
+  }
+
+  function expandAll() {
+    setCollapsed(new Set());
+  }
+
+  function collapseAll() {
+    setCollapsed(new Set(grouped.map(([cat]) => cat)));
+  }
+
   function toggleSort(column) {
     if (sortCol === column) setSortDir((current) => current === 'asc' ? 'desc' : 'asc');
     else { setSortCol(column); setSortDir(column === 'product' ? 'asc' : 'desc'); }
@@ -125,6 +158,10 @@ export function DailyItemsMatrix({ rows, title = 'Histórico diário dos itens' 
             {categories.map((option) => <option key={option} value={option}>{option}</option>)}
           </select>
           <label><input type="checkbox" checked={onlyLongPauses} onChange={(event) => setOnlyLongPauses(event.target.checked)} /> Pausado há 2+ dias</label>
+          <div className="matrix-group-actions">
+            <button type="button" onClick={expandAll}>Expandir tudo</button>
+            <button type="button" onClick={collapseAll}>Recolher tudo</button>
+          </div>
         </div>
       </div>
 
@@ -142,36 +179,52 @@ export function DailyItemsMatrix({ rows, title = 'Histórico diário dos itens' 
             {dates.map((date) => <th key={date}><button className="matrix-sort" type="button" onClick={() => toggleSort(date)}>{formatDateBR(date)} <span>{sortMark(date)}</span></button></th>)}
           </tr></thead>
           <tbody>
-            {visible.map((item) => (
-              <tr key={item.key}>
-                <td><strong>{item.name}</strong><small>{item.category}</small></td>
-                <td>
-                  <b className={item.currentStreak >= 2 ? 'pause-streak is-long' : 'pause-streak'}>{item.currentStreak} consecutivo(s)</b>
-                  <small>{item.pausedDays} no período</small>
-                </td>
-                {dates.map((date) => {
-                  const cell = item.byDate.get(date);
-                  const prices = cell?.prices || [];
-                  const price = prices.length ? prices.reduce((sum, value) => sum + value, 0) / prices.length : 0;
-                  const paused = cell?.paused || 0;
-                  const status = !cell ? '—' : paused > 0 ? (isSingleStore ? 'P' : `P ${paused}/${cell.total}`) : 'A';
-                  const changed = item.changedDates.has(date);
-                  const direction = item.priceDirection.get(date);
-                  const cellClass = paused ? 'matrix-paused' : cell ? 'matrix-active' : 'matrix-empty';
-                  return <td key={date} className={cellClass}>
-                    <strong>{status}</strong>
-                    <small className={changed ? 'price-changed' : ''}>
-                      {price > 0 ? brl(price) : 'sem preço'}
-                      {changed && direction && (
-                        <span className={direction === 'up' ? 'price-arrow price-arrow-up' : 'price-arrow price-arrow-down'}>
-                          {direction === 'up' ? '▲' : '▼'}
-                        </span>
-                      )}
-                    </small>
-                  </td>;
-                })}
-              </tr>
-            ))}
+            {grouped.map(([categoryName, categoryItems]) => {
+              const isCollapsed = collapsed.has(categoryName);
+              return (
+                <Fragment key={categoryName}>
+                  <tr className="matrix-category-row">
+                    <td colSpan={2 + dates.length}>
+                      <button type="button" className="matrix-category-toggle" onClick={() => toggleCategory(categoryName)}>
+                        <span className={isCollapsed ? 'matrix-caret is-collapsed' : 'matrix-caret'}>▾</span>
+                        {categoryName}
+                        <small>{categoryItems.length} item{categoryItems.length === 1 ? '' : 's'}</small>
+                      </button>
+                    </td>
+                  </tr>
+                  {!isCollapsed && categoryItems.map((item) => (
+                    <tr key={item.key}>
+                      <td><strong>{item.name}</strong><small>{item.category}</small></td>
+                      <td>
+                        <b className={item.currentStreak >= 2 ? 'pause-streak is-long' : 'pause-streak'}>{item.currentStreak} consecutivo(s)</b>
+                        <small>{item.pausedDays} no período</small>
+                      </td>
+                      {dates.map((date) => {
+                        const cell = item.byDate.get(date);
+                        const prices = cell?.prices || [];
+                        const price = prices.length ? prices.reduce((sum, value) => sum + value, 0) / prices.length : 0;
+                        const paused = cell?.paused || 0;
+                        const status = !cell ? '—' : paused > 0 ? (isSingleStore ? 'P' : `P ${paused}/${cell.total}`) : 'A';
+                        const changed = item.changedDates.has(date);
+                        const direction = item.priceDirection.get(date);
+                        const cellClass = paused ? 'matrix-paused' : cell ? 'matrix-active' : 'matrix-empty';
+                        return <td key={date} className={cellClass}>
+                          <strong>{status}</strong>
+                          <small className={changed ? 'price-changed' : ''}>
+                            {price > 0 ? brl(price) : 'sem preço'}
+                            {changed && direction && (
+                              <span className={direction === 'up' ? 'price-arrow price-arrow-up' : 'price-arrow price-arrow-down'}>
+                                {direction === 'up' ? '▲' : '▼'}
+                              </span>
+                            )}
+                          </small>
+                        </td>;
+                      })}
+                    </tr>
+                  ))}
+                </Fragment>
+              );
+            })}
           </tbody>
         </table>
         {!visible.length && <div className="empty-state">Nenhum item encontrado nesta análise.</div>}
