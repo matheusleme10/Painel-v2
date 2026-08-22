@@ -194,7 +194,7 @@ export function DailyItemsMatrix({ rows, title = 'Histórico diário dos itens' 
                   </tr>
                   {!isCollapsed && categoryItems.map((item) => (
                     <tr key={item.key}>
-                      <td><strong>{item.name}</strong><small>{item.category}</small></td>
+                      <td><strong>{item.name}</strong></td>
                       <td>
                         <b className={item.currentStreak >= 2 ? 'pause-streak is-long' : 'pause-streak'}>{item.currentStreak} consecutivo(s)</b>
                         <small>{item.pausedDays} no período</small>
